@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local-only Claude Code settings — not the whole .claude/ directory,
+# which also holds tracked project skills/config.
+.claude/settings.local.json
+
+# Scratch patch backups from in-progress work sessions, never project content.
+.patches/

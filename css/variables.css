@@ -1,0 +1,122 @@
+:root {
+  /* Colors — background */
+  --color-bg: #08080a;
+  --color-surface-1: #0e0e10;
+  --color-surface-2: #141416;
+  --color-surface-3: #111113;
+  --color-surface-glass-start: rgba(24, 26, 22, .66);
+  --color-surface-glass-end: rgba(12, 13, 12, .72);
+
+  /* Colors — text */
+  --color-text-primary: #f4f4f2;
+  --color-text-primary-strong: #f7f7f4;
+  --color-text-muted: #a3a39c;
+  --color-text-dim: #6f6f68;
+  --color-text-dim-2: #7a7a72;
+  --color-text-dim-3: #8a8a80;
+  --color-text-dim-4: #9a9a92;
+  --color-text-dim-5: #9c9c94;
+
+  /* Colors — accent */
+  --color-accent: #c8ff2e;
+  --color-accent-soft: rgba(200, 255, 46, .5);
+  --color-accent-on-accent: #0a0a0c;
+  --color-accent-border: rgba(200, 255, 46, .4);
+  --color-accent-border-strong: rgba(200, 255, 46, .5);
+
+  /* Colors — borders */
+  --color-border-faint: rgba(255, 255, 255, .06);
+  --color-border-subtle: rgba(255, 255, 255, .08);
+  --color-border-soft: rgba(255, 255, 255, .1);
+  --color-border-strong: rgba(255, 255, 255, .14);
+
+  /* Typography */
+  --font-display: 'Golos Text', sans-serif;
+  --font-body: 'Onest', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Fluid across the whole viewport range by formula rather than by
+     breakpoint override — both cap at their old fixed value from
+     ~800px width upward, so nothing changes at the authored desktop
+     size; only narrower viewports interpolate down. */
+  --fs-h1: clamp(30px, 4vw + 20px, 52px);
+  --fs-h2: clamp(24px, 3vw + 16px, 40px);
+  --fs-body: 17px;
+  --fs-body-sm: 16px;
+  --fs-eyebrow: 11px;
+  --fs-mono-label: 12px;
+
+  --lh-heading: 1.06;
+  --ls-heading: -.02em;
+
+  /* Radii */
+  --radius-hero: 22px;
+  --radius-card: 16px;
+  --radius-mockup: 12px;
+  --radius-chip: 9px;
+  --radius-sm: 5px;
+
+  /* Glow / bloom */
+  --glow-accent: rgba(200, 255, 46, .17);
+  --glow-accent-soft: rgba(200, 255, 46, .11);
+  --glow-muted: rgba(120, 150, 110, .12);
+  --glow-blur-lg: 48px;
+  --glow-blur-xl: 56px;
+
+  /* Layout — overridden per range in responsive.css; values here are
+     the standard/large desktop baseline (unchanged from pre-responsive). */
+  --container-max: 1360px;
+  --section-padding: 64px;
+  --header-height: 88px;
+
+  /* Safe-area insets (notch / home-indicator / rounded-corner devices).
+     0px fallback keeps every calc() using these valid on browsers
+     without env() support. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Shadows */
+  --shadow-deep: 0 40px 90px rgba(0, 0, 0, .6);
+  --shadow-elevated: 0 30px 60px rgba(0, 0, 0, .5);
+  --shadow-lifted: 0 10px 24px rgba(0, 0, 0, .4);
+
+  /* Z-index scale */
+  --z-bg: 0;
+  --z-halo: 1;
+  --z-main: 2;
+  --z-copy: 2;
+  --z-hint: 3;
+  --z-menu: 90;
+  --z-hamburger: 5;
+  --z-header: 100;
+  --z-modal: 300;
+
+  /* Motion — durations only (easing curves above stay as-is). Scoped to
+     components.css's shared, generic rules (hover states, panel
+     reveals) where the same duration already repeats verbatim. Section
+     files keep their own bespoke timings (Portfolio orbit speed, drag
+     physics, Journey scroll-progress, Hero scatter delay, Assembly
+     cascade stagger, Configurator/FAQ/Brief exit-swap timers) — those
+     are tuned choreography, not interchangeable "micro hover" values,
+     and are intentionally NOT retrofitted to these tokens. */
+  --motion-micro: .2s;   /* hover: color/background/border/transform on small controls */
+  --motion-base: .3s;    /* generic height/opacity transitions */
+  --motion-reveal: .5s;  /* menu/panel reveal-on-open fades */
+
+  /* Spacing — a small scale for generic, repeated gaps only. Checked
+     against components.css/base.css: real exact-value repetition here
+     is thin (most values occur 2-3x, not the dozens a full sitewide
+     scale would need), so this is applied narrowly rather than forced
+     across near-but-not-identical values. Never used for 3D scene
+     coordinates, orbit/track geometry, or other tuned positioning. */
+  --space-xs: 7px;
+  --space-sm: 11px;
+  --space-md: 16px;
+  --space-lg: 24px;
+
+  /* Motion */
+  --ease-rise: cubic-bezier(.2, .8, .2, 1);
+  --ease-pop: cubic-bezier(.34, 1.5, .5, 1);
+}

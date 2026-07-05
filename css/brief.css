@@ -1,0 +1,1292 @@
+/* Section shell — transparent, continues the global .site-bg canvas.
+   Normal document flow, same reasoning as configurator/faq: this is an
+   interactive terminal, not a scroll-driven scene. Padding trimmed
+   (vs a plain --section-padding multiple) specifically so the quiz
+   card + its nav stay reachable on ~700-950px browser heights. */
+.brief {
+  position: relative;
+  background: transparent;
+  font-family: var(--font-body);
+  padding: 36px 0 64px;
+}
+
+.brief__container {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--section-padding);
+}
+
+/* ===== HUD ===== */
+.brief__hud {
+  max-width: 680px;
+  margin-bottom: 22px;
+}
+
+.brief__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h2);
+  line-height: 1.12;
+  letter-spacing: var(--ls-heading);
+  margin: 16px 0 0;
+  color: var(--color-text-primary-strong);
+  text-wrap: balance;
+}
+
+.brief__title span {
+  color: var(--color-accent);
+}
+
+.brief__subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 12px 0 0;
+  max-width: 560px;
+}
+
+/* ===== Stage — quiz left, live mockup right. Columns size to their
+   own content independently (align-items: flex-start): the mock can
+   grow taller as more modules stack up without ever stretching the
+   compact quiz card (and its nav) away from the top of the section. */
+.brief__stage {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+}
+
+/* ===== Quiz ===== */
+.brief__quiz {
+  width: 440px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.brief__quiz-progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.brief__quiz-progress-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.brief__quiz-progress-track {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .08);
+  overflow: hidden;
+}
+
+.brief__quiz-progress-fill {
+  display: block;
+  height: 100%;
+  width: 14.3%;
+  border-radius: 2px;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px rgba(200, 255, 46, .7);
+  transition: width .4s var(--ease-rise);
+}
+
+/* Safe-centering: same fix as configurator/faq — auto margins center
+   shorter steps but can never push a tall one (6-7 options) out of the
+   safe area, at any content length. Floor trimmed from 380 to 300px —
+   options are now more compact too, so this is a real height save,
+   not just a smaller number with the same content overflowing it. */
+.brief__quiz-card {
+  position: relative;
+  min-height: 272px;
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, var(--color-surface-glass-start), var(--color-surface-glass-end));
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-elevated);
+}
+
+.brief__quiz-card > [data-brief-quiz-content] {
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+/* Staggered reveal for each step's own content */
+.brief-rise {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .32s var(--ease-rise), transform .32s var(--ease-rise), filter .32s var(--ease-rise);
+}
+
+.brief__quiz-card.is-in .brief-rise {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.brief-rise--1 { transition-delay: .02s; }
+.brief-rise--2 { transition-delay: .08s; }
+.brief-rise--3 { transition-delay: .14s; }
+
+.brief__quiz-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.brief__quiz-question {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.28;
+  color: var(--color-text-primary-strong);
+  margin: 0 0 16px;
+}
+
+.brief__quiz-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.brief-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .035);
+  border: 1px solid var(--color-border-soft);
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.28;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, color .2s ease, transform .2s var(--ease-rise), box-shadow .2s ease;
+}
+
+.brief-option:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-primary);
+  transform: translateY(-1px);
+}
+
+.brief-option:focus-visible {
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.brief-option__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong);
+  flex-shrink: 0;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+/* Multi-select uses a small square (checkbox language) instead of a
+   round radio dot, so the two step types read differently at a glance
+   before you even read the copy. */
+.brief-option--multi .brief-option__dot {
+  border-radius: 3px;
+}
+
+.brief-option.is-active {
+  color: var(--color-text-primary-strong);
+  border-color: var(--color-accent-border-strong);
+  background: linear-gradient(135deg, rgba(200, 255, 46, .1), rgba(200, 255, 46, .02));
+  box-shadow: 0 0 0 1px rgba(200, 255, 46, .08) inset, 0 0 16px rgba(200, 255, 46, .12);
+}
+
+.brief-option.is-active .brief-option__dot {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 7px rgba(200, 255, 46, .8);
+}
+
+/* ===== Contact step ===== */
+.brief__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.brief__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.brief__field-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--color-text-dim-3);
+}
+
+.brief__field-label span {
+  color: var(--color-text-dim-2);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Sizing only — surface/border/focus/invalid states come from the
+   shared .field-input in components.css. */
+.brief__input,
+.brief__textarea {
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.brief__textarea {
+  min-height: 46px;
+  resize: none;
+}
+
+.brief__field-error {
+  font-size: 10px;
+  margin-top: 1px;
+}
+
+/* ===== Nav ===== */
+.brief__quiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.brief__nav-btn {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: .02em;
+  padding: 10px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: opacity .2s ease, transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.brief__nav-btn--back {
+  color: var(--color-text-dim-3);
+  background: transparent;
+  border: 1px solid var(--color-border-soft);
+}
+
+.brief__nav-btn--back:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+
+.brief__nav-btn--back:disabled {
+  opacity: .35;
+  cursor: default;
+  pointer-events: none;
+}
+
+.brief__nav-btn--next {
+  flex: 1;
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  border: none;
+  box-shadow: 0 8px 20px rgba(200, 255, 46, .25);
+}
+
+.brief__nav-btn--next:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.brief__nav-btn--next:disabled {
+  opacity: .35;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+.brief__quiz-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 2px 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .02em;
+  color: var(--color-text-dim-3);
+  text-align: center;
+}
+
+.brief__quiz-hint.is-visible {
+  display: flex;
+}
+
+.brief__quiz-hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* ===== Success state (left side, replaces the quiz once submitted) ===== */
+.brief__success {
+  padding: 34px 30px;
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, rgba(20, 24, 18, .94), rgba(12, 13, 12, .96));
+  border: 1px solid var(--color-accent-border-strong);
+  box-shadow: 0 0 60px rgba(200, 255, 46, .22), var(--shadow-elevated);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
+}
+
+.brief__success.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.brief__success .status-pill {
+  margin-bottom: 16px;
+}
+
+.brief__success .check-dot {
+  width: 46px;
+  height: 46px;
+  font-size: 19px;
+  border-width: 2px;
+  margin-bottom: 16px;
+  animation: briefCheckPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes briefCheckPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 255, 46, 0); }
+  50% { box-shadow: 0 0 22px 4px rgba(200, 255, 46, .55); }
+}
+
+.brief__success-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--color-text-primary-strong);
+  margin: 0 0 10px;
+}
+
+.brief__success-text {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text-dim-5);
+  margin: 0 0 22px;
+  max-width: 340px;
+}
+
+.brief__success-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--color-text-dim-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 7px;
+  padding: 8px 14px;
+  margin-bottom: 22px;
+}
+
+.brief__success-id b {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--color-accent);
+}
+
+.brief__restart-btn {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: transparent;
+  border: 1px solid var(--color-accent-border);
+  border-radius: 7px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.brief__restart-btn:hover {
+  border-color: var(--color-accent-border-strong);
+  background: rgba(200, 255, 46, .06);
+}
+
+/* ===== Live mockup (right) ===== */
+.brief__mock {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-mockup);
+  overflow: hidden;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-elevated);
+}
+
+.brief__mock-status {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+/* .browser-bar above is position:absolute (zero flow height), so
+   without this margin the progress line renders at the mock's very
+   top edge (behind the toolbar) instead of right below it — and
+   .brief__mock-body, next in flow, inherits the same fix for free. */
+.brief__mock-progress {
+  position: relative;
+  height: 2px;
+  margin-top: 38px;
+  background: rgba(255, 255, 255, .07);
+  z-index: 2;
+}
+
+.brief__mock-progress-fill {
+  display: block;
+  height: 100%;
+  width: 14.3%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px rgba(200, 255, 46, .7);
+  transition: width .4s var(--ease-rise);
+}
+
+.brief__mock-scan {
+  top: 38px;
+}
+
+.brief__mock-scan.is-scanning {
+  animation: briefScan .65s ease-out;
+}
+
+@keyframes briefScan {
+  0% { top: 38px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.brief__mock-body {
+  position: relative;
+  min-height: 300px;
+  padding: 22px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.brief__mock-placeholder {
+  position: absolute;
+  inset: 60px 28px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .04em;
+  color: var(--color-text-dim-3);
+  opacity: 1;
+  transition: opacity .3s ease;
+}
+
+.brief__mock-placeholder.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.brief__mock-placeholder-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-strong);
+  flex-shrink: 0;
+}
+
+/* Modules — each created once (when its answer first appears) and
+   fades in independently; later edits to an earlier answer just swap
+   this element's content in place, no re-animation needed. */
+.brief-mod {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise), filter .4s var(--ease-rise);
+}
+
+.brief-mod.is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.brief-mod--format {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+.brief-mod__h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 23px;
+  line-height: 1.2;
+  color: var(--color-text-primary-strong);
+  margin: 0;
+}
+
+.brief-mod__sub {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-dim-5);
+  margin: 6px 0 0;
+}
+
+.brief-mod__label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--color-text-dim-3);
+  margin-bottom: 9px;
+}
+
+.brief-mod--stage .brief-mod__chip,
+.brief-mod--goal .brief-mod__chip,
+.brief-mod--timing .brief-mod__chip,
+.brief-mod--content .brief-mod__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-accent);
+  background: rgba(200, 255, 46, .08);
+  border: 1px solid var(--color-accent-border);
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+.brief-mod__chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+  flex-shrink: 0;
+}
+
+.brief-mod--content .brief-mod__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.brief-mod__pill {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--color-text-dim-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: color .25s ease, border-color .25s ease, background .25s ease;
+}
+
+.brief-mod__pill.is-done {
+  color: var(--color-accent);
+  background: rgba(200, 255, 46, .07);
+  border-color: var(--color-accent-border);
+}
+
+.brief-mod__pill--accent {
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.brief-mod--channel .brief-mod__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.brief-mod__channel {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--color-text-dim-4);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.brief-mod__channel.is-active {
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(200, 255, 46, .4);
+}
+
+/* ===== F. Mini-preview — small format-specific site schema =====
+   Shared "pending zone" language: dashed border + faint fill until the
+   CONTENT step confirms that material exists ([data-zone].is-filled),
+   at which point it switches to a solid accent-tinted fill. Applies
+   only where a builder actually tags a zone (see applyContentZones). */
+.brief-mod--preview {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+[data-zone] {
+  transition: background .3s ease, border-color .3s ease, opacity .3s ease;
+}
+
+/* Text zones reuse the plain .ui-bar block (no border to toggle), so
+   their pending/filled states are opacity-only. */
+.ui-bar[data-zone='text'] {
+  opacity: .4;
+}
+
+.ui-bar[data-zone='text'].is-filled {
+  opacity: 1;
+}
+
+/* --- Landing: hero (visual + headline/subtitle + CTA), benefits row,
+   proof row, FAQ rows --- */
+.brief-preview__landing {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.brief-preview__landing-hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brief-preview__landing-visual {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  border: 1px dashed var(--color-border-strong);
+  background: rgba(255, 255, 255, .02);
+}
+
+.brief-preview__landing-visual.is-filled {
+  border-style: solid;
+  border-color: var(--color-accent-border);
+  background: repeating-linear-gradient(135deg, rgba(200, 255, 46, .1) 0 6px, rgba(255, 255, 255, .02) 6px 12px);
+}
+
+.brief-preview__landing-hero-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.brief-preview__landing-cta {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9px;
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  border-radius: 5px;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+.brief-preview__landing-benefits {
+  display: flex;
+  gap: 6px;
+}
+
+.brief-preview__landing-benefit {
+  flex: 1;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+}
+
+.brief-preview__landing-proof {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brief-preview__landing-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+}
+
+.brief-preview__landing-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.brief-preview__landing-faq span {
+  height: 9px;
+  border-radius: 3px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-faint);
+}
+
+.brief-preview__landing-faq span:last-child {
+  width: 70%;
+}
+
+/* --- Ecommerce: 3 product cards (fav / thumb / price) + cart summary --- */
+.brief-preview__shop {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.brief-preview__shop-grid {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+
+.brief-preview__product {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 6px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+}
+
+.brief-preview__product-fav {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 8px;
+  line-height: 1;
+  color: var(--color-text-dim-3);
+}
+
+.brief-preview__product-thumb {
+  height: 24px;
+  border-radius: 4px;
+  border: 1px dashed var(--color-border-strong);
+  background: rgba(255, 255, 255, .02);
+}
+
+.brief-preview__product-thumb.is-filled {
+  border-style: solid;
+  border-color: var(--color-accent-border);
+  background: repeating-linear-gradient(135deg, rgba(200, 255, 46, .1) 0 5px, rgba(255, 255, 255, .02) 5px 10px);
+}
+
+.brief-preview__product-price {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.brief-preview__shop-cart {
+  flex-shrink: 0;
+  width: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: var(--font-mono);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 6px;
+  padding: 7px 8px;
+}
+
+.brief-preview__shop-cart-label {
+  font-size: 8px;
+  color: var(--color-text-dim-4);
+  white-space: nowrap;
+}
+
+.brief-preview__shop-cart-label b {
+  color: var(--color-accent);
+}
+
+.brief-preview__shop-cart-total {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.brief-preview__shop-cart-cta {
+  text-align: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  border-radius: 4px;
+  padding: 5px 0;
+}
+
+/* --- Service: 3 priced rows, a 3-step record path, booking CTA --- */
+.brief-preview__service {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.brief-preview__service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brief-preview__service-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.brief-preview__service-price {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--color-text-dim-3);
+  white-space: nowrap;
+}
+
+.brief-preview__service-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brief-preview__service-step {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: rgba(200, 255, 46, .08);
+  border: 1px solid var(--color-accent-border);
+}
+
+.brief-preview__service-cta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9.5px;
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  border-radius: 5px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+/* --- Corporate: a small sitemap (root + connected pages), doubling as
+   the "structure" content-zone since it literally shows structure --- */
+.brief-preview__sitemap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.brief-preview__sitemap-root {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--color-text-primary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 5px;
+  padding: 5px 12px;
+}
+
+.brief-preview__sitemap-branches {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding-top: 11px;
+}
+
+.brief-preview__sitemap-branches::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: var(--color-border-strong);
+}
+
+.brief-preview__sitemap-node {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--color-text-dim-4);
+  background: var(--color-surface-2);
+  border: 1px dashed var(--color-border-soft);
+  border-radius: 4px;
+  padding: 5px 8px;
+}
+
+.brief-preview__sitemap-node::before {
+  content: '';
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 1px;
+  height: 11px;
+  background: var(--color-border-strong);
+}
+
+.brief-preview__sitemap.is-filled .brief-preview__sitemap-node {
+  color: var(--color-text-primary);
+  border-style: solid;
+  border-color: var(--color-accent-border);
+  background: rgba(200, 255, 46, .05);
+}
+
+/* --- Redesign: ДО/СТАЛО comparison + improvement tags --- */
+.brief-preview__redesign {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.brief-preview__redesign-cols {
+  display: flex;
+  gap: 8px;
+}
+
+.brief-preview__redesign-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-soft);
+}
+
+.brief-preview__redesign-col--before {
+  background: rgba(255, 255, 255, .015);
+}
+
+.brief-preview__redesign-col--after {
+  background: rgba(200, 255, 46, .04);
+  border-color: var(--color-accent-border);
+}
+
+.brief-preview__redesign-tag {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: var(--color-text-dim-3);
+  margin-bottom: 2px;
+}
+
+.brief-preview__redesign-col--after .brief-preview__redesign-tag {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.brief-preview__redesign-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.brief-preview__redesign-tags span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--color-accent);
+  background: rgba(200, 255, 46, .07);
+  border: 1px solid var(--color-accent-border);
+  border-radius: 5px;
+  padding: 4px 9px;
+}
+
+/* --- Tilda upgrade: fix rows with a status word each --- */
+.brief-preview__tilda {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.brief-preview__tilda-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.brief-preview__tilda-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+}
+
+.brief-preview__tilda-name {
+  flex: 1;
+  color: var(--color-text-dim-5);
+}
+
+.brief-preview__tilda-status {
+  font-size: 9px;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* ===== Final module — mockup collapses into this once submitted ===== */
+.brief-mock-final {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  padding: 26px;
+  background: var(--color-surface-1);
+  opacity: 0;
+  transform: scale(.96);
+  transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
+  overflow-y: auto;
+}
+
+.brief-mock-final.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.brief-mock-final .status-pill {
+  margin-bottom: 12px;
+}
+
+.brief-mock-final__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--color-text-primary-strong);
+  margin: 0 0 6px;
+}
+
+.brief-mock-final__text {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  color: var(--color-text-dim-5);
+  margin: 0 0 18px;
+  max-width: 320px;
+}
+
+.brief-mock-final__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 160px));
+  gap: 7px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.brief-mock-final__summary-item {
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-soft);
+}
+
+.brief-mock-final__summary-item span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--color-text-dim-3);
+  margin-bottom: 2px;
+}
+
+.brief-mock-final__summary-item b {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--color-text-primary);
+}
+
+.brief-mock-final__tech {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .05em;
+  color: var(--color-text-dim-3);
+}
+
+.brief-mock-final__tech b {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* ===== Reduced motion — no scroll-jacking here to begin with; just
+   drop the cascade/scan choreography and switch state instantly. ===== */
+@media (prefers-reduced-motion: reduce) {
+  .brief-option,
+  .brief-option:hover,
+  .brief__nav-btn--next:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .brief__mock-scan {
+    display: none;
+  }
+
+  .brief-rise,
+  .brief-mod {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+
+  .brief__success .check-dot {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Responsive — large screens down to phone
+   ============================================================ */
+
+@media (max-width: 1199px) {
+  .brief__stage {
+    gap: 20px;
+  }
+
+  .brief__quiz {
+    width: 380px;
+  }
+}
+
+/* Portrait tablet and below — two columns have nowhere to go, so the
+   quiz stacks above the live preview. This is already the order the
+   owner's spec asks for (progress -> question -> answers -> nav all
+   live inside .brief__quiz already, in that order) plus the preview
+   right after — no re-sequencing needed, just a direction change. */
+@media (max-width: 1023px) {
+  .brief__stage {
+    flex-direction: column;
+  }
+
+  .brief__quiz {
+    width: 100%;
+  }
+
+  .brief__mock {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  .brief__quiz-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .brief__quiz-options {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .brief__quiz-question {
+    font-size: 17px;
+  }
+
+  .brief__mock-body {
+    min-height: 0;
+    padding: 20px 18px 20px;
+  }
+}
+
+/* Landscape phone — enough width to bring the split back if there's
+   also enough height for it not to feel cramped; below that height
+   threshold the stacked single-column layout above still applies. */
+@media (max-width: 1023px) and (min-width: 700px) and (max-height: 480px) and (orientation: landscape) {
+  .brief__stage {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .brief__quiz {
+    width: 45%;
+  }
+
+  .brief__mock {
+    width: auto;
+    margin-top: 0;
+  }
+}

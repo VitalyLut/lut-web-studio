@@ -1,0 +1,131 @@
+/* ============================================================
+   RESPONSIVE ORCHESTRATION LAYER
+   ============================================================
+   This file holds only:
+     1) the shared breakpoint/capability contract every section
+        file follows (documented here, applied there), and
+     2) truly global adjustments (root tokens, header/menu-level
+        chrome, cross-section utilities).
+   Section-specific reflows (Hero touch assembly, Portfolio
+   swipe deck, Journey vertical route, etc.) live in their own
+   section CSS/JS files, next to the desktop mechanic they
+   adapt — see each file's own media queries.
+
+   BREAKPOINT SCALE (desktop-first; override via max-width)
+   ------------------------------------------------------------
+   Ultra large           min-width: 1920px
+   Large desktop          1440px – 1919px
+   Standard desktop       1200px – 1439px   (authored baseline)
+   Small desktop /
+   landscape tablet       max-width: 1199px
+   Portrait tablet        max-width: 1023px
+   Large phone /
+   compact tablet         max-width: 767px
+   Phone                  max-width: 599px
+   Compact phone          max-width: 389px
+
+   These are ranges to design *for*, not the only queries allowed —
+   a section may add an intermediate step where its own content
+   genuinely needs one.
+
+   CAPABILITY QUERIES (device, not viewport width)
+   ------------------------------------------------------------
+   Hover-capable / mouse   (hover: hover) and (pointer: fine)
+   Touch / coarse pointer  (hover: none), (pointer: coarse)
+
+   Use capability queries for interaction model (hover reveals,
+   drag vs. swipe, cursor effects) and width queries for layout.
+   Never infer touch from viewport width alone.
+   ============================================================ */
+
+/* ---- Root token overrides — layout scale per range ---- */
+
+@media (min-width: 1920px) {
+  :root {
+    --container-max: 1720px;
+    --section-padding: 80px;
+  }
+}
+
+/* Ultra-wide (2560px+, 3440px, 3840px 4K): 1720px still leaves a very
+   wide margin either side once you're this far past it. Widen the
+   container further and let each section's own >=1920px scene-scale
+   rule (hero mockup, assembly scene, etc.) carry a little further too
+   — checked visually at 2560/3840, not just left as an arithmetic
+   guess, since this is exactly the "small island in the center"
+   failure mode the responsive spec calls out. */
+@media (min-width: 2560px) {
+  :root {
+    --container-max: 1960px;
+  }
+}
+
+@media (max-width: 1199px) {
+  :root {
+    --section-padding: 44px;
+  }
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --section-padding: 32px;
+    --header-height: 76px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --section-padding: 20px;
+    --header-height: 64px;
+  }
+}
+
+@media (max-width: 389px) {
+  :root {
+    --section-padding: 16px;
+  }
+}
+
+/* ---- Large-screen H1/H2 ceiling lift ----
+   The clamp() in variables.css caps type size at its old desktop
+   value from ~800px width up, by design (baseline stays put). On
+   very large monitors that cap now reads small relative to the
+   expanded container above, so lift it explicitly rather than
+   fighting the clamp formula. */
+@media (min-width: 1920px) {
+  :root {
+    --fs-h1: 60px;
+    --fs-h2: 46px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --fs-h1: 72px;
+    --fs-h2: 54px;
+  }
+}
+
+/* ---- Touch: remove hover-only chrome that has no equivalent
+   meaning on a device that can't hover ---- */
+@media (hover: none), (pointer: coarse) {
+  .site-halo {
+    display: none;
+  }
+}
+
+/* ---- Universal overflow safety net for absolutely-positioned
+   decorative scenes: never let a section's 2.5D stage force
+   horizontal scroll on a narrow viewport. Sections still control
+   their own inner layout; this only clips paint that escapes the
+   section box. ---- */
+@media (max-width: 1023px) {
+  .hero-viewport,
+  .assembly,
+  .portfolio,
+  .trust,
+  .configurator,
+  .journey {
+    overflow-x: clip;
+  }
+}

@@ -1,0 +1,1004 @@
+/* Section shell — transparent, continues the global .site-bg canvas.
+   Same sticky-scroll-track pattern as assembly.css (fixed vh track +
+   sticky 100vh stage): this section's scene has a fixed pixel/vh size
+   rather than variable-height swapped content, so the fragility that
+   forced configurator to switch to normal flow doesn't apply here. */
+.journey {
+  position: relative;
+  background: transparent;
+  font-family: var(--font-body);
+}
+
+.journey__track {
+  position: relative;
+  height: 350vh;
+}
+
+.journey__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.journey__container {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--section-padding);
+}
+
+/* ===== HUD ===== */
+.journey__hud {
+  max-width: 640px;
+  margin-bottom: 30px;
+}
+
+.journey__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h2);
+  line-height: 1.12;
+  letter-spacing: var(--ls-heading);
+  margin: 18px 0 0;
+  color: var(--color-text-primary-strong);
+  text-wrap: balance;
+}
+
+.journey__title span {
+  color: var(--color-accent);
+}
+
+.journey__subtitle {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+  margin: 14px 0 0;
+  max-width: 560px;
+}
+
+/* ===== Scene ===== */
+.journey__scene {
+  position: relative;
+  height: clamp(440px, 50vh, 560px);
+  border-radius: var(--radius-hero);
+  overflow: hidden;
+  background: rgba(255, 255, 255, .012);
+  border: 1px solid var(--color-border-faint);
+}
+
+/* Depth cue — a single soft vignette (no nested frames) plus a slow
+   scanline sweep. Reads as "digital corridor" texture without the
+   "boxes inside boxes" clutter of the old nested-rings version. */
+.journey__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 15% 15%, rgba(200, 255, 46, .05), transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(200, 255, 46, .04), transparent 60%);
+}
+
+.journey__scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(200, 255, 46, .35), transparent);
+  animation: journeyScan 7s linear infinite;
+}
+
+@keyframes journeyScan {
+  0% { top: 0%; opacity: 0; }
+  8% { opacity: .8; }
+  92% { opacity: .8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* Client-question chips — one per station, anchored near its own node
+   (positioned in JS from the same sampled path point). Each dissolves
+   individually once ITS station is reached, not as one group, so the
+   "question turns into an answer" beat happens station-by-station. */
+.journey__chaos {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.journey__chip {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .01em;
+  color: var(--color-text-dim-4);
+  background: linear-gradient(135deg, var(--color-surface-glass-start), var(--color-surface-glass-end));
+  border: 1px solid var(--color-border-soft);
+  border-radius: 20px;
+  padding: 7px 14px 7px 8px;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .3);
+  transition: opacity .5s ease, transform .5s ease;
+}
+
+.journey__chip.is-hidden {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(.85);
+}
+
+.journey__chip-num {
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 9px;
+}
+
+.journey__chip-mark {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--color-text-dim-3);
+  flex-shrink: 0;
+}
+
+/* Connector — thin dashed thread from each chip to its station node,
+   drawn in the same SVG/coordinate space as the route so it always
+   lines up exactly, no separate CSS trig needed. */
+.journey__connector {
+  stroke: rgba(200, 255, 46, .2);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  transition: opacity .5s ease;
+}
+
+.journey__connector.is-hidden {
+  opacity: 0;
+}
+
+/* Route — SVG path drawn progressively via stroke-dashoffset (path has
+   pathLength="100" set in HTML so dasharray/dashoffset are plain 0-100
+   percentages, no getTotalLength() measurement needed at runtime). */
+.journey__route {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.journey__route-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.journey__route-path {
+  fill: none;
+}
+
+.journey__route-path--bg {
+  stroke: rgba(255, 255, 255, .07);
+  stroke-width: 1.5;
+}
+
+.journey__route-path--fg {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  filter: drop-shadow(0 0 5px rgba(200, 255, 46, .6));
+}
+
+.journey__station {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  z-index: 4;
+}
+
+.journey__station-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-surface-1);
+  border: 1.5px solid var(--color-border-strong);
+  transition: background .35s ease, border-color .35s ease, box-shadow .35s ease, transform .35s var(--ease-rise);
+}
+
+.journey__station-num {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .05em;
+  color: var(--color-text-dim-3);
+  transition: color .35s ease;
+}
+
+.journey__station.is-done .journey__station-dot {
+  background: var(--color-accent);
+  border-color: var(--color-accent-border-strong);
+}
+
+.journey__station.is-done .journey__station-num {
+  color: var(--color-text-dim-5);
+}
+
+.journey__station.is-active .journey__station-dot {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 5px rgba(200, 255, 46, .18), 0 0 18px rgba(200, 255, 46, .8);
+  transform: scale(1.45);
+  animation: journeyStationPulse 1.8s ease-in-out infinite;
+}
+
+.journey__station.is-active .journey__station-num {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+@keyframes journeyStationPulse {
+  0%, 100% { box-shadow: 0 0 0 5px rgba(200, 255, 46, .18), 0 0 18px rgba(200, 255, 46, .8); }
+  50% { box-shadow: 0 0 0 8px rgba(200, 255, 46, .1), 0 0 24px rgba(200, 255, 46, .95); }
+}
+
+/* Signal dot — the visitor, always sampled from the real path via
+   getPointAtLength so it can never drift off the curve. Its position
+   (left/top) is the only style written every rAF tick. */
+.journey__signal {
+  position: absolute;
+  left: 3%;
+  top: 40%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #f2ffcf 0%, var(--color-accent) 55%, rgba(200, 255, 46, 0) 100%);
+  box-shadow: 0 0 14px 3px rgba(200, 255, 46, .85), 0 0 30px 8px rgba(200, 255, 46, .3);
+  z-index: 6;
+  will-change: left, top;
+}
+
+/* Ambient glow that trails the signal underneath everything else — the
+   replacement for the old nested-rings backdrop: depth that's actually
+   tied to where the visitor is, instead of static decoration. */
+.journey__glow {
+  position: absolute;
+  left: 3%;
+  top: 40%;
+  width: 260px;
+  height: 260px;
+  margin-left: -130px;
+  margin-top: -130px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 255, 46, .16), transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+  will-change: left, top;
+}
+
+/* Short comet tail one step behind the dot — cheap: same getPointAtLength
+   sampling, evaluated at a slightly earlier progress. */
+.journey__signal-trail {
+  position: absolute;
+  left: 3%;
+  top: 40%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(200, 255, 46, .45);
+  filter: blur(2px);
+  z-index: 5;
+  pointer-events: none;
+  will-change: left, top;
+}
+
+/* ===== Question / answer card (bottom-left) ===== */
+.journey__card {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 6;
+  width: min(380px, 36%);
+  padding: 22px 24px;
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, var(--color-surface-glass-start), var(--color-surface-glass-end));
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-elevated);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .6s ease, transform .6s var(--ease-rise);
+}
+
+.journey__card.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.journey__card-kicker {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  color: var(--color-accent);
+  margin-bottom: 14px;
+}
+
+.journey__card-row {
+  margin-bottom: 12px;
+}
+
+.journey__card-question {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.3;
+  color: var(--color-text-primary-strong);
+  margin: 0;
+}
+
+.journey__card-answer {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-dim-5);
+  margin: 0;
+}
+
+.journey__modules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+/* Reuse the shared floating .chip component, but laid out inline
+   instead of absolutely-positioned (its default use elsewhere). */
+.journey__modules .chip {
+  position: static;
+}
+
+/* Station 7 swaps the module chips for a mini contact-form preview. */
+.journey__form-preview {
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.journey__card.is-form .journey__modules {
+  display: none;
+}
+
+.journey__card.is-form .journey__form-preview {
+  display: flex;
+}
+
+.journey__form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.journey__form-label {
+  width: 58px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: .07em;
+  color: var(--color-text-dim-3);
+}
+
+.journey__form-bar {
+  flex: 1;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--color-border-faint);
+  transition: border-color .3s ease, background .3s ease, box-shadow .3s ease;
+}
+
+.journey__form-bar--tall {
+  height: 26px;
+}
+
+.journey__form-submit {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10.5px;
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  padding: 9px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .3s ease, color .3s ease;
+}
+
+.journey__form-submit:hover {
+  transform: translateY(-1px);
+}
+
+.journey__form-preview.is-sent .journey__form-bar {
+  border-color: var(--color-accent-border-strong);
+  background: rgba(200, 255, 46, .06);
+  box-shadow: 0 0 12px rgba(200, 255, 46, .22);
+}
+
+.journey__form-preview.is-sent .journey__form-submit {
+  background: var(--color-surface-2);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent-border-strong);
+}
+
+/* ===== Mini site preview — floats clear of the route's final stretch.
+   Stations/chips occupy roughly the top 45-50% of the scene on the
+   right side (checked empirically), so anchoring from `top` at 54%
+   with a trimmed-down height keeps this panel entirely below station
+   06/07, their chips, and the curve's closing arc, with room to spare
+   at the bottom edge too — reads as a floating companion card rather
+   than a panel wedged into the corner. ===== */
+.journey__mock {
+  position: absolute;
+  right: 0;
+  top: 54%;
+  z-index: 6;
+  width: min(260px, 24%);
+  border-radius: var(--radius-mockup);
+  overflow: hidden;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-elevated);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .6s ease, transform .6s var(--ease-rise);
+}
+
+.journey__mock.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.journey__mock-progress {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 46px;
+  height: 2px;
+  z-index: 1;
+  background: rgba(255, 255, 255, .07);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.journey__mock-progress-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px rgba(200, 255, 46, .7);
+  transition: width .1s linear;
+}
+
+.journey__mock-body {
+  position: relative;
+  height: 172px;
+  padding: 50px 12px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.journey__mock-block {
+  flex-grow: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-left: 2px solid transparent;
+  border-radius: 3px;
+  overflow: hidden;
+  transition: flex-grow .4s var(--ease-rise), border-color .3s ease, background .3s ease;
+}
+
+.journey__mock-block-name {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: .03em;
+  color: var(--color-text-dim-3);
+  white-space: nowrap;
+  transition: color .3s ease;
+}
+
+.journey__mock-block .ui-bar {
+  flex: 1;
+  height: 5px;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.journey__mock-block.is-done {
+  border-left-color: rgba(200, 255, 46, .35);
+}
+
+.journey__mock-block.is-active {
+  flex-grow: 6;
+  background: rgba(200, 255, 46, .06);
+  border-left-color: var(--color-accent);
+}
+
+.journey__mock-block.is-active .journey__mock-block-name {
+  color: var(--color-text-primary);
+}
+
+.journey__mock-block.is-active .ui-bar {
+  opacity: 1;
+}
+
+/* The "Заявка" row swaps its bar for a small sent-state pill once the
+   route actually completes, instead of just sitting highlighted like
+   every other row. */
+.journey__mock-cta {
+  display: none;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: .04em;
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.journey__mock-block.is-complete .ui-bar {
+  display: none;
+}
+
+.journey__mock-block.is-complete .journey__mock-cta {
+  display: inline-block;
+}
+
+/* ===== Final success banner — centered overlay, hidden until the route
+   is essentially complete. Everything stacks and centers: label, then
+   headline, then one big checkmark, then caption, then CTA. ===== */
+.journey__final {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 10;
+  width: min(400px, 78%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px 32px 28px;
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, rgba(20, 24, 18, .95), rgba(10, 11, 10, .97));
+  border: 1px solid var(--color-accent-border-strong);
+  box-shadow: 0 0 70px rgba(200, 255, 46, .28), var(--shadow-deep);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(.92);
+  transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
+}
+
+.journey__final.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.journey__final .status-pill {
+  margin-bottom: 16px;
+}
+
+.journey__final-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--color-text-primary-strong);
+  margin: 0 0 20px;
+}
+
+.journey__final-check {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-accent);
+  background: rgba(200, 255, 46, .12);
+  border: 2px solid var(--color-accent);
+  margin-bottom: 20px;
+  transform: scale(0);
+}
+
+.journey__final.is-visible .journey__final-check {
+  animation: journeyCheckIn .6s var(--ease-pop) .15s forwards, journeyCheckGlow 2.2s ease-in-out .75s infinite;
+}
+
+@keyframes journeyCheckIn {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
+@keyframes journeyCheckGlow {
+  0%, 100% { box-shadow: 0 0 26px rgba(200, 255, 46, .45); }
+  50% { box-shadow: 0 0 42px rgba(200, 255, 46, .8); }
+}
+
+.journey__final-caption {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-dim-5);
+  margin: 0 0 18px;
+  max-width: 320px;
+}
+
+/* ===== Reduced-motion static fallback ===== */
+.journey__rm {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey__track {
+    height: auto;
+  }
+
+  .journey__stage {
+    position: relative;
+    height: auto;
+    padding: calc(var(--section-padding) * 1.2) 0;
+  }
+
+  .journey__scene {
+    display: none;
+  }
+
+  .journey__rm {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .journey__rm-item {
+    padding-top: 22px;
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .journey__rm-item:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .journey__rm-kicker {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: .1em;
+    color: var(--color-accent);
+    margin-bottom: 10px;
+  }
+
+  .journey__rm-question {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--color-text-primary-strong);
+    margin: 0 0 8px;
+  }
+
+  .journey__rm-answer {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--color-text-dim-5);
+    margin: 0 0 10px;
+    max-width: 640px;
+  }
+
+  .journey__rm-modules {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .03em;
+    color: var(--color-text-dim-3);
+  }
+
+  .journey__rm-final {
+    margin-top: 6px;
+    padding: 26px 28px;
+    border-radius: var(--radius-card);
+    background: rgba(200, 255, 46, .05);
+    border: 1px solid var(--color-accent-border-strong);
+  }
+
+  .journey__rm-final .status-pill {
+    margin-bottom: 12px;
+  }
+
+  .journey__rm-final-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--color-text-primary-strong);
+    margin: 0 0 8px;
+  }
+
+  .journey__rm-final-caption {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--color-text-dim-5);
+    margin: 0 0 14px;
+    max-width: 560px;
+  }
+}
+
+/* ============================================================
+   Mobile vertical rail (hidden on desktop/tablet-landscape)
+   ============================================================ */
+.journey__rail {
+  display: none;
+}
+
+@media (min-width: 1920px) {
+  .journey__scene {
+    height: clamp(440px, 44vh, 620px);
+  }
+}
+
+@media (max-width: 1199px) {
+  .journey__track {
+    height: 320vh;
+  }
+}
+
+/* Portrait tablet / phone — the horizontal S-curve route is built
+   around a 1000x400 (2.5:1) viewBox; squeezing that into a narrow tall
+   viewport would just distort the artwork, not turn it into a vertical
+   route. Swapped for a plain vertical rail instead: same JOURNEY_STEPS
+   data and the same scroll-progress/station-index logic in
+   journey.js (setActiveStation/updateVisual also write to the rail's
+   dots/fill now — no second data source), just a simpler renderer.
+
+   The intro (badge/H2/subtitle) stays INSIDE this same sticky stage
+   instead of scrolling away separately beforehand — pulling it out
+   (the earlier approach, mirroring Assembly) put a huge dead gap
+   between "reading the intro" and "the route actually starting," and
+   made the two feel like unrelated scenes. Compacting .journey__hud
+   here and keeping it pinned above the rail/card keeps intro and
+   mechanic reading as one story throughout the whole scroll. */
+@media (max-width: 1023px) {
+  .journey__track {
+    /* Each of 7 stations needs its own readable dwell time; checked
+       against STATION_FRAC's spacing (roughly even, ~13% apart) at
+       this length rather than reusing the desktop 320vh number as-is. */
+    height: 260vh;
+  }
+
+  .journey__stage {
+    align-items: flex-start;
+  }
+
+  .journey__container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: calc(var(--header-height) + 12px);
+    padding-bottom: 10px;
+  }
+
+  .journey__hud {
+    display: block;
+    flex-shrink: 0;
+    max-width: none;
+    margin-bottom: 12px;
+  }
+
+  .journey__title {
+    font-size: clamp(20px, 5vw, 26px);
+    margin-top: 10px;
+  }
+
+  .journey__subtitle {
+    margin-top: 8px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .journey__scene {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    grid-template-rows: auto auto;
+    gap: 14px;
+    padding: 18px 16px;
+  }
+
+  .journey__chaos,
+  .journey__route {
+    display: none;
+  }
+
+  .journey__rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    padding: 4px 0;
+    z-index: 2;
+  }
+
+  .journey__rail-line {
+    position: absolute;
+    left: 50%;
+    top: 11px;
+    bottom: 11px;
+    width: 2px;
+    background: rgba(255, 255, 255, .1);
+    transform: translateX(-50%);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .journey__rail-line-fill {
+    display: block;
+    width: 100%;
+    height: 0%;
+    background: var(--color-accent);
+    box-shadow: 0 0 8px rgba(200, 255, 46, .6);
+    transition: height .15s linear;
+  }
+
+  .journey__rail-dot {
+    position: relative;
+    z-index: 1;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--color-surface-1);
+    border: 1.5px solid var(--color-border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--color-text-dim-3);
+    transition: background .3s ease, border-color .3s ease, box-shadow .3s ease, color .3s ease, transform .3s var(--ease-rise);
+  }
+
+  .journey__rail-dot.is-done {
+    background: var(--color-accent);
+    border-color: var(--color-accent-border-strong);
+    color: var(--color-accent-on-accent);
+  }
+
+  .journey__rail-dot.is-active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-on-accent);
+    box-shadow: 0 0 0 4px rgba(200, 255, 46, .18), 0 0 14px rgba(200, 255, 46, .7);
+    transform: scale(1.2);
+  }
+
+  .journey__card,
+  .journey__mock {
+    position: static;
+    width: 100%;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Card spans the SAME full height as the rail (grid-row: 1/3, see
+     .journey__rail above) instead of just row 1 — the actual bug
+     behind "05-07 sink into a big empty area below the card": rail's
+     7 dots are already evenly spread across the whole scene height
+     (flex:1 + justify-content:space-between), but the card previously
+     only occupied row 1, so nothing sat next to the bottom few dots at
+     all — not an uneven-spacing problem, an orphaned-content one.
+     align-self: center keeps the card's own (content-sized) box
+     centered against that full span rather than stretched thin, so it
+     reads as accompanying the whole rail without an empty stretch
+     inside the card itself. Mock (the small site-building preview)
+     moves out of the grid entirely here — it was the second grid row
+     this card would otherwise have had to share, and the rail/card
+     story is the part actually being fixed. */
+  .journey__card {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+  }
+
+  .journey__mock {
+    display: none;
+  }
+
+  /* Overlay, not a 3rd grid row — .journey__final has no explicit
+     grid-row, so it was being auto-placed into a NEW implicit row
+     after rail/card (which now span rows 1/-1 themselves), stacking
+     its ~340px height on top of theirs. That pushed the grid's total
+     content height well past the sticky stage's fixed 100dvh, and
+     .journey__stage's overflow:hidden silently clipped the bottom of
+     the final card — the reported "ЗАЯВКА СФОРМИРОВАНА is cut off"
+     bug. Since the card already has its own solid-ish gradient
+     background + backdrop-blur (it was designed to sit on top of
+     things on desktop too), positioning it as a centered overlay
+     across the same area instead of adding grid height fixes this
+     without needing more scroll-track real estate. */
+  .journey__final {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    width: calc(100% - 16px);
+    max-width: 380px;
+    height: fit-content;
+    max-height: calc(100% - 16px);
+    overflow-y: auto;
+    transform: none;
+    display: none;
+    z-index: 10;
+  }
+
+  .journey__final.is-visible {
+    display: flex;
+    transform: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .journey__scene {
+    grid-template-columns: 28px 1fr;
+    padding: 18px 14px;
+  }
+
+  .journey__card {
+    padding: 18px 18px;
+  }
+}

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#08080a}
+@keyframes lutPulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes lutFloat1{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes lutFloat2{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes lutFloat3{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4px,-8px) rotate(.6deg)}}
+@keyframes lutBloom1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-26px,28px) scale(1.06)}}
+@keyframes lutBloom2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(32px,-22px) scale(1.05)}}
+@keyframes lutWaveX{from{background-position-x:0}to{background-position-x:14px}}
+@keyframes lutRise{from{opacity:1;transform:none}to{opacity:1;transform:none}}
+@keyframes lutFloatC1{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-7px)}}
+@keyframes lutFloatC2{0%,100%{transform:translate(0,0)}50%{transform:translate(-5px,5px)}}
+@keyframes lutFloatC3{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4px,6px) rotate(1deg)}}
+@keyframes lutScanGlow{0%,100%{opacity:.6}50%{opacity:1}}
+</style>
+</helmet>
+
+<!-- ======================= SECTION 1 : HERO ======================= -->
+<section style="display:flex;justify-content:center;align-items:flex-start;padding:64px;min-height:100vh;background:#08080a;background-image:radial-gradient(120% 90% at 15% 0%,#131318 0%,#0a0a0c 50%,#08080a 100%);font-family:'Onest',sans-serif">
+
+  <div id="1a" data-screen-label="Hero" onMouseMove="{{ moveHalo }}" onMouseLeave="{{ hideHalo }}" style="position:relative;width:1180px;height:720px;border-radius:22px;overflow:hidden;background:#08080a;border:1px solid rgba(255,255,255,.08);color:#f4f4f2">
+    <!-- atmosphere : premium unified background -->
+    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(95% 75% at 80% -12%,rgba(200,255,46,.11),transparent 55%),radial-gradient(70% 60% at 10% 6%,rgba(150,170,150,.06),transparent 60%),radial-gradient(120% 110% at 50% 120%,rgba(90,110,70,.09),transparent 58%),radial-gradient(150% 130% at 22% 0%,#141419 0%,#0b0b0e 52%,#08080a 100%)"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:34px 34px;-webkit-mask-image:radial-gradient(125% 105% at 70% 18%,#000 28%,transparent 92%);mask-image:radial-gradient(125% 105% at 70% 18%,#000 28%,transparent 92%)"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(200,255,46,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(200,255,46,.05) 1px,transparent 1px);background-size:170px 170px;-webkit-mask-image:radial-gradient(100% 90% at 72% 12%,#000 18%,transparent 78%);mask-image:radial-gradient(100% 90% at 72% 12%,#000 18%,transparent 78%)"></div>
+    <div style="position:absolute;width:560px;height:560px;left:660px;top:-190px;background:radial-gradient(circle,rgba(200,255,46,.17),transparent 62%);filter:blur(48px);animation:lutBloom1 22s ease-in-out infinite;pointer-events:none"></div>
+    <div style="position:absolute;width:620px;height:620px;left:-190px;top:300px;background:radial-gradient(circle,rgba(120,150,110,.12),transparent 64%);filter:blur(56px);animation:lutBloom2 28s ease-in-out infinite;pointer-events:none"></div>
+    <div style="position:absolute;width:360px;height:360px;left:300px;top:430px;background:radial-gradient(circle,rgba(200,255,46,.06),transparent 60%);filter:blur(52px);animation:lutBloom1 26s ease-in-out infinite reverse;pointer-events:none"></div>
+    <div ref="{{ haloRef }}" style="position:absolute;left:0;top:0;width:440px;height:440px;margin:-220px 0 0 -220px;border-radius:50%;background:radial-gradient(circle,rgba(200,255,46,.15),rgba(200,255,46,.05) 42%,transparent 68%);filter:blur(14px);opacity:0;transition:opacity .55s ease;mix-blend-mode:plus-lighter;pointer-events:none;will-change:transform"></div>
+    <div style="position:absolute;inset:0;mix-blend-mode:overlay;opacity:.05;pointer-events:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;)"></div>
+    <div style="position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 170px rgba(0,0,0,.5)"></div>
+
+    <!-- brand -->
+    <div style="position:absolute;left:64px;top:40px;display:flex;align-items:center;gap:11px;z-index:5;animation:lutRise .7s cubic-bezier(.2,.8,.2,1) both">
+      <div style="width:26px;height:26px;border-radius:6px;background:#c8ff2e;display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px;color:#0a0a0c">L</div>
+      <span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:16px;letter-spacing:.01em">LUT<span style="color:#c8ff2e"> WEB STUDIO</span></span>
+    </div>
+
+    <!-- hamburger -->
+    <button onClick="{{ toggleMenu }}" style="position:absolute;top:38px;right:40px;z-index:30;width:46px;height:46px;border-radius:9px;background:#141416;border:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;transition:border-color .2s ease;animation:lutRise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:.1s" style-hover="border-color:rgba(200,255,46,.6)">
+      <span style="width:18px;height:2px;background:#f4f4f2;border-radius:2px;transition:transform .3s cubic-bezier(.2,.8,.2,1);transform:{{ l1 }}"></span>
+      <span style="width:18px;height:2px;background:#f4f4f2;border-radius:2px;transition:opacity .2s ease;opacity:{{ l2op }}"></span>
+      <span style="width:18px;height:2px;background:#f4f4f2;border-radius:2px;transition:transform .3s cubic-bezier(.2,.8,.2,1);transform:{{ l3 }}"></span>
+    </button>
+
+    <!-- FULLSCREEN MENU OVERLAY -->
+    <div style="position:absolute;inset:0;z-index:20;background:rgba(8,8,10,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:{{ menuOp }};pointer-events:{{ menuPE }};transition:opacity .4s ease;display:flex;flex-direction:column;justify-content:center;padding:80px 64px 56px">
+      <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(80% 70% at 80% 10%,rgba(200,255,46,.08),transparent 55%)"></div>
+      <div style="position:absolute;top:46px;left:64px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;color:#6f6f68">МЕНЮ / MENU</div>
+      <nav style="position:relative;display:flex;flex-direction:column;gap:2px;max-width:560px">
+        <a href="#1a" onClick="{{ closeMenu }}" style="display:flex;align-items:baseline;gap:16px;text-decoration:none;color:#f4f4f2;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .05s,transform .5s cubic-bezier(.2,.8,.2,1) .05s,color .25s ease,padding-left .25s ease" style-hover="color:#c8ff2e;padding-left:10px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8ff2e;width:28px">01</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.01em">Главная</span>
+        </a>
+        <a href="#2a" onClick="{{ closeMenu }}" style="display:flex;align-items:baseline;gap:16px;text-decoration:none;color:#f4f4f2;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .11s,transform .5s cubic-bezier(.2,.8,.2,1) .11s,color .25s ease,padding-left .25s ease" style-hover="color:#c8ff2e;padding-left:10px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8ff2e;width:28px">02</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.01em">Как мы собираем</span>
+        </a>
+        <a href="#" onClick="{{ closeMenu }}" style="display:flex;align-items:baseline;gap:16px;text-decoration:none;color:#f4f4f2;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .17s,transform .5s cubic-bezier(.2,.8,.2,1) .17s,color .25s ease,padding-left .25s ease" style-hover="color:#c8ff2e;padding-left:10px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8ff2e;width:28px">03</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.01em">Услуги</span>
+        </a>
+        <a href="#" onClick="{{ closeMenu }}" style="display:flex;align-items:baseline;gap:16px;text-decoration:none;color:#f4f4f2;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .23s,transform .5s cubic-bezier(.2,.8,.2,1) .23s,color .25s ease,padding-left .25s ease" style-hover="color:#c8ff2e;padding-left:10px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8ff2e;width:28px">04</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.01em">Кейсы</span>
+        </a>
+        <a href="#" onClick="{{ closeMenu }}" style="display:flex;align-items:baseline;gap:16px;text-decoration:none;color:#f4f4f2;padding:9px 0;opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .29s,transform .5s cubic-bezier(.2,.8,.2,1) .29s,color .25s ease,padding-left .25s ease" style-hover="color:#c8ff2e;padding-left:10px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8ff2e;width:28px">05</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.01em">Контакты</span>
+        </a>
+      </nav>
+      <div style="position:relative;display:flex;align-items:flex-end;justify-content:space-between;margin-top:44px;flex-wrap:wrap;gap:24px">
+        <a href="tel:+79377779923" style="text-decoration:none;opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .36s,transform .5s cubic-bezier(.2,.8,.2,1) .36s">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#6f6f68;margin-bottom:6px">ПОЗВОНИТЬ</div>
+          <div style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:24px;color:#f4f4f2;transition:color .25s ease" style-hover="color:#c8ff2e">+7 937 777-99-23</div>
+        </a>
+        <div style="display:flex;gap:9px;opacity:{{ navOp }};transform:translateY({{ navTy }});transition:opacity .5s ease .42s,transform .5s cubic-bezier(.2,.8,.2,1) .42s">
+          <a href="#" aria-label="Telegram" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+          <a href="#" aria-label="WhatsApp" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg></a>
+          <a href="#" aria-label="Instagram" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
+          <a href="#" aria-label="YouTube" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+          <a href="#" aria-label="VK" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor"><path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14c5.6 0 6.93-1.33 6.93-6.93V8.93C22 3.33 20.68 2 15.07 2zm3.15 14.27h-1.51c-.57 0-.74-.46-1.76-1.48-.89-.86-1.27-.97-1.5-.97-.31 0-.4.09-.4.52v1.35c0 .37-.12.59-1.09.59-1.61 0-3.39-.98-4.64-2.79-1.88-2.64-2.4-4.63-2.4-5.04 0-.22.09-.43.52-.43h1.51c.39 0 .53.17.68.58.74 2.15 1.99 4.03 2.5 4.03.19 0 .28-.09.28-.57V9.68c-.06-1-.59-1.08-.59-1.44 0-.17.14-.34.37-.34h2.37c.32 0 .44.17.44.55v3.06c0 .32.14.43.23.43.19 0 .35-.11.7-.46 1.08-1.21 1.85-3.07 1.85-3.07.1-.22.28-.43.66-.43h1.51c.46 0 .56.23.46.55-.19.88-2.05 3.5-2.05 3.5-.16.26-.22.38 0 .68.16.22.68.66 1.03 1.07.64.72 1.13 1.33 1.26 1.75.14.42-.07.63-.5.63z"/></svg></a>
+          <a href="#" aria-label="Messenger" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.744 6.614 4.469 8.654V24l4.088-2.242c1.092.301 2.246.464 3.443.464 6.627 0 12-4.975 12-11.111C24 4.974 18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8l3.131 3.259L19.752 8l-6.561 6.963z"/></svg></a>
+          <a href="#" aria-label="Max" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="6"/><path d="M8 16V9.2c0-.5.6-.75 1-.4l3 2.6 3-2.6c.4-.35 1-.1 1 .4V16" fill="none"/></svg></a>
+          <a href="#" aria-label="TikTok" style="width:44px;height:44px;border-radius:10px;background:#141416;border:1px solid rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center;color:#c8ff2e;transition:background .2s ease,color .2s ease,transform .2s ease" style-hover="background:#c8ff2e;color:#0a0a0c;transform:translateY(-3px)"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- left copy -->
+    <div style="position:absolute;left:64px;top:150px;width:452px;z-index:2">
+      <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:#c8ff2e;text-transform:uppercase;border:1px solid rgba(200,255,46,.4);border-radius:3px;padding:6px 12px;animation:lutRise .75s cubic-bezier(.2,.8,.2,1) both;animation-delay:.05s">
+        <span style="width:6px;height:6px;background:#c8ff2e;box-shadow:0 0 10px #c8ff2e"></span>Сайты на Tilda под ключ
+      </div>
+      <h1 style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:44px;line-height:1.06;margin:22px 0 0;letter-spacing:-.02em;color:#f7f7f4;text-wrap:balance;animation:lutRise .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:.16s">Соберём сайт, который <span style="color:#c8ff2e">приводит клиентов</span></h1>
+      <p style="font-family:'Onest',sans-serif;font-size:17px;line-height:1.6;color:#a3a39c;margin:20px 0 0;max-width:420px;animation:lutRise .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:.3s">Продающие лендинги для малого бизнеса. Собираем полную структуру — от первого экрана до заявки — и запускаем за неделю.</p>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:30px;animation:lutRise .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:.44s">
+        <button ref="{{ btn1Ref }}" onMouseMove="{{ moveBtn1 }}" onMouseLeave="{{ leaveBtn1 }}" style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;letter-spacing:.02em;color:#0a0a0c;background:#c8ff2e;border:none;border-radius:5px;padding:15px 26px;cursor:pointer;box-shadow:5px 5px 0 rgba(200,255,46,.22);transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .18s ease" style-hover="box-shadow:8px 8px 0 rgba(200,255,46,.32)">ОБСУДИТЬ ПРОЕКТ</button>
+        <button ref="{{ btn2Ref }}" onMouseEnter="{{ worksEnter }}" onMouseMove="{{ moveBtn2 }}" onMouseLeave="{{ worksLeave }}" style="position:relative;overflow:hidden;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:14px;letter-spacing:.02em;background:transparent;border:1px solid rgba(200,255,46,.45);border-radius:5px;padding:15px 22px;cursor:pointer;transition:transform .28s cubic-bezier(.2,.8,.2,1),border-color .3s ease" style-hover="border-color:#c8ff2e">
+          <div style="position:absolute;left:0;right:0;bottom:0;height:{{ worksLiquid }};transition:height .55s cubic-bezier(.45,.05,.2,1);pointer-events:none">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,#d4ff5a,#9fe62a)"></div>
+            <div style="position:absolute;left:0;right:0;top:-8px;height:16px;background:radial-gradient(circle at 7px 16px,#d4ff5a 7px,transparent 8px);background-size:14px 16px;background-repeat:repeat-x;animation:lutWaveX 1.1s linear infinite"></div>
+            <div style="position:absolute;left:0;right:0;top:-6px;height:14px;background:radial-gradient(circle at 7px 14px,rgba(212,255,90,.5) 6px,transparent 7px);background-size:14px 14px;background-repeat:repeat-x;animation:lutWaveX 1.7s linear infinite reverse"></div>
+          </div>
+          <span style="position:relative;z-index:2;color:{{ worksText }};transition:color .35s ease">Смотреть работы</span>
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;margin-top:34px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.04em;color:#6f6f68;animation:lutRise .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:.56s">
+        <span><span style="color:#e6e6e0;font-size:15px;font-weight:600">120+</span> проектов</span>
+        <span style="opacity:.4">/</span>
+        <span><span style="color:#e6e6e0;font-size:15px;font-weight:600">7 дней</span> запуск</span>
+        <span style="opacity:.4">/</span>
+        <span><span style="color:#e6e6e0;font-size:15px;font-weight:600">100%</span> на Tilda</span>
+      </div>
+    </div>
+
+    <!-- MOCKUP 2.5D -->
+    <div onMouseEnter="{{ enterA }}" onMouseMove="{{ moveA }}" onMouseLeave="{{ leaveA }}" style="position:absolute;left:566px;top:150px;width:560px;height:440px;cursor:pointer;perspective:1300px;animation:lutRise .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:.34s">
+      <div ref="{{ tiltRefA }}" style="position:absolute;inset:0;transform-style:preserve-3d;transition:transform .3s ease-out">
+        <div style="position:absolute;inset:-16px;border-radius:20px;background:radial-gradient(closest-side,rgba(200,255,46,.28),transparent);opacity:{{ glowA }};transition:opacity .5s ease;transform:translateZ(-40px);pointer-events:none"></div>
+        <div style="position:absolute;inset:0;border-radius:12px;background:#0e0e10;border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 90px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);transform:translateZ(-10px)"></div>
+        <div style="position:absolute;left:0;top:0;width:100%;height:38px;display:flex;align-items:center;gap:7px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.07);transform:translateZ(-8px)">
+          <span style="width:9px;height:9px;border-radius:50%;background:#ff5f57"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:#febc2e"></span>
+          <span style="width:9px;height:9px;border-radius:50%;background:#28c840"></span>
+          <span style="flex:1"></span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#7a7a72;background:rgba(255,255,255,.05);padding:3px 12px;border-radius:5px">lutstudio.ru</span>
+        </div>
+
+        <div style="position:absolute;left:16px;right:16px;top:46px;bottom:16px;transform-style:preserve-3d">
+          <div style="position:absolute;left:0;top:0;width:520px;height:40px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:0ms;transform:{{ aT0 }};opacity:{{ aO0 }}">
+            <div style="width:100%;height:100%;animation:lutFloat1 6.5s ease-in-out infinite;border-radius:7px;background:#141416;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 22px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:space-between;padding:0 14px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:13px;height:13px;border-radius:4px;background:#c8ff2e"></span><span style="width:52px;height:7px;border-radius:3px;background:rgba(230,230,224,.7)"></span></div>
+              <div style="display:flex;align-items:center;gap:14px"><span style="width:26px;height:6px;border-radius:2px;background:rgba(160,160,152,.5)"></span><span style="width:26px;height:6px;border-radius:2px;background:rgba(160,160,152,.5)"></span><span style="width:48px;height:18px;border-radius:4px;background:#c8ff2e"></span></div>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;top:54px;width:300px;height:84px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:40ms;transform:{{ aT1 }};opacity:{{ aO1 }}">
+            <div style="width:100%;height:100%;animation:lutFloat2 7s ease-in-out infinite;animation-delay:.4s;display:flex;flex-direction:column;justify-content:center;gap:11px">
+              <span style="width:100%;height:13px;border-radius:3px;background:#e6e6e0"></span>
+              <span style="width:72%;height:13px;border-radius:3px;background:#c8ff2e"></span>
+              <span style="width:48%;height:10px;border-radius:3px;background:rgba(160,160,152,.4)"></span>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;top:150px;width:140px;height:36px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:90ms;transform:{{ aT2 }};opacity:{{ aO2 }}">
+            <div style="width:100%;height:100%;animation:lutFloat3 5.5s ease-in-out infinite;animation-delay:.2s;border-radius:5px;background:#c8ff2e;box-shadow:0 10px 24px rgba(200,255,46,.32);display:flex;align-items:center;justify-content:center">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.03em;color:#0a0a0c">ОСТАВИТЬ ЗАЯВКУ</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:330px;top:54px;width:190px;height:132px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:60ms;transform:{{ aT3 }};opacity:{{ aO3 }}">
+            <div style="width:100%;height:100%;animation:lutFloat2 8s ease-in-out infinite;animation-delay:.6s;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.1);box-shadow:0 16px 34px rgba(0,0,0,.45);background:repeating-linear-gradient(135deg,rgba(200,255,46,.1) 0 10px,rgba(255,255,255,.03) 10px 20px);display:flex;align-items:center;justify-content:center">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;color:rgba(200,255,46,.8)">IMG</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;top:206px;width:160px;height:82px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:120ms;transform:{{ aT4 }};opacity:{{ aO4 }}">
+            <div style="width:100%;height:100%;animation:lutFloat1 6s ease-in-out infinite;animation-delay:.8s;border-radius:8px;background:#141416;border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 24px rgba(0,0,0,.4);padding:13px;display:flex;flex-direction:column;gap:9px">
+              <span style="width:22px;height:22px;border-radius:5px;background:#c8ff2e"></span>
+              <span style="width:80%;height:7px;border-radius:3px;background:rgba(230,230,224,.55)"></span>
+              <span style="width:55%;height:7px;border-radius:3px;background:rgba(160,160,152,.4)"></span>
+            </div>
+          </div>
+          <div style="position:absolute;left:178px;top:206px;width:160px;height:82px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:150ms;transform:{{ aT5 }};opacity:{{ aO5 }}">
+            <div style="width:100%;height:100%;animation:lutFloat3 6.8s ease-in-out infinite;animation-delay:.3s;border-radius:8px;background:#141416;border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 24px rgba(0,0,0,.4);padding:13px;display:flex;flex-direction:column;gap:9px">
+              <span style="width:22px;height:22px;border-radius:5px;border:1.5px solid #c8ff2e"></span>
+              <span style="width:80%;height:7px;border-radius:3px;background:rgba(230,230,224,.55)"></span>
+              <span style="width:55%;height:7px;border-radius:3px;background:rgba(160,160,152,.4)"></span>
+            </div>
+          </div>
+          <div style="position:absolute;left:356px;top:206px;width:164px;height:82px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:110ms;transform:{{ aT6 }};opacity:{{ aO6 }}">
+            <div style="width:100%;height:100%;animation:lutFloat1 7.4s ease-in-out infinite;animation-delay:.5s;border-radius:8px;background:#141416;border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 24px rgba(0,0,0,.4);padding:13px;display:flex;flex-direction:column;gap:9px">
+              <span style="width:22px;height:22px;border-radius:5px;background:#c8ff2e"></span>
+              <span style="width:80%;height:7px;border-radius:3px;background:rgba(230,230,224,.55)"></span>
+              <span style="width:55%;height:7px;border-radius:3px;background:rgba(160,160,152,.4)"></span>
+            </div>
+          </div>
+          <div style="position:absolute;left:0;top:305px;width:520px;height:64px;transition:transform .95s cubic-bezier(.34,1.5,.5,1),opacity .5s ease;transition-delay:170ms;transform:{{ aT7 }};opacity:{{ aO7 }}">
+            <div style="width:100%;height:100%;animation:lutFloat2 7.8s ease-in-out infinite;animation-delay:.1s;border-radius:8px;background:#111113;border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 24px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:space-between;padding:0 16px">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:15px;height:15px;border-radius:4px;background:#c8ff2e"></span><span style="width:66px;height:7px;border-radius:3px;background:rgba(230,230,224,.5)"></span></div>
+              <div style="display:flex;gap:9px"><span style="width:22px;height:6px;border-radius:2px;background:rgba(160,160,152,.4)"></span><span style="width:22px;height:6px;border-radius:2px;background:rgba(160,160,152,.4)"></span><span style="width:22px;height:6px;border-radius:2px;background:rgba(160,160,152,.4)"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showHint }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:566px;top:606px;display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.03em;color:#7a7a72;opacity:{{ hintA }};transition:opacity .4s ease;z-index:3">
+      <span style="width:16px;height:16px;border:1px solid #c8ff2e;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;color:#c8ff2e;animation:lutPulse 1.8s ease-in-out infinite">↖</span>
+      Наведите на макет — блоки соберутся в сайт
+    </div>
+    </sc-if>
+  </div>
+
+</section>
+
+<!-- ======================= SECTION 2 : LWS ASSEMBLY SYSTEM ======================= -->
+<section id="2a" style="position:relative;background:#08080a;font-family:'Onest',sans-serif;color:#f4f4f2">
+  <div ref="{{ b2Ref }}" style="position:relative;height:480vh">
+    <div data-screen-label="Система сборки" style="position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center">
+      <!-- atmosphere -->
+      <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(80% 70% at 82% 12%,rgba(200,255,46,.1),transparent 55%),radial-gradient(70% 60% at 10% 90%,rgba(120,150,110,.07),transparent 60%),radial-gradient(150% 130% at 60% 0%,#121218 0%,#0a0a0d 55%,#08080a 100%)"></div>
+      <div style="position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:38px 38px;-webkit-mask-image:radial-gradient(130% 110% at 72% 45%,#000 30%,transparent 92%);mask-image:radial-gradient(130% 110% at 72% 45%,#000 30%,transparent 92%)"></div>
+      <div style="position:absolute;width:640px;height:640px;right:-120px;top:-160px;background:radial-gradient(circle,rgba(200,255,46,.13),transparent 62%);filter:blur(60px);animation:lutBloom1 24s ease-in-out infinite;pointer-events:none"></div>
+      <div style="position:absolute;width:560px;height:560px;left:-160px;bottom:-160px;background:radial-gradient(circle,rgba(120,150,110,.1),transparent 64%);filter:blur(56px);animation:lutBloom2 30s ease-in-out infinite;pointer-events:none"></div>
+      <div style="position:absolute;inset:0;mix-blend-mode:overlay;opacity:.045;pointer-events:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E&quot;)"></div>
+      <div style="position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 220px rgba(0,0,0,.55)"></div>
+
+      <div style="position:relative;width:100%;max-width:1360px;margin:0 auto;padding:0 64px;display:grid;grid-template-columns:0.82fr 1.18fr;gap:36px;align-items:center;z-index:3">
+        <!-- LEFT -->
+        <div ref="{{ b2LeftRef }}" style="position:relative">
+          <div style="display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:#c8ff2e;text-transform:uppercase;border:1px solid rgba(200,255,46,.4);border-radius:3px;padding:6px 12px;opacity:{{ b2op }};transform:translateY({{ b2ty }});transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)">
+            <span style="width:6px;height:6px;background:#c8ff2e;box-shadow:0 0 10px #c8ff2e"></span>LWS Assembly System
+          </div>
+          <h2 style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:40px;line-height:1.08;letter-spacing:-.02em;margin:22px 0 0;color:#f7f7f4;max-width:520px;text-wrap:balance;opacity:{{ b2op }};transform:translateY({{ b2ty }});transition:opacity .7s ease .08s,transform .7s cubic-bezier(.2,.8,.2,1) .08s">Сайт — это не красивый экран. Это <span style="color:#c8ff2e">собранная система</span>.</h2>
+          <p style="font-family:'Onest',sans-serif;font-size:16px;line-height:1.6;color:#a3a39c;margin:20px 0 0;max-width:472px;opacity:{{ b2op }};transform:translateY({{ b2ty }});transition:opacity .7s ease .16s,transform .7s cubic-bezier(.2,.8,.2,1) .16s">Мы не рисуем «красивую картинку». Мы собираем сайт вокруг бизнес-задачи: ниша и конкуренты, аудитория и смыслы, структура, визуал, адаптив, формы и запуск — каждый слой работает на заявку.</p>
+
+          <div style="margin-top:34px;padding-top:26px;border-top:1px solid rgba(255,255,255,.1);opacity:{{ b2op }};transform:translateY({{ b2ty }});transition:opacity .7s ease .24s,transform .7s cubic-bezier(.2,.8,.2,1) .24s">
+            <div style="display:flex;align-items:baseline;gap:15px">
+              <span style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:34px;color:#c8ff2e;line-height:1;min-width:52px">{{ acCode }}</span>
+              <div>
+                <div style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:19px;color:#f4f4f2">{{ acName }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;color:#8a8a80;margin-top:4px">{{ acEn }}</div>
+              </div>
+            </div>
+            <p style="font-family:'Onest',sans-serif;font-size:14.5px;line-height:1.55;color:#9a9a92;margin:16px 0 0;min-height:66px;max-width:432px">{{ acDesc }}</p>
+            <div style="display:flex;gap:7px;margin-top:6px">
+              <sc-for list="{{ dots }}" as="d" hint-placeholder-count="6">
+                <span style="width:26px;height:4px;border-radius:2px;background:{{ d.c }};box-shadow:{{ d.sh }};transition:background .45s ease,box-shadow .45s ease"></span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT : 2.5D CORE -->
+        <div style="position:relative;height:100vh;display:flex;align-items:center;justify-content:center;perspective:1600px">
+          <div ref="{{ coreRef }}" style="position:relative;width:520px;height:560px;transform-style:preserve-3d;transform:rotateX(15deg) rotateY(-7deg)">
+            <!-- scanner -->
+            <div ref="{{ scanRef }}" style="position:absolute;left:50%;top:50%;width:470px;height:2px;transform:translate(-50%,-50%);opacity:0;pointer-events:none;background:linear-gradient(90deg,transparent,#c8ff2e,transparent);box-shadow:0 0 22px 3px rgba(200,255,46,.6);z-index:60;animation:lutScanGlow 1.4s ease-in-out infinite"></div>
+
+            <!-- LAYER 01 -->
+            <div ref="{{ layer0 }}" style="position:absolute;left:50%;top:50%;width:384px;height:150px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(24,26,22,.66),rgba(12,13,12,.72));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);transform:translate(-50%,-50%);will-change:transform,opacity">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:11px 16px 5px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#c8ff2e;letter-spacing:.04em">01</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:13.5px;color:#f4f4f2">Аналитика ниши</span></div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#8a8a80">MARKET SCAN</span>
+              </div>
+              <div style="position:relative;padding:6px 16px 0;display:flex;gap:14px;align-items:flex-end;height:82px">
+                <div style="display:flex;align-items:flex-end;gap:5px;height:56px">
+                  <span style="width:8px;height:40%;background:rgba(200,255,46,.5);border-radius:2px"></span><span style="width:8px;height:70%;background:rgba(200,255,46,.7);border-radius:2px"></span><span style="width:8px;height:52%;background:rgba(200,255,46,.45);border-radius:2px"></span><span style="width:8px;height:92%;background:#c8ff2e;border-radius:2px"></span><span style="width:8px;height:34%;background:rgba(200,255,46,.4);border-radius:2px"></span>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+                  <span style="width:82%;height:6px;border-radius:3px;background:rgba(230,230,224,.4)"></span><span style="width:56%;height:6px;border-radius:3px;background:rgba(160,160,152,.3)"></span><span style="width:68%;height:6px;border-radius:3px;background:rgba(160,160,152,.3)"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- LAYER 02 -->
+            <div ref="{{ layer1 }}" style="position:absolute;left:50%;top:50%;width:384px;height:150px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(24,26,22,.66),rgba(12,13,12,.72));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);transform:translate(-50%,-50%);will-change:transform,opacity">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:11px 16px 5px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#c8ff2e;letter-spacing:.04em">02</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:13.5px;color:#f4f4f2">Смыслы и оффер</span></div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#8a8a80">MEANING LAYER</span>
+              </div>
+              <div style="position:relative;padding:8px 16px 0;display:flex;flex-direction:column;gap:9px">
+                <span style="width:82%;height:12px;border-radius:3px;background:#e6e6e0"></span><span style="width:60%;height:8px;border-radius:3px;background:rgba(200,255,46,.7)"></span><span style="width:44%;height:6px;border-radius:3px;background:rgba(160,160,152,.35)"></span><span style="margin-top:2px;width:104px;height:22px;border-radius:5px;background:#c8ff2e"></span>
+              </div>
+            </div>
+
+            <!-- LAYER 03 -->
+            <div ref="{{ layer2 }}" style="position:absolute;left:50%;top:50%;width:384px;height:150px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(24,26,22,.66),rgba(12,13,12,.72));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);transform:translate(-50%,-50%);will-change:transform,opacity">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:11px 16px 5px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#c8ff2e;letter-spacing:.04em">03</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:13.5px;color:#f4f4f2">Структура страницы</span></div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#8a8a80">CONVERSION ROUTE</span>
+              </div>
+              <div style="position:relative;padding:8px 16px 0;display:flex;flex-direction:column;gap:7px">
+                <span style="width:100%;height:13px;border-radius:3px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07)"></span>
+                <div style="display:flex;gap:7px;height:36px">
+                  <span style="flex:1;border-radius:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07)"></span>
+                  <span style="flex:1;border-radius:4px;background:rgba(200,255,46,.14);border:1px solid rgba(200,255,46,.3)"></span>
+                </div>
+                <span style="width:40%;height:10px;border-radius:3px;background:rgba(200,255,46,.6)"></span>
+              </div>
+            </div>
+
+            <!-- LAYER 04 -->
+            <div ref="{{ layer3 }}" style="position:absolute;left:50%;top:50%;width:384px;height:150px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(24,26,22,.66),rgba(12,13,12,.72));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);transform:translate(-50%,-50%);will-change:transform,opacity">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:11px 16px 5px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#c8ff2e;letter-spacing:.04em">04</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:13.5px;color:#f4f4f2">Визуальная система</span></div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#8a8a80">VISUAL SYSTEM</span>
+              </div>
+              <div style="position:relative;padding:12px 16px 0;display:flex;align-items:center;gap:14px">
+                <div style="display:flex;gap:6px">
+                  <span style="width:22px;height:22px;border-radius:5px;background:#c8ff2e"></span><span style="width:22px;height:22px;border-radius:5px;background:#1c1e1a;border:1px solid rgba(255,255,255,.12)"></span><span style="width:22px;height:22px;border-radius:5px;background:#e6e6e0"></span>
+                </div>
+                <span style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:22px;color:#f4f4f2">Aa</span>
+                <div style="flex:1;height:38px;border-radius:5px;background-image:linear-gradient(rgba(255,255,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);background-size:11px 11px;border:1px solid rgba(255,255,255,.08)"></div>
+              </div>
+            </div>
+
+            <!-- LAYER 05 -->
+            <div ref="{{ layer4 }}" style="position:absolute;left:50%;top:50%;width:384px;height:150px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(24,26,22,.66),rgba(12,13,12,.72));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);transform:translate(-50%,-50%);will-change:transform,opacity">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:11px 16px 5px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#c8ff2e;letter-spacing:.04em">05</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:13.5px;color:#f4f4f2">Интерфейс и анимации</span></div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#8a8a80">MOTION INTERFACE</span>
+              </div>
+              <div style="position:relative;padding:12px 16px 0;display:flex;align-items:center;gap:18px">
+                <div style="position:relative;width:74px;height:44px">
+                  <span style="position:absolute;left:0;top:6px;width:44px;height:5px;border-radius:3px;background:rgba(200,255,46,.6)"></span><span style="position:absolute;left:8px;top:18px;width:54px;height:5px;border-radius:3px;background:rgba(200,255,46,.35)"></span><span style="position:absolute;left:2px;top:30px;width:36px;height:5px;border-radius:3px;background:rgba(200,255,46,.25)"></span>
+                  <span style="position:absolute;right:4px;bottom:0;width:0;height:0;border-left:9px solid #c8ff2e;border-bottom:13px solid transparent;transform:rotate(-20deg)"></span>
+                </div>
+                <div style="width:46px;height:24px;border-radius:12px;background:rgba(200,255,46,.18);border:1px solid rgba(200,255,46,.4);display:flex;align-items:center;padding:0 3px;justify-content:flex-end">
+                  <span style="width:17px;height:17px;border-radius:50%;background:#c8ff2e"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- LAYER 06 -->
+            <div ref="{{ layer5 }}" style="position:absolute;left:50%;top:50%;width:384px;height:150px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,rgba(24,26,22,.66),rgba(12,13,12,.72));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.09);box-shadow:0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);transform:translate(-50%,-50%);will-change:transform,opacity">
+              <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:11px 16px 5px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;color:#c8ff2e;letter-spacing:.04em">06</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:13.5px;color:#f4f4f2">Запуск и заявки</span></div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.16em;color:#8a8a80">LAUNCH CORE</span>
+              </div>
+              <div style="position:relative;padding:8px 16px 0;display:flex;flex-direction:column;gap:8px">
+                <span style="width:100%;height:17px;border-radius:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)"></span><span style="width:100%;height:17px;border-radius:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)"></span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="flex:1;height:21px;border-radius:5px;background:#c8ff2e"></span>
+                  <span style="width:21px;height:21px;border-radius:50%;border:1.5px solid #c8ff2e;display:flex;align-items:center;justify-content:center;color:#c8ff2e;font-size:11px">✓</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CHAOTIC CHIPS -->
+            <div ref="{{ chip0 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC1 6s ease-in-out infinite;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);font-family:'JetBrains Mono',monospace;font-size:10px;color:#c9c9c2;white-space:nowrap"><span style="width:7px;height:7px;border-radius:2px;background:#c8ff2e"></span>Конкурент</div></div>
+            <div ref="{{ chip1 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC2 7.2s ease-in-out infinite;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);font-family:'JetBrains Mono',monospace;font-size:10px;color:#c9c9c2;white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:#c8ff2e"></span>Аудитория</div></div>
+            <div ref="{{ chip2 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC3 6.6s ease-in-out infinite;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);font-family:'JetBrains Mono',monospace;font-size:10px;color:#c9c9c2;white-space:nowrap"><span style="color:#c8ff2e;font-weight:700">#</span>SEO-запрос</div></div>
+            <div ref="{{ chip3 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC1 7.6s ease-in-out infinite;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);font-family:'JetBrains Mono',monospace;font-size:10px;color:#c9c9c2;white-space:nowrap"><span style="width:8px;height:8px;border-radius:2px;border:1.5px solid #c8ff2e"></span>Оффер</div></div>
+            <div ref="{{ chip4 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC2 6.2s ease-in-out infinite;display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9px;background:#c8ff2e;box-shadow:0 12px 28px rgba(200,255,46,.32);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:10px;color:#0a0a0c;white-space:nowrap">CTA →</div></div>
+            <div ref="{{ chip5 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC3 7s ease-in-out infinite;display:flex;flex-direction:column;gap:3px;padding:8px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45)"><span style="width:34px;height:5px;border-radius:2px;background:rgba(230,230,224,.5)"></span><span style="width:24px;height:5px;border-radius:2px;background:rgba(200,255,46,.6)"></span><span style="width:30px;height:5px;border-radius:2px;background:rgba(160,160,152,.4)"></span></div></div>
+            <div ref="{{ chip6 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC1 6.8s ease-in-out infinite;display:flex;align-items:center;gap:5px;padding:8px 10px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45)"><span style="width:13px;height:13px;border-radius:3px;background:#c8ff2e"></span><span style="width:13px;height:13px;border-radius:3px;background:#1c1e1a;border:1px solid rgba(255,255,255,.15)"></span><span style="width:13px;height:13px;border-radius:3px;background:#e6e6e0"></span></div></div>
+            <div ref="{{ chip7 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC2 7.4s ease-in-out infinite;display:flex;align-items:center;justify-content:center;width:48px;height:34px;border-radius:8px;background:repeating-linear-gradient(135deg,rgba(200,255,46,.12) 0 8px,rgba(255,255,255,.03) 8px 16px);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;color:rgba(200,255,46,.85)">IMG</div></div>
+            <div ref="{{ chip8 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC3 6.4s ease-in-out infinite;display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);font-family:'JetBrains Mono',monospace;font-size:10px;color:#c9c9c2;white-space:nowrap"><span style="width:0;height:0;border-left:9px solid #c8ff2e;border-bottom:11px solid transparent"></span>Hover</div></div>
+            <div ref="{{ chip9 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC1 7.8s ease-in-out infinite;display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:9px;background:rgba(18,19,17,.82);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45)"><span style="width:52px;height:9px;border-radius:3px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)"></span><span style="width:52px;height:9px;border-radius:3px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)"></span></div></div>
+            <div ref="{{ chip10 }}" style="position:absolute;left:50%;top:50%;will-change:transform,opacity;z-index:40"><div style="animation:lutFloatC2 6.9s ease-in-out infinite;width:30px;height:48px;border-radius:7px;background:rgba(18,19,17,.85);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 12px 26px rgba(0,0,0,.45);padding:5px;display:flex;flex-direction:column;gap:3px"><span style="width:100%;height:4px;border-radius:2px;background:#c8ff2e"></span><span style="width:80%;height:3px;border-radius:2px;background:rgba(230,230,224,.4)"></span><span style="width:100%;flex:1;border-radius:3px;background:rgba(255,255,255,.05)"></span></div></div>
+          </div>
+
+          <!-- ASSEMBLY COMPLETE -->
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY({{ doneTy }});opacity:{{ doneOp }};transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1);pointer-events:none;z-index:80;display:flex;flex-direction:column;align-items:center;gap:12px">
+            <div style="display:inline-flex;align-items:center;gap:9px;padding:11px 20px;border-radius:8px;background:rgba(200,255,46,.14);border:1px solid rgba(200,255,46,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 0 44px rgba(200,255,46,.32)">
+              <span style="width:9px;height:9px;border-radius:50%;background:#c8ff2e;box-shadow:0 0 12px #c8ff2e"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.16em;color:#c8ff2e">ASSEMBLY COMPLETE</span>
+            </div>
+            <span style="font-family:'Onest',sans-serif;font-size:13px;color:#cfcfc8;text-align:center;max-width:280px">Система собрана: от первого экрана до заявки</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showHint&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Поведение&quot;},&quot;introScatter&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Поведение&quot;}}">
+class Component extends DCLogic {
+  state = { asm: true, worksHover: false, menuOpen: false, activeIndex: -1, done: false, b2seen: true };
+
+  constructor(props) {
+    super(props);
+    this.tiltA = React.createRef();
+    this.btn1 = React.createRef();
+    this.btn2 = React.createRef();
+    this.halo = React.createRef();
+    this.core = React.createRef();
+    this.scan = React.createRef();
+    this.b2 = React.createRef();
+    this.b2Left = React.createRef();
+    this.layerRefs = []; for (let i = 0; i < 6; i++) this.layerRefs.push(React.createRef());
+    this.chipRefs = []; for (let i = 0; i < 11; i++) this.chipRefs.push(React.createRef());
+
+    this.L = [
+      { code: '01', name: 'Аналитика ниши', en: 'MARKET SCAN', desc: 'Изучаем нишу, конкурентов и аудиторию. Собираем данные, на которых строится вся система.', ex: -72, ey: -192, ez: -40, er: -6 },
+      { code: '02', name: 'Смыслы и оффер', en: 'MEANING LAYER', desc: 'Формулируем оффер и ключевые смыслы — то, ради чего клиент останется на сайте.', ex: 82, ey: -118, ez: -8, er: 5 },
+      { code: '03', name: 'Структура страницы', en: 'CONVERSION ROUTE', desc: 'Проектируем маршрут к заявке: последовательность блоков и логику прогрева.', ex: -52, ey: -38, ez: 22, er: -4 },
+      { code: '04', name: 'Визуальная система', en: 'VISUAL SYSTEM', desc: 'Цвет, типографика, сетка и ритм — единый язык, который выглядит дорого.', ex: 66, ey: 44, ez: -18, er: 6 },
+      { code: '05', name: 'Интерфейс и анимации', en: 'MOTION INTERFACE', desc: 'Оживляем интерфейс: наведения, переходы и микроанимации ведут внимание к цели.', ex: -82, ey: 122, ez: 12, er: -5 },
+      { code: '06', name: 'Запуск и заявки', en: 'LAUNCH CORE', desc: 'Подключаем формы, аналитику и запускаем. Сайт начинает приводить заявки.', ex: 56, ey: 202, ez: -40, er: 4 }
+    ];
+    this.C = [
+      { layer: 0, x: -300, y: -150 }, { layer: 0, x: -338, y: 26 }, { layer: 0, x: -250, y: 196 },
+      { layer: 1, x: 300, y: -176 }, { layer: 1, x: 336, y: -18 },
+      { layer: 2, x: 298, y: 150 },
+      { layer: 3, x: -70, y: -262 }, { layer: 3, x: 126, y: -250 },
+      { layer: 4, x: -150, y: 258 },
+      { layer: 5, x: 150, y: 262 }, { layer: 5, x: 336, y: 96 }
+    ];
+    this.INTRO = 0.05;
+    this.SEG = 0.128;
+  }
+
+  componentDidMount() {
+    if (this.props.introScatter ?? true) {
+      this._t1 = setTimeout(() => this.setState({ asm: false }), 1300);
+    } else {
+      this.setState({ asm: false });
+    }
+    this._onScroll = () => this.onScroll();
+    this._onResize = () => this.updateAssembly();
+    window.addEventListener('scroll', this._onScroll, { passive: true });
+    window.addEventListener('resize', this._onResize);
+    requestAnimationFrame(() => this.updateAssembly());
+    if (this.b2Left.current) {
+      this._io = new IntersectionObserver((es) => {
+        es.forEach(e => { if (e.isIntersecting) { this.setState({ b2seen: true }); if (this._io) this._io.disconnect(); } });
+      }, { threshold: 0.18 });
+      this._io.observe(this.b2Left.current);
+    }
+  }
+  componentWillUnmount() {
+    clearTimeout(this._t1);
+    window.removeEventListener('scroll', this._onScroll);
+    window.removeEventListener('resize', this._onResize);
+    if (this._io) this._io.disconnect();
+    if (this._raf) cancelAnimationFrame(this._raf);
+  }
+
+  set(k, v) { this.setState({ [k]: v }); }
+  _c01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  _lerp(a, b, t) { return a + (b - a) * t; }
+  _eoc(t) { return 1 - Math.pow(1 - t, 3); }
+  _eio(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  onScroll() {
+    if (this._raf) return;
+    this._raf = requestAnimationFrame(() => { this._raf = 0; this.updateAssembly(); });
+  }
+
+  updateAssembly() {
+    const sp = this.b2.current;
+    if (!sp) return;
+    const rect = sp.getBoundingClientRect();
+    const total = sp.offsetHeight - window.innerHeight;
+    let p = total > 0 ? (-rect.top) / total : 0;
+    p = this._c01(p);
+    const intro = this.INTRO, seg = this.SEG;
+    const fin = this._c01((p - 0.84) / 0.13);
+
+    if (this.core.current) {
+      const rx = this._lerp(15, 6, fin), ry = this._lerp(-7, 0, fin);
+      this.core.current.style.transform = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
+    }
+
+    for (let i = 0; i < 6; i++) {
+      const el = this.layerRefs[i].current; if (!el) continue;
+      const L = this.L[i];
+      const ls = intro + i * seg, le = ls + seg * 0.72;
+      const a = this._eoc(this._c01((p - ls) / (le - ls)));
+      const asmY = (i - 2.5) * 26 * (1 - 0.5 * fin);
+      const asmZ = i * 16 * (1 - 0.5 * fin);
+      const x = this._lerp(L.ex, 0, a), y = this._lerp(L.ey, asmY, a), z = this._lerp(L.ez, asmZ, a);
+      const rot = this._lerp(L.er, 0, a), sc = this._lerp(0.9, 1, a);
+      el.style.transform = 'translate(-50%,-50%) translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,' + z.toFixed(1) + 'px) rotateZ(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
+      el.style.opacity = this._lerp(0.4, 1, a).toFixed(3);
+      let heat = 0;
+      if (p >= ls && p <= le + 0.02) { const mid = (ls + le) / 2, half = (le - ls) / 2 + 0.02; heat = this._c01(1 - Math.abs((p - mid) / half)); }
+      const locked = p > le ? 1 : 0;
+      el.style.borderColor = heat > 0.04 ? 'rgba(200,255,46,' + (0.35 + 0.5 * heat).toFixed(2) + ')' : (locked ? 'rgba(200,255,46,.26)' : 'rgba(255,255,255,.09)');
+      el.style.boxShadow = '0 30px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)' + (heat > 0.04 ? ',0 0 ' + (18 + 46 * heat).toFixed(0) + 'px rgba(200,255,46,' + (0.32 * heat).toFixed(2) + ')' : '');
+      el.style.zIndex = String(10 + (heat > 0.04 ? 20 : (locked ? 5 : Math.round(6 - i))));
+    }
+
+    if (this.scan.current) {
+      const sweep = this._c01((p - 0.03) / 0.8);
+      const sy = this._lerp(-236, 236, sweep);
+      this.scan.current.style.transform = 'translate(-50%,-50%) translateY(' + sy.toFixed(1) + 'px)';
+      this.scan.current.style.opacity = (p > 0.03 && p < 0.85) ? '0.85' : '0';
+    }
+
+    for (let i = 0; i < this.C.length; i++) {
+      const el = this.chipRefs[i].current; if (!el) continue;
+      const c = this.C[i];
+      const ls = intro + c.layer * seg;
+      const a = this._eio(this._c01((p - (ls - 0.03)) / (seg * 0.6)));
+      const tx = this._lerp(c.x, 0, a), ty = this._lerp(c.y, (c.layer - 2.5) * 26, a), sc = this._lerp(1, 0.5, a);
+      el.style.transform = 'translate(-50%,-50%) translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,70px) scale(' + sc.toFixed(3) + ')';
+      el.style.opacity = this._lerp(1, 0, a).toFixed(3);
+    }
+
+    let ai = Math.floor((p - intro) / seg);
+    if (ai < -1) ai = -1; if (ai > 5) ai = 5;
+    if (p >= intro + 6 * seg) ai = 5;
+    const done = p > 0.9;
+    if (ai !== this.state.activeIndex || done !== this.state.done) this.setState({ activeIndex: ai, done: done });
+  }
+
+  tilt(e) {
+    const el = this.tiltA.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = 'rotateX(' + (-py * 9).toFixed(2) + 'deg) rotateY(' + (px * 12).toFixed(2) + 'deg)';
+  }
+  untilt() {
+    const el = this.tiltA.current;
+    if (el) el.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  }
+
+  magnet(ref, e, strength) {
+    const el = ref.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const mx = e.clientX - (r.left + r.width / 2);
+    const my = e.clientY - (r.top + r.height / 2);
+    el.style.transform = 'translate(' + (mx * strength).toFixed(1) + 'px,' + (my * strength).toFixed(1) + 'px)';
+  }
+  demagnet(ref) {
+    const el = ref.current;
+    if (el) el.style.transform = 'translate(0px,0px)';
+  }
+
+  moveHalo(e) {
+    const el = this.halo.current;
+    if (!el) return;
+    const p = el.offsetParent;
+    if (!p) return;
+    const r = p.getBoundingClientRect();
+    el.style.transform = 'translate(' + (e.clientX - r.left).toFixed(1) + 'px,' + (e.clientY - r.top).toFixed(1) + 'px)';
+    el.style.opacity = '1';
+  }
+  hideHalo() {
+    const el = this.halo.current;
+    if (el) el.style.opacity = '0';
+  }
+
+  renderVals() {
+    const scA = [
+      { x: -70, y: -92, r: -7, s: 0.9, zH: 6, zS: -20, o: 0.85 },
+      { x: -150, y: 40, r: 7, s: 0.85, zH: 22, zS: 34, o: 0.85 },
+      { x: -58, y: 152, r: 16, s: 1.05, zH: 44, zS: 72, o: 0.9 },
+      { x: 58, y: -74, r: 11, s: 0.8, zH: 60, zS: 92, o: 0.85 },
+      { x: -132, y: 122, r: -13, s: 0.9, zH: 18, zS: -12, o: 0.85 },
+      { x: 22, y: 188, r: 9, s: 0.85, zH: 30, zS: 54, o: 0.85 },
+      { x: 60, y: 152, r: -10, s: 0.9, zH: 20, zS: 24, o: 0.85 },
+      { x: -32, y: 122, r: -5, s: 0.92, zH: 6, zS: -28, o: 0.85 }
+    ];
+    const v = {};
+    scA.forEach((d, i) => {
+      v['aT' + i] = this.state.asm
+        ? 'translate3d(0px,0px,' + d.zH + 'px) rotate(0deg) scale(1)'
+        : 'translate3d(' + d.x + 'px,' + d.y + 'px,' + d.zS + 'px) rotate(' + d.r + 'deg) scale(' + d.s + ')';
+      v['aO' + i] = this.state.asm ? 1 : d.o;
+    });
+
+    v.tiltRefA = this.tiltA;
+    v.haloRef = this.halo;
+    v.btn1Ref = this.btn1;
+    v.btn2Ref = this.btn2;
+    v.coreRef = this.core;
+    v.scanRef = this.scan;
+    v.b2Ref = this.b2;
+    v.b2LeftRef = this.b2Left;
+    this.L.forEach((_, i) => { v['layer' + i] = this.layerRefs[i]; });
+    this.C.forEach((_, i) => { v['chip' + i] = this.chipRefs[i]; });
+
+    v.enterA = () => this.set('asm', true);
+    v.moveA = (e) => this.tilt(e);
+    v.leaveA = () => { this.set('asm', false); this.untilt(); };
+
+    v.moveHalo = (e) => this.moveHalo(e);
+    v.hideHalo = () => this.hideHalo();
+
+    v.moveBtn1 = (e) => this.magnet(this.btn1, e, 0.32);
+    v.leaveBtn1 = () => this.demagnet(this.btn1);
+    v.worksEnter = () => this.set('worksHover', true);
+    v.moveBtn2 = (e) => this.magnet(this.btn2, e, 0.32);
+    v.worksLeave = () => { this.set('worksHover', false); this.demagnet(this.btn2); };
+
+    v.toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+    v.closeMenu = () => this.set('menuOpen', false);
+
+    v.worksLiquid = this.state.worksHover ? '160%' : '0%';
+    v.worksText = this.state.worksHover ? '#0a0a0c' : '#f4f4f2';
+
+    v.menuOp = this.state.menuOpen ? 1 : 0;
+    v.menuPE = this.state.menuOpen ? 'auto' : 'none';
+    v.navOp = this.state.menuOpen ? 1 : 0;
+    v.navTy = this.state.menuOpen ? '0px' : '18px';
+    v.l1 = this.state.menuOpen ? 'translateY(7px) rotate(45deg)' : 'translateY(0px) rotate(0deg)';
+    v.l2op = this.state.menuOpen ? 0 : 1;
+    v.l3 = this.state.menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'translateY(0px) rotate(0deg)';
+
+    v.glowA = this.state.asm ? 1 : 0;
+    v.hintA = this.state.asm ? 0 : 1;
+    v.showHint = this.props.showHint ?? true;
+
+    const ai = this.state.activeIndex, done = this.state.done;
+    let code, name, en, desc;
+    if (done) { code = 'OK'; name = 'Система собрана'; en = 'ASSEMBLY COMPLETE'; desc = 'От первого экрана до заявки — единый работающий механизм.'; }
+    else if (ai < 0) { code = '00'; name = 'Готовность к сборке'; en = 'STANDBY'; desc = 'Листайте вниз — сайт собирается слой за слоем, из данных бизнеса в единую систему.'; }
+    else { const L = this.L[ai]; code = L.code; name = L.name; en = L.en; desc = L.desc; }
+    v.acCode = code; v.acName = name; v.acEn = en; v.acDesc = desc;
+
+    v.dots = this.L.map((_, i) => {
+      const on = done || i <= ai;
+      const active = !done && i === ai;
+      return { c: on ? (active ? '#c8ff2e' : 'rgba(200,255,46,.55)') : 'rgba(255,255,255,.14)', sh: active ? '0 0 12px rgba(200,255,46,.7)' : 'none' };
+    });
+    v.doneOp = done ? 1 : 0;
+    v.doneTy = done ? '0px' : '12px';
+
+    v.b2op = this.state.b2seen ? 1 : 0;
+    v.b2ty = this.state.b2seen ? '0px' : '26px';
+
+    return v;
+  }
+}
+</script>
+</body>
+</html>

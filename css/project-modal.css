@@ -1,0 +1,515 @@
+/* ===== PROJECT SIGNAL — global quick-contact popup =====
+   Lives once in the DOM near the end of body. Opened from any element
+   carrying [data-open-project-modal] (see js/project-modal.js). Fixed,
+   full-viewport overlay + a centered glass window; hidden by
+   opacity/pointer-events (same idiom as .menu in components.css) so it
+   never needs display:none <-> display:flex toggling. */
+.project-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(32px, var(--safe-top)) max(32px, var(--safe-right)) max(32px, var(--safe-bottom)) max(32px, var(--safe-left));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .35s ease;
+}
+
+@media (max-width: 599px) {
+  .project-modal {
+    padding: max(16px, var(--safe-top)) max(12px, var(--safe-right)) max(16px, var(--safe-bottom)) max(12px, var(--safe-left));
+    align-items: flex-end;
+  }
+}
+
+.project-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.project-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 5, .72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* The rest of the page recedes behind the overlay — toggled on <body>
+   so no JS reference to <main> is needed. Header is left alone: it's
+   fully transparent chrome, transforming it adds risk for no visible
+   gain. */
+body.is-modal-open main {
+  transition: transform .4s ease, filter .4s ease;
+  transform: scale(.985);
+  filter: blur(2px);
+}
+
+.project-modal__window {
+  position: relative;
+  z-index: 1;
+  width: min(480px, 92vw);
+  max-height: min(720px, 88vh);
+  max-height: min(720px, 88dvh);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-card);
+  background: linear-gradient(135deg, var(--color-surface-glass-start), var(--color-surface-glass-end));
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-deep), 0 0 0 1px rgba(200, 255, 46, .06), 0 0 60px rgba(200, 255, 46, .07);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(22px) scale(.96);
+  filter: blur(6px);
+  transition: opacity .38s var(--ease-rise), transform .38s var(--ease-rise), filter .38s var(--ease-rise);
+}
+
+.project-modal.is-open .project-modal__window {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Bottom-sheet on phone — near-fullscreen, docked to the bottom edge
+   (see the flex-end alignment on .project-modal above) rather than a
+   small centered card, so the form and keyboard have real room. */
+@media (max-width: 599px) {
+  .project-modal__window {
+    width: 100%;
+    max-height: min(92vh, 92dvh);
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    padding-bottom: var(--safe-bottom);
+  }
+}
+
+/* ===== Top bar ===== */
+.project-modal__bar {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 10px 0 16px;
+  border-bottom: 1px solid var(--color-border-faint);
+}
+
+.project-modal__bar-label {
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--color-text-dim-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-modal__close {
+  position: relative;
+  margin-left: auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid var(--color-border-soft);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, background .2s ease;
+}
+
+/* Invisible hit-area extension — keeps the visual chip small inside the
+   40px-tall top bar while still meeting the 44px touch-target minimum. */
+.project-modal__close::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+
+.project-modal__close:hover {
+  border-color: rgba(200, 255, 46, .5);
+  color: var(--color-accent);
+  background: rgba(200, 255, 46, .06);
+}
+
+/* ===== Scrollable body ===== */
+.project-modal__body {
+  overflow-y: auto;
+  padding: 22px 26px 24px;
+}
+
+/* Thinner variant of the global branded scrollbar (see base.css) —
+   this box is much narrower than the page, a full-width scrollbar
+   would look heavy here. */
+.project-modal__body::-webkit-scrollbar {
+  width: 7px;
+}
+
+.project-modal__body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 255, 46, .35) transparent;
+}
+
+/* ===== Form state ===== */
+.project-modal__eyebrow {
+  margin-bottom: 12px;
+}
+
+.project-modal__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.18;
+  letter-spacing: var(--ls-heading);
+  color: var(--color-text-primary-strong);
+}
+
+.project-modal__subtitle {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.project-modal__form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.project-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-modal__label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--color-text-dim-3);
+}
+
+/* Sizing only — surface/border/focus/invalid states come from the
+   shared .field-input in components.css. */
+.project-modal__input {
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.project-modal__input.is-invalid.is-shaking {
+  animation: pmShake .38s ease;
+}
+
+@keyframes pmShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+
+.project-modal__error {
+  font-size: 10.5px;
+}
+
+/* ===== Format cards ===== */
+.project-modal__types {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 2px;
+  border-radius: 10px;
+  transition: box-shadow .2s ease;
+}
+
+.project-modal__types.is-invalid {
+  box-shadow: 0 0 0 1px rgba(255, 140, 90, .5), 0 0 0 4px rgba(255, 140, 90, .08);
+}
+
+.project-modal__types.is-shaking {
+  animation: pmShake .38s ease;
+}
+
+.pm-type {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 10px 11px;
+  min-height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .025);
+  border: 1px solid var(--color-border-soft);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+.pm-type__num {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--color-text-dim);
+  flex-shrink: 0;
+}
+
+.pm-type__name {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.25;
+}
+
+.pm-type__status {
+  display: none;
+  position: absolute;
+  right: 8px;
+  bottom: 7px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--color-accent);
+}
+
+.pm-type:hover {
+  border-color: rgba(200, 255, 46, .4);
+  box-shadow: 0 0 14px rgba(200, 255, 46, .12);
+  transform: translateY(-1px);
+}
+
+.pm-type.is-active {
+  background: rgba(200, 255, 46, .06);
+  border-color: rgba(200, 255, 46, .55);
+  box-shadow: inset 0 0 0 1px rgba(200, 255, 46, .12), 0 0 16px rgba(200, 255, 46, .1);
+}
+
+.pm-type.is-active .pm-type__num {
+  color: var(--color-accent);
+}
+
+.pm-type.is-active .pm-type__name {
+  color: var(--color-text-primary);
+}
+
+.pm-type.is-active .pm-type__status {
+  display: block;
+}
+
+.project-modal__type-detail {
+  min-height: 15px;
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-dim-3);
+}
+
+/* ===== Submit ===== */
+.project-modal__submit {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 4px;
+  padding: 15px 20px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-accent-on-accent);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .03em;
+  cursor: pointer;
+  box-shadow: 5px 5px 0 rgba(200, 255, 46, .22);
+  transition: box-shadow .18s ease, transform .1s linear, opacity .2s ease;
+}
+
+.project-modal__submit:hover {
+  box-shadow: 7px 7px 0 rgba(200, 255, 46, .3);
+}
+
+.project-modal__submit:disabled {
+  cursor: default;
+  opacity: .85;
+}
+
+.project-modal__submit-glow {
+  position: absolute;
+  inset: -20px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 255, 46, .25), transparent 70%);
+  filter: blur(16px);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.project-modal__submit:hover .project-modal__submit-glow {
+  opacity: .8;
+}
+
+.project-modal__submit-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.project-modal__submit.is-loading .project-modal__submit-scan {
+  animation: pmScan 1.1s ease-in-out infinite;
+}
+
+@keyframes pmScan {
+  to { transform: translateX(120%); }
+}
+
+.project-modal__hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-dim-3);
+}
+
+.project-modal__hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+  flex-shrink: 0;
+  animation: lutPulse 1.8s ease-in-out infinite;
+}
+
+/* ===== Form <-> success crossfade ===== */
+.project-modal__form-state {
+  transition: opacity .22s ease, transform .22s ease;
+}
+
+.project-modal__form-state.is-exiting {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* ===== Success state ===== */
+.project-modal__success-state {
+  text-align: center;
+  padding: 8px 0 4px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise);
+}
+
+.project-modal__success-state.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.project-modal__success-check {
+  width: 52px;
+  height: 52px;
+  font-size: 22px;
+  border-width: 2px;
+  margin: 0 auto 18px;
+  animation: pmCheckIn .5s var(--ease-pop);
+}
+
+@keyframes pmCheckIn {
+  0% { transform: scale(.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.project-modal__success-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--color-text-primary-strong);
+}
+
+.project-modal__success-text {
+  margin: 10px auto 0;
+  max-width: 340px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.project-modal__success-state .project-modal__hint {
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.project-modal__success-status {
+  margin: 14px 0 0;
+  justify-content: center;
+  display: flex;
+}
+
+.project-modal__secondary-btn {
+  display: block;
+  margin: 20px auto 0;
+  padding: 11px 22px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
+}
+
+.project-modal__secondary-btn:hover {
+  border-color: rgba(200, 255, 46, .5);
+  color: var(--color-accent);
+}
+
+/* ===== Generic press-feedback for any CTA that opens this modal ===== */
+[data-open-project-modal].is-pressed {
+  animation: pmPress .22s ease;
+}
+
+@keyframes pmPress {
+  0% { transform: scale(1); }
+  40% { transform: scale(.96); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-modal,
+  .project-modal__window,
+  .project-modal__form-state,
+  .project-modal__success-state,
+  body.is-modal-open main {
+    transition: none !important;
+  }
+
+  .project-modal__submit-scan,
+  .project-modal__success-check,
+  [data-open-project-modal].is-pressed,
+  .project-modal__input.is-shaking,
+  .project-modal__types.is-shaking {
+    animation: none !important;
+  }
+
+  body.is-modal-open main {
+    transform: none !important;
+    filter: none !important;
+  }
+}
