@@ -73,6 +73,46 @@
   }
 }
 
+/* Header-clearance safeguard for short desktop/tablet-landscape viewports.
+   Two independent things push the copy under the fixed header on short
+   viewports, so both need a stop:
+
+   1. .assembly__stage itself centers its child (align-items: center on
+      the flex stage). .assembly__container's own height tracks whichever
+      of its two columns is tallest, and on narrow-ish desktop widths the
+      copy column can outgrow .assembly__scene's 100vh (long lines wrap
+      more before .assembly__scene's own width shrinks) — so the stage
+      ends up centering an oversized container, pushing its top *above*
+      y0 (further under the header, not just close to it). flex-start
+      pins the container's top to the stage's own top unconditionally,
+      regardless of which column ends up tallest.
+
+   2. Within that container, .assembly__container's grid still centers
+      .assembly__content per its own (unconditional) align-items: center,
+      since .assembly__scene's explicit height:100vh normally forces the
+      row tall enough that centering the much-shorter copy inside it
+      places the copy too close to the top on short viewports. Anchoring
+      just this column to the row's start and nudging it down with a
+      transform (not margin — margin would grow this item's own
+      margin-box past the scene's 100vh, making it the row's tallest item
+      and reintroducing problem #1) fixes that deterministically.
+
+   Neither rule touches .assembly__scene or the scroll-jacking logic that
+   drives which step is showing. On the narrowest required checkpoint
+   (1024x768) the copy column's own content can still outgrow the
+   available height even with correct top clearance — see the width-driven
+   note in the audit report; that's a separate, out-of-scope issue. */
+@media (min-width: 1024px) and (max-height: 860px) {
+  .assembly__stage {
+    align-items: flex-start;
+  }
+
+  .assembly__content {
+    align-self: start;
+    transform: translateY(calc(var(--header-height) + 16px));
+  }
+}
+
 /* Sticky stage becomes a compact single column: readout on top (per
    the owner's mobile spec — current step first, scene underneath),
    pinned near the top of the safe zone rather than vertically centered

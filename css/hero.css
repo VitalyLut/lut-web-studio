@@ -144,7 +144,7 @@
   perspective: 1300px;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
   .hero__mockup-shell {
     width: calc(560px * var(--hero-scale, .85));
     height: calc(440px * var(--hero-scale, .85));
@@ -157,6 +157,17 @@
     transform: scale(var(--hero-scale, .85));
     transform-origin: top left;
   }
+}
+
+/* 1024-1199px squeeze zone: the mockup's fixed 560px width is an
+   unshrinkable floor for the right grid column (fr tracks don't shrink
+   below a content's own intrinsic size), which left the copy column too
+   narrow for both CTAs to stay on one line and pushed .hero__stats close
+   to/under the fold at heights like 1024x768. A gentle .95 scale here
+   (vs. .85 starting at 1023px and below) frees just enough width for
+   that without visibly shrinking the mockup. */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .hero__mockup-shell { --hero-scale: .95; }
 }
 
 @media (max-width: 767px) {
