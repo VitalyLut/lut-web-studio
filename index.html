@@ -1007,6 +1007,11 @@
           <p class="brief__subtitle reveal-up reveal-delay-2">Ответьте на несколько вопросов. Это займёт 1–2 минуты и поможет сразу понять формат, объём и следующий шаг.</p>
         </div>
 
+        <div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+          <label for="brief-website">Website</label>
+          <input type="text" id="brief-website" tabindex="-1" autocomplete="off" data-brief-honeypot>
+        </div>
+
         <div class="brief__stage">
           <div class="brief__quiz reveal-up reveal-delay-3" data-brief-quiz>
             <div class="brief__quiz-progress">
@@ -1152,11 +1157,17 @@
               <span class="field-error project-modal__error" data-pm-error="type">Выберите формат сайта</span>
             </div>
 
+            <div class="project-modal__field" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+              <label for="pm-website">Website</label>
+              <input type="text" id="pm-website" tabindex="-1" autocomplete="off" data-pm-honeypot>
+            </div>
+
             <button type="submit" class="project-modal__submit" data-pm-submit>
               <span class="project-modal__submit-glow" aria-hidden="true"></span>
               <span class="project-modal__submit-scan" aria-hidden="true"></span>
               <span data-pm-submit-label>Отправить заявку →</span>
             </button>
+            <span class="field-error project-modal__error" data-pm-submit-error></span>
             <p class="project-modal__hint"><span class="project-modal__hint-dot"></span>Обычно отвечаем в течение 15 минут в рабочее время.</p>
           </form>
         </div>
@@ -1167,6 +1178,7 @@
           <p class="project-modal__success-text">Скоро свяжемся с вами, разберём задачу и подберём решение под ваш проект.</p>
           <p class="project-modal__hint"><span class="project-modal__hint-dot"></span>Обычно отвечаем в течение 15 минут в рабочее время.</p>
           <span class="status-pill project-modal__success-status"><span class="status-pill__dot"></span>ЗАЯВКА ПОЛУЧЕНА</span>
+          <div class="project-modal__success-id"><span>ID</span><b data-pm-success-id></b></div>
           <button type="button" class="project-modal__secondary-btn" data-project-modal-close>Закрыть</button>
         </div>
       </div>

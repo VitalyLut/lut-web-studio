@@ -95,6 +95,22 @@
     }
   }
 
+  // ---- UTM: reads utm_source/medium/campaign/term/content from the
+  // current URL. Missing/empty values come back as null, matching the
+  // submit-lead/submit-brief Edge Function contract exactly (each utm.*
+  // field is string|null). ----
+  function getUtmParams() {
+    var params = new URLSearchParams(window.location.search);
+    var keys = ['source', 'medium', 'campaign', 'term', 'content'];
+    var out = {};
+    keys.forEach(function (key) {
+      var value = params.get('utm_' + key);
+      value = value && value.trim() ? value.trim() : null;
+      out[key] = value;
+    });
+    return out;
+  }
+
   window.LwsUtil = {
     reduceMotion: reduceMotion,
     hasHover: hasHover,
@@ -104,6 +120,7 @@
     lockScroll: lockScroll,
     unlockScroll: unlockScroll,
     getFocusable: getFocusable,
-    trapFocus: trapFocus
+    trapFocus: trapFocus,
+    getUtmParams: getUtmParams
   };
 })();

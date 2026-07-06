@@ -9,13 +9,17 @@
   };
 
   var OPEN_EXIT_MS = 260;
-  var SUBMIT_PROCESS_MS = 650;
   var STATE_SWAP_MS = 260;
+
+  var SUBMIT_URL = 'https://mkazpfcbtktznyuqjaqq.supabase.co/functions/v1/submit-lead';
 
   var root, overlay, windowEl, body, formStateEl, successStateEl, form;
   var nameInput, phoneInput, typeButtons, typeDetailEl, submitBtn, submitLabelEl;
+  var honeypotInput, submitErrorEl, successIdEl;
   var lastFocusedTrigger = null;
   var selectedType = null;
+  var currentIdempotencyKey = null;
+  var isSubmitting = false;
 
   // reduceMotion/lockScroll/unlockScroll/trapFocus now live in
   // window.LwsUtil (js/util.js) — menu.js shares the identical
@@ -125,6 +129,18 @@
     ['name', 'phone', 'type'].forEach(clearError);
   }
 
+  // ---- submit-level error (network/server failure, not tied to a field) ----
+  function showSubmitError(message) {
+    if (!submitErrorEl) return;
+    submitErrorEl.textContent = message;
+    submitErrorEl.classList.add('is-visible');
+  }
+
+  function clearSubmitError() {
+    if (!submitErrorEl) return;
+    submitErrorEl.classList.remove('is-visible');
+  }
+
   // ---- format type selection ----
   function setSelectedType(type) {
     selectedType = type || null;
@@ -153,6 +169,8 @@
     form.reset();
     setSelectedType(null);
     clearAllErrors();
+    clearSubmitError();
+    isSubmitting = false;
     submitBtn.disabled = false;
     submitBtn.classList.remove('is-loading');
     if (submitLabelEl) submitLabelEl.textContent = 'Отправить заявку →';
@@ -161,6 +179,10 @@
     successStateEl.hidden = true;
     successStateEl.classList.remove('is-visible');
     body.scrollTop = 0;
+    // A fresh idempotency key per new attempt at filling out the form —
+    // reused across retries/double-clicks of THIS attempt, replaced only
+    // when the modal is opened again (see openModal()).
+    currentIdempotencyKey = crypto.randomUUID();
   }
 
   function trapFocus(e) {
@@ -220,42 +242,74 @@
   }
 
   // ---- submit ----
+  function showSuccess(submissionId) {
+    formStateEl.classList.add('is-exiting');
+    var swapDelay = reduceMotion() ? 0 : STATE_SWAP_MS;
+    window.setTimeout(function () {
+      formStateEl.hidden = true;
+      successStateEl.hidden = false;
+      if (successIdEl) successIdEl.textContent = submissionId || '';
+      void successStateEl.offsetWidth;
+      successStateEl.classList.add('is-visible');
+    }, swapDelay);
+  }
+
+  function endSubmitting() {
+    isSubmitting = false;
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('is-loading');
+    if (submitLabelEl) submitLabelEl.textContent = 'Отправить заявку →';
+  }
+
   function submitForm() {
+    if (isSubmitting) return;
     if (!validate()) return;
+
+    clearSubmitError();
 
     var payload = {
       name: nameInput.value.trim(),
       phone: phoneInput.value.trim(),
       projectType: selectedType,
       source: root.getAttribute('data-active-source') || 'unknown',
-      sourceLabel: root.getAttribute('data-active-source-label') || '',
-      pageUrl: window.location.href
+      pageUrl: window.location.href,
+      idempotencyKey: currentIdempotencyKey,
+      honeypot: honeypotInput ? honeypotInput.value : '',
+      utm: window.LwsUtil.getUtmParams()
     };
 
-    // No backend/webhook/CRM yet — this is the single place to wire one
-    // up later, e.g.:
-    //   fetch('/api/lead', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(payload)
-    //   }).then(...).catch(...)
-    console.log('[project-modal] lead payload (no backend wired yet):', payload);
-
+    isSubmitting = true;
     submitBtn.disabled = true;
     submitBtn.classList.add('is-loading');
     if (submitLabelEl) submitLabelEl.textContent = 'Отправляем...';
 
-    var delay = reduceMotion() ? 0 : SUBMIT_PROCESS_MS;
-    window.setTimeout(function () {
-      formStateEl.classList.add('is-exiting');
-      var swapDelay = reduceMotion() ? 0 : STATE_SWAP_MS;
-      window.setTimeout(function () {
-        formStateEl.hidden = true;
-        successStateEl.hidden = false;
-        void successStateEl.offsetWidth;
-        successStateEl.classList.add('is-visible');
-      }, swapDelay);
-    }, delay);
+    fetch(SUBMIT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          return { status: res.status, data: data };
+        });
+      })
+      .then(function (result) {
+        if (result.data && result.data.ok) {
+          isSubmitting = false;
+          showSuccess(result.data.submissionId);
+          return;
+        }
+        endSubmitting();
+        if (result.status === 429) {
+          showSubmitError('Слишком много попыток. Подождите немного и попробуйте снова.');
+        } else {
+          showSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
+        }
+      })
+      .catch(function () {
+        endSubmitting();
+        showSubmitError('Не удалось отправить заявку. Попробуйте ещё раз.');
+      });
   }
 
   // ---- global trigger delegation: any element with
@@ -293,6 +347,9 @@
     typeDetailEl = root.querySelector('[data-pm-type-detail]');
     submitBtn = root.querySelector('[data-pm-submit]');
     submitLabelEl = root.querySelector('[data-pm-submit-label]');
+    honeypotInput = root.querySelector('[data-pm-honeypot]');
+    submitErrorEl = root.querySelector('[data-pm-submit-error]');
+    successIdEl = root.querySelector('[data-pm-success-id]');
 
     if (!windowEl || !form || !nameInput || !phoneInput || !submitBtn) return;
 

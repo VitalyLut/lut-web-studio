@@ -176,17 +176,7 @@
     });
   }
 
-  var BRIEF_ID_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I — avoids visual ambiguity
-
-  function generateBriefId() {
-    var now = new Date();
-    var y = String(now.getFullYear()).slice(2);
-    var m = String(now.getMonth() + 1).padStart(2, '0');
-    var d = String(now.getDate()).padStart(2, '0');
-    var suffix = '';
-    for (var i = 0; i < 4; i++) suffix += BRIEF_ID_CHARS.charAt(Math.floor(Math.random() * BRIEF_ID_CHARS.length));
-    return 'LWS-' + y + m + d + '-' + suffix;
-  }
+  var SUBMIT_URL = 'https://mkazpfcbtktznyuqjaqq.supabase.co/functions/v1/submit-brief';
 
   var STAGE_MAP = {
     'Есть только идея': 'идея',
@@ -240,6 +230,7 @@
     var nextBtn = section.querySelector('[data-brief-next]');
     var hintEl = section.querySelector('[data-brief-hint]');
     var placeholderEl = section.querySelector('[data-brief-placeholder]');
+    var honeypotEl = document.querySelector('[data-brief-honeypot]');
 
     var reduceMotion = window.LwsUtil.reduceMotion();
     var EXIT_MS = 150;
@@ -248,7 +239,13 @@
     var currentStep = 0;
     var answers = { format: null, stage: null, goal: null, content: null, timing: null, channel: null, name: '', contact: '', comment: '' };
     var submitted = false;
+    var isSubmitting = false;
     var moduleEls = {};
+    // One key per brief-filling attempt: created here for the initial
+    // load, replaced in restart() for the next attempt. Reused as-is
+    // across retries/double-clicks of the SAME attempt so a genuine
+    // network-error retry never counts as a second submission.
+    var idempotencyKey = crypto.randomUUID();
     var briefId = null;
 
     function isStepAnswered(step) {
@@ -293,7 +290,8 @@
             '<span class="brief__field-label">Комментарий <span>(необязательно)</span></span>' +
             '<textarea class="field-input brief__textarea" data-brief-field="comment" placeholder="Коротко о задаче, если хочется">' + esc(answers.comment) + '</textarea>' +
           '</div>' +
-        '</div>'
+        '</div>' +
+        '<span class="field-error brief__field-error" data-brief-submit-error></span>'
       );
     }
 
@@ -529,6 +527,7 @@
       var contactEl = quizContent.querySelector('[data-brief-field="contact"]');
       var nameErr = quizContent.querySelector('[data-brief-error="name"]');
       var contactErr = quizContent.querySelector('[data-brief-error="contact"]');
+      var submitErrorEl = quizContent.querySelector('[data-brief-submit-error]');
       var validName = answers.name.trim().length > 0;
       var validContact = answers.contact.trim().length > 0;
       if (!validName || !validContact) {
@@ -542,28 +541,77 @@
         }
         return;
       }
-      submitted = true;
-      briefId = generateBriefId();
 
-      // No backend yet — this is the shape a future submit call would
-      // send. Exposed on window so email/Telegram/MAX/CRM wiring can
-      // read it later without touching this file again.
-      window.LWS_LAST_BRIEF = {
-        briefId: briefId,
-        submittedAt: new Date().toISOString(),
-        answers: answers
+      if (isSubmitting) return;
+      if (submitErrorEl) submitErrorEl.classList.remove('is-visible');
+
+      var payload = {
+        name: answers.name.trim(),
+        contact: answers.contact.trim(),
+        comment: answers.comment ? answers.comment.trim() : '',
+        answers: {
+          format: answers.format,
+          stage: answers.stage,
+          goal: answers.goal,
+          content: answers.content || [],
+          timing: answers.timing,
+          channel: answers.channel
+        },
+        pageUrl: window.location.href,
+        idempotencyKey: idempotencyKey,
+        honeypot: honeypotEl ? honeypotEl.value : '',
+        utm: window.LwsUtil.getUtmParams()
       };
 
-      renderSuccessLeft();
-      renderMockFinal();
+      isSubmitting = true;
+      if (nextBtn) { nextBtn.disabled = true; nextBtn.textContent = 'Отправляем...'; }
+
+      fetch(SUBMIT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            return { status: res.status, data: data };
+          });
+        })
+        .then(function (result) {
+          if (result.data && result.data.ok) {
+            isSubmitting = false;
+            submitted = true;
+            briefId = result.data.submissionId;
+            renderSuccessLeft();
+            renderMockFinal();
+            return;
+          }
+          isSubmitting = false;
+          if (nextBtn) { nextBtn.disabled = false; nextBtn.textContent = 'Отправить бриф'; }
+          var message = result.status === 429
+            ? 'Слишком много попыток. Подождите немного и попробуйте снова.'
+            : 'Не удалось отправить бриф. Попробуйте ещё раз.';
+          if (submitErrorEl) { submitErrorEl.textContent = message; submitErrorEl.classList.add('is-visible'); }
+        })
+        .catch(function () {
+          isSubmitting = false;
+          if (nextBtn) { nextBtn.disabled = false; nextBtn.textContent = 'Отправить бриф'; }
+          if (submitErrorEl) {
+            submitErrorEl.textContent = 'Не удалось отправить бриф. Попробуйте ещё раз.';
+            submitErrorEl.classList.add('is-visible');
+          }
+        });
     }
 
     function restart() {
       currentStep = 0;
       answers = { format: null, stage: null, goal: null, content: null, timing: null, channel: null, name: '', contact: '', comment: '' };
       submitted = false;
+      isSubmitting = false;
       moduleEls = {};
       briefId = null;
+      // A genuinely new brief attempt — next submit must not be treated
+      // as a replay of the previous (already-accepted) one.
+      idempotencyKey = crypto.randomUUID();
 
       quizEl.innerHTML =
         '<div class="brief__quiz-progress">' +
