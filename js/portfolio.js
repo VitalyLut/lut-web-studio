@@ -7,7 +7,7 @@
       title: 'Стоматология СМ', type: 'Сайт стоматологической клиники', geo: 'Подольск', tag: 'Стоматология',
       description: 'Сайт для стоматологической клиники: услуги, врачи, структура доверия, адаптив и путь пациента до заявки.',
       fact: 'Полная структура сайта: 7 страниц, от услуг до записи',
-      image: 'assets/images/portfolio/biryukov-dental.ru.jpg', imgW: 900, imgH: 562,
+      image: 'assets/images/portfolio/biryukov-dental.ru.webp', imgW: 1600, imgH: 1000,
       alt: 'Главная страница сайта стоматологической клиники в Подольске',
       domain: 'biryukov-dental.ru', url: 'https://biryukov-dental.ru'
     },
@@ -15,7 +15,7 @@
       title: 'Стоматология 4А', type: 'Сайт стоматологии', geo: '', tag: 'Стоматология',
       description: 'Лёгкая и аккуратная упаковка стоматологии с акцентом на услуги, доверие и удобный первый контакт.',
       fact: 'Клиника упакована с нуля: структура, визуал, адаптив',
-      image: 'assets/images/portfolio/4a-dental.ru.jpg', imgW: 900, imgH: 562,
+      image: 'assets/images/portfolio/4a-dental.ru.webp', imgW: 1600, imgH: 1000,
       alt: 'Главная страница сайта стоматологии 4А',
       domain: '4a-dental.ru', url: 'https://4a-dental.ru'
     },
@@ -23,7 +23,7 @@
       title: 'Эстетик Стом', type: 'Корпоративный сайт стоматологии', geo: 'Казань', tag: 'Стоматология',
       description: 'Сайт для сети стоматологий: направления лечения, врачи, доверие, структура услуг и понятная запись на приём.',
       fact: 'Полный редизайн: новая структура и визуал сайта',
-      image: 'assets/images/portfolio/es-stom.ru.jpg', imgW: 900, imgH: 487,
+      image: 'assets/images/portfolio/es-stom.ru.webp', imgW: 1600, imgH: 867,
       alt: 'Главная страница сайта стоматологической клиники Эстетик Стом в Казани',
       domain: 'es-stom.ru', url: 'https://es-stom.ru'
     },
@@ -31,7 +31,7 @@
       title: 'Milin Bouquet', type: 'Сайт цветочного магазина', geo: '', tag: 'Цветы',
       description: 'Визуальная упаковка цветочного проекта: каталог, атмосфера бренда, акцент на букеты и быстрый путь к заказу.',
       fact: 'Полный редизайн и визуальная пересборка сайта',
-      image: 'assets/images/portfolio/milin-bouquet.ru.jpg', imgW: 900, imgH: 562,
+      image: 'assets/images/portfolio/milin-bouquet.ru.webp', imgW: 1600, imgH: 1000,
       alt: 'Главная страница сайта цветочного магазина Milin Bouquet',
       domain: 'milin-bouquet.ru', url: 'https://milin-bouquet.ru'
     },
@@ -39,7 +39,7 @@
       title: 'Модная стоматология', type: 'Сайт стоматологической клиники', geo: 'Краснодар', tag: 'Стоматология',
       description: 'Сайт клиники с мягким визуалом, услугами, доверительными блоками и понятным сценарием обращения.',
       fact: 'Лендинг с архитектурой под будущее расширение',
-      image: 'assets/images/portfolio/modnaya-stom.ru.jpg', imgW: 900, imgH: 562,
+      image: 'assets/images/portfolio/modnaya-stom.ru.webp', imgW: 1600, imgH: 1000,
       alt: 'Главная страница сайта стоматологической клиники в Краснодаре',
       domain: 'modnaya-stom.ru', url: 'https://modnaya-stom.ru'
     },
