@@ -7,19 +7,20 @@
     { id: 'live', number: '05', title: 'Живой след' }
   ];
 
-  // Placeholder evidence entities — no real letters/audio exist yet (see
-  // assets/proof/letters/README.md and assets/proof/audio/README.md).
-  // Each slot can independently gain a letterImage and/or audioFile later;
-  // renderArchive()/bindVoicePlayer() below already branch on whichever
-  // fields are actually filled in, so wiring a real asset in is just
-  // editing this array — no component rewrite.
+  // Real, verified recommendation letters (see assets/proof/letters/).
+  // No voice testimonials exist yet (see assets/proof/audio/README.md) —
+  // every item is type:'letter' for now so the archive never teases an
+  // "Есть голосовой отзыв" link that only leads to a pending state.
+  // Flip an item to 'letter+voice' and fill audioFile/audioDuration once
+  // a real recording is added — renderArchive()/bindVoicePlayer() already
+  // branch on whichever fields are filled in, no component rewrite needed.
   var PROOF_ITEMS = [
-    { id: 'proof-01', company: null, type: 'letter+voice', letterImage: null, audioFile: null, audioDuration: null, source: null, verified: false },
-    { id: 'proof-02', company: null, type: 'letter', letterImage: null, audioFile: null, audioDuration: null, source: null, verified: false },
-    { id: 'proof-03', company: null, type: 'letter+voice', letterImage: null, audioFile: null, audioDuration: null, source: null, verified: false },
-    { id: 'proof-04', company: null, type: 'letter', letterImage: null, audioFile: null, audioDuration: null, source: null, verified: false },
-    { id: 'proof-05', company: null, type: 'letter+voice', letterImage: null, audioFile: null, audioDuration: null, source: null, verified: false },
-    { id: 'proof-06', company: null, type: 'letter', letterImage: null, audioFile: null, audioDuration: null, source: null, verified: false }
+    { id: 'proof-01', company: 'ООО «4А Денталь»', type: 'letter', letterImage: 'assets/proof/letters/letter-01.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Краснодар', verified: true },
+    { id: 'proof-02', company: 'ООО «Эстетик Стом+»', type: 'letter', letterImage: 'assets/proof/letters/letter-02.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Казань', verified: true },
+    { id: 'proof-03', company: 'Milin Bouquet (ИП Усманов Р.Р.)', type: 'letter', letterImage: 'assets/proof/letters/letter-03.webp', audioFile: null, audioDuration: null, source: 'Благодарственное письмо-рекомендация', verified: true },
+    { id: 'proof-04', company: 'ООО «Стоматология «Арт-Дент»»', type: 'letter', letterImage: 'assets/proof/letters/letter-04.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Волгоград', verified: true },
+    { id: 'proof-05', company: 'ООО «Дента»', type: 'letter', letterImage: 'assets/proof/letters/letter-05.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Новороссийск', verified: true },
+    { id: 'proof-06', company: 'ООО «Солнечная стоматология»', type: 'letter', letterImage: 'assets/proof/letters/letter-06.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Казань', verified: true }
   ];
 
   // Content platforms only — Telegram/MAX/WhatsApp are contact channels,
