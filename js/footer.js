@@ -22,12 +22,6 @@
     });
   }
 
-  function initLegalStubs(root) {
-    root.querySelectorAll('[data-footer-legal-links] a').forEach(function (link) {
-      link.addEventListener('click', function (e) { e.preventDefault(); });
-    });
-  }
-
   // The background LWS watermark answers whenever the visitor is over any
   // meaningful interactive element in the footer — one shared class on the
   // footer root, not a per-element effect, so it reads as "the brand
@@ -57,7 +51,6 @@
 
     renderSocials(root);
     initNav(root, reduceMotion);
-    initLegalStubs(root);
     initInteractiveWatermark(root);
   }
 

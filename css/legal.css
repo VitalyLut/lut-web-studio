@@ -1,0 +1,79 @@
+/* Minimal shared template for the temporary legal-page stubs and 404 —
+   deliberately not pulling in any section CSS: just enough to sit on the
+   site's dark background with correct type and a way back home. */
+.legal {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  padding: 96px var(--section-padding);
+}
+
+.legal__container {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.legal__back {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-label);
+  letter-spacing: .02em;
+  color: var(--color-text-muted);
+  margin-bottom: 40px;
+  transition: color var(--motion-micro) ease;
+}
+
+.legal__back:hover,
+.legal__back:focus-visible {
+  color: var(--color-accent);
+}
+
+.legal__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h1);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  color: var(--color-text-primary-strong);
+  margin: 0 0 24px;
+}
+
+.legal__text {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 560px;
+}
+
+@media (max-width: 599px) {
+  .legal {
+    padding: 64px 20px;
+  }
+
+  .legal__back {
+    margin-bottom: 28px;
+  }
+}
+
+/* 404 — same template, centered instead of left-aligned */
+.legal--404 .legal__container {
+  max-width: 480px;
+  text-align: center;
+}
+
+.legal--404 .legal__title {
+  font-size: clamp(64px, 10vw, 120px);
+  color: var(--color-accent);
+}
+
+.legal--404 .legal__text {
+  max-width: none;
+  margin: 0 auto 32px;
+}
+
+.legal--404 .legal__back {
+  margin-bottom: 0;
+}
