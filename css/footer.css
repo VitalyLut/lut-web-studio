@@ -156,11 +156,14 @@
   border-radius: 6px;
   background: var(--color-accent);
   overflow: hidden;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--color-accent-on-accent);
   flex-shrink: 0;
+}
+
+.footer__brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .footer__brand-scan {
