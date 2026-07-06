@@ -7,7 +7,15 @@
   position: relative;
   background: transparent;
   font-family: var(--font-body);
-  padding: 36px 0 64px;
+  /* Compact top (not standard): the quiz card + its nav still need to
+     stay reachable on ~700-950px browser heights, same constraint the
+     original 36px value was picked for — this is a meaningful rhythm
+     improvement over that without reopening a short-viewport fit issue,
+     since Brief is plain document flow (not centered/height-locked), so
+     the only cost of more top space is a little extra scrolling, never
+     an overlap. Standard bottom, since nothing after it has that
+     constraint. */
+  padding: var(--section-gap-compact) 0 var(--section-gap);
 }
 
 .brief__container {

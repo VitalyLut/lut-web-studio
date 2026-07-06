@@ -259,18 +259,73 @@
     var dragLastT = 0;
     var dragMoved = 0;
 
+    // Touch/pen gestures start undecided — neither scroll nor rotate —
+    // until the movement's dominant axis is known. Mouse skips all of
+    // this and keeps the original immediate-drag behavior verbatim,
+    // since a mouse drag on the orbit is never ambiguous with a page
+    // scroll gesture the way a touch drag is.
+    var GESTURE_DIRECTION_THRESHOLD = 8;
+    var gestureDirection = null; // null | 'horizontal' | 'vertical'
+    var gestureStartX = 0;
+    var gestureStartY = 0;
+
     function onPointerDown(e) {
-      dragging = true;
-      velocity = 0;
       dragMoved = 0;
+      if (e.pointerType === 'mouse') {
+        dragging = true;
+        velocity = 0;
+        dragLastX = e.clientX;
+        dragLastT = now();
+        orbit.classList.add('is-dragging');
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      // Touch/pen: record the start point but commit to nothing yet —
+      // no preventDefault, no drag, no rotation. touch-action: pan-y
+      // (see portfolio.css) already lets the browser begin a native
+      // vertical scroll immediately if that's what this becomes; we
+      // only take over once a horizontal intent is confirmed below.
+      gestureDirection = null;
+      gestureStartX = e.clientX;
+      gestureStartY = e.clientY;
       dragLastX = e.clientX;
       dragLastT = now();
-      orbit.classList.add('is-dragging');
-      if (e.cancelable) e.preventDefault();
+      velocity = 0;
     }
 
     function onPointerMove(e) {
-      if (!dragging) return;
+      if (e.pointerType === 'mouse') {
+        if (!dragging) return;
+        var tm = now();
+        var dxm = e.clientX - dragLastX;
+        var dtm = Math.max(1, tm - dragLastT);
+        dragMoved += Math.abs(dxm);
+        baseAngle += dxm * DRAG_SENSITIVITY;
+        velocity = (dxm * DRAG_SENSITIVITY) / dtm;
+        dragLastX = e.clientX;
+        dragLastT = tm;
+        return;
+      }
+
+      if (gestureDirection === 'vertical') return; // let the page scroll — do nothing
+
+      if (gestureDirection === null) {
+        var deltaX = e.clientX - gestureStartX;
+        var deltaY = e.clientY - gestureStartY;
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          gestureDirection = 'vertical';
+          return;
+        }
+        if (Math.abs(deltaX) <= GESTURE_DIRECTION_THRESHOLD) return; // still undecided
+        gestureDirection = 'horizontal';
+        dragging = true;
+        orbit.classList.add('is-dragging');
+        // falls through to apply this same move's rotation below
+      }
+
+      // gestureDirection === 'horizontal'
+      if (e.cancelable) e.preventDefault();
       var t = now();
       var dx = e.clientX - dragLastX;
       var dt = Math.max(1, t - dragLastT);
@@ -282,6 +337,7 @@
     }
 
     function onPointerUp() {
+      gestureDirection = null;
       if (!dragging) return;
       dragging = false;
       orbit.classList.remove('is-dragging');

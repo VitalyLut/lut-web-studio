@@ -617,7 +617,11 @@
 
   .portfolio__orbit {
     transform: scale(.82);
-    touch-action: none;
+    /* Vertical page scroll stays native (browser handles it directly,
+       no JS involved); horizontal is reserved for the orbit's own drag
+       handling in portfolio.js, which now determines gesture direction
+       itself before ever taking over. */
+    touch-action: pan-y;
   }
 }
 

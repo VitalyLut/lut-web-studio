@@ -7,7 +7,10 @@
   position: relative;
   background: transparent;
   font-family: var(--font-body);
-  padding: var(--section-padding) 0 calc(var(--section-padding) * 1.5);
+  /* Large bottom: Brief's own top is standard, not enough on its own to
+     separate "doubts answered" from "tell us about your project" as two
+     distinct beats — FAQ's bottom carries more of that weight. */
+  padding: var(--section-gap) 0 var(--section-gap-large);
 }
 
 .faq__container {

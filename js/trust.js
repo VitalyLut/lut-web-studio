@@ -61,7 +61,7 @@
       var hasLetter = !!item.letterImage;
       var hasAudio = !!item.audioFile;
       var inner = hasLetter
-        ? '<img src="' + item.letterImage + '" alt="' + (item.company ? 'Рекомендательное письмо — ' + item.company : 'Рекомендательное письмо') + '">'
+        ? '<img src="' + item.letterImage + '" alt="' + (item.company ? 'Рекомендательное письмо — ' + item.company : 'Рекомендательное письмо') + '" loading="lazy" decoding="async">'
         : '<span class="trust__letter-head"></span>' +
           '<span class="trust__letter-lines">' +
             '<span></span><span></span><span></span>' +
@@ -123,7 +123,7 @@
     var hasLetter = !!item.letterImage;
     var hasAudio = !!item.audioFile;
     var letterHtml = hasLetter
-      ? '<img src="' + item.letterImage + '" alt="Рекомендательное письмо — ' + (item.company || '') + '">'
+      ? '<img src="' + item.letterImage + '" alt="Рекомендательное письмо — ' + (item.company || '') + '" decoding="async">'
       : '<div class="trust__viewer-doc-placeholder">' +
           '<span class="trust__viewer-doc-head"></span>' +
           '<span class="trust__viewer-doc-lines"><span></span><span></span><span></span><span></span></span>' +
@@ -148,29 +148,35 @@
     );
   }
 
-  function initViewer(section) {
-    var viewer = section.querySelector('[data-trust-viewer]');
-    var overlay = section.querySelector('[data-trust-viewer-overlay]');
-    var closeBtn = section.querySelector('[data-trust-viewer-close]');
-    var windowEl = section.querySelector('.trust__viewer-window');
+  // The viewer lives at the end of <body> (see index.html), not inside
+  // .trust — a section-local stacking context could otherwise put it
+  // under unrelated fixed/sticky elements like the header. All of its
+  // lookups are document-global; `section` params below are kept only
+  // where callers still pass one for the OTHER (section-scoped) work
+  // those functions do.
+  function initViewer() {
+    var viewer = document.querySelector('[data-trust-viewer]');
+    var overlay = document.querySelector('[data-trust-viewer-overlay]');
+    var closeBtn = document.querySelector('[data-trust-viewer-close]');
+    var windowEl = document.querySelector('.trust__viewer-window');
     if (!viewer) return;
 
     function onKeydown(e) {
       if (e.key === 'Escape') {
-        closeViewer(section);
+        closeViewer();
         return;
       }
       window.LwsUtil.trapFocus(e, windowEl);
     }
     viewerKeydownBound = onKeydown;
 
-    overlay.addEventListener('click', function () { closeViewer(section); });
-    closeBtn.addEventListener('click', function () { closeViewer(section); });
+    overlay.addEventListener('click', function () { closeViewer(); });
+    closeBtn.addEventListener('click', function () { closeViewer(); });
   }
 
-  function revealViewer(section) {
-    var viewer = section.querySelector('[data-trust-viewer]');
-    var closeBtn = section.querySelector('[data-trust-viewer-close]');
+  function revealViewer() {
+    var viewer = document.querySelector('[data-trust-viewer]');
+    var closeBtn = document.querySelector('[data-trust-viewer-close]');
     viewerLastFocused = document.activeElement;
     viewer.classList.add('is-open');
     viewer.setAttribute('aria-hidden', 'false');
@@ -180,17 +186,17 @@
   }
 
   function openViewer(section, item, index) {
-    var viewer = section.querySelector('[data-trust-viewer]');
-    var body = section.querySelector('[data-trust-viewer-body]');
+    var viewer = document.querySelector('[data-trust-viewer]');
+    var body = document.querySelector('[data-trust-viewer-body]');
     if (!viewer || !body) return;
 
     body.innerHTML = buildViewerBody(item, index);
     bindVoicePlayer(section, (item.type === 'letter+voice' || item.type === 'voice') ? item : null, true);
-    revealViewer(section);
+    revealViewer();
   }
 
-  function closeViewer(section) {
-    var viewer = section.querySelector('[data-trust-viewer]');
+  function closeViewer() {
+    var viewer = document.querySelector('[data-trust-viewer]');
     if (!viewer || !viewer.classList.contains('is-open')) return;
     viewer.classList.remove('is-open');
     viewer.setAttribute('aria-hidden', 'true');
@@ -213,7 +219,7 @@
   }
 
   function bindVoicePlayer(section, item, inViewer) {
-    var scope = inViewer ? section.querySelector('[data-trust-viewer-body]') : section.querySelector('[data-trust-scene="evidence"]');
+    var scope = inViewer ? document.querySelector('[data-trust-viewer-body]') : section.querySelector('[data-trust-scene="evidence"]');
     if (!scope) return;
     var voiceEl = scope.querySelector('[data-trust-voice]');
     if (!voiceEl) return;
@@ -299,36 +305,49 @@
     }).join('');
   }
 
+  // Real file, added by the owner to assets/proof/contract/ — no PDF
+  // exists (no safe local converter is available either: no LibreOffice/
+  // pandoc, and macOS's built-in textutil can't produce PDF output), so
+  // this is an honest DOCX download/open card rather than an inline
+  // preview a browser can't actually render.
+  var CONTRACT_FILE_NAME = 'Универсальный_договор_на_разработку_сайта_LUT_Web_Studio.docx';
+  var CONTRACT_FILE_PATH = 'assets/proof/contract/' + CONTRACT_FILE_NAME;
+  var CONTRACT_FILE_SIZE_LABEL = '51 КБ';
+
   function buildContractViewerBody() {
     return (
-      '<div class="trust__viewer-doc">' +
+      '<div class="trust__viewer-doc trust__contract-doc">' +
         '<span class="trust__viewer-doc-label">Шаблон договора</span>' +
-        '<div class="trust__viewer-doc-frame">' +
-          '<div class="trust__viewer-doc-placeholder">' +
-            '<span class="trust__viewer-doc-head"></span>' +
-            '<span class="trust__viewer-doc-lines"><span></span><span></span><span></span><span></span></span>' +
-            '<span class="trust__viewer-doc-seal" aria-hidden="true"></span>' +
+        '<p class="trust__contract-doc-text">Работаю по договору. В нём фиксируются объём работ, сроки, стоимость, этапы оплаты, количество правок, передача прав и другие условия проекта.</p>' +
+        '<div class="trust__contract-doc-file">' +
+          '<span class="trust__contract-doc-icon" aria-hidden="true">DOC</span>' +
+          '<div class="trust__contract-doc-meta">' +
+            '<span class="trust__contract-doc-name">' + CONTRACT_FILE_NAME + '</span>' +
+            '<span class="trust__contract-doc-info">Word (.docx) · ' + CONTRACT_FILE_SIZE_LABEL + '</span>' +
           '</div>' +
         '</div>' +
-        '<p class="trust__viewer-doc-status">Шаблон договора будет доступен здесь после согласования индивидуальных условий проекта.</p>' +
+        '<div class="trust__contract-doc-actions">' +
+          '<a class="btn btn--primary trust__contract-doc-btn" href="' + CONTRACT_FILE_PATH + '" download>Скачать договор</a>' +
+          '<a class="btn btn--secondary trust__contract-doc-btn" href="' + CONTRACT_FILE_PATH + '" target="_blank" rel="noopener noreferrer">Открыть документ</a>' +
+        '</div>' +
       '</div>'
     );
   }
 
-  function openContractViewer(section) {
-    var viewer = section.querySelector('[data-trust-viewer]');
-    var body = section.querySelector('[data-trust-viewer-body]');
+  function openContractViewer() {
+    var viewer = document.querySelector('[data-trust-viewer]');
+    var body = document.querySelector('[data-trust-viewer-body]');
     if (!viewer || !body) return;
 
     body.innerHTML = buildContractViewerBody();
-    revealViewer(section);
+    revealViewer();
   }
 
   function initContractButton(section) {
     var btn = section.querySelector('[data-trust-contract-btn]');
     if (!btn) return;
     btn.addEventListener('click', function () {
-      openContractViewer(section);
+      openContractViewer();
     });
   }
 
@@ -345,7 +364,7 @@
     renderArchive(section);
     renderNetwork(section);
     initContractButton(section);
-    initViewer(section);
+    initViewer();
 
     var reduceMotion = window.LwsUtil.reduceMotion();
     var activeIndex = 0;
@@ -490,10 +509,27 @@
       btn.addEventListener('click', function () { setActiveMode(i); });
     });
 
-    // First mode's one-shot sequence plays once on load (skipped under
-    // reduced motion, where the settled end-state is shown directly).
+    // First mode's one-shot sequence used to play the instant the page
+    // loaded, regardless of scroll position — visitors who hadn't
+    // scrolled anywhere near Trust yet would come back to it already
+    // finished. Now it waits until the section is actually ~35% visible,
+    // fires once, and disconnects (skipped entirely under reduced
+    // motion, where the settled end-state is shown directly instead).
     if (!reduceMotion) {
-      playPaymentSequence();
+      if ('IntersectionObserver' in window) {
+        var trustSequenceIO = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            playPaymentSequence();
+            trustSequenceIO.disconnect();
+          });
+        }, { threshold: 0.35 });
+        trustSequenceIO.observe(section);
+      } else {
+        // No IntersectionObserver support — fail open rather than never
+        // playing the sequence at all.
+        playPaymentSequence();
+      }
     } else {
       settlePaymentSequence(section);
       settleContractSequence(section);

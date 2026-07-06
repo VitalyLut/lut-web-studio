@@ -116,6 +116,21 @@
   --space-md: 16px;
   --space-lg: 24px;
 
+  /* Section rhythm — vertical spacing between independent, non-scroll-
+     jacked sections (currently applied to Trust/FAQ/Brief/Footer only).
+     Deliberately NOT applied to Hero/Assembly/Portfolio/Configurator/
+     Journey — those are either scroll-jacked pinned tracks or full-
+     viewport flex-centered scenes where the top/bottom space is really
+     internal centering math, not a stackable gap between two independent
+     blocks; touching it risks the same class of regression already
+     fixed once before (see the Assembly header-overlap fix). Three tiers
+     only, chosen per-transition by how connected the two sections feel:
+     compact = same conversation continuing, standard = default
+     section-to-section pacing, large = a bigger narrative pause. */
+  --section-gap-compact: 48px;
+  --section-gap: 72px;
+  --section-gap-large: 104px;
+
   /* Motion */
   --ease-rise: cubic-bezier(.2, .8, .2, 1);
   --ease-pop: cubic-bezier(.34, 1.5, .5, 1);

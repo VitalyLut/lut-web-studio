@@ -8,7 +8,12 @@
   isolation: isolate;
   background: transparent;
   font-family: var(--font-body);
-  padding: 44px 0 24px;
+  /* Compact top: Brief and Footer are the same "get in touch" beat
+     continuing, not two independent blocks — the manifesto CTA reads as
+     a direct continuation of the brief flow, so it stays close rather
+     than getting the full standard gap. Bottom is the page's own
+     terminal edge, not a gap to another section — left as-is. */
+  padding: var(--section-gap-compact) 0 24px;
 }
 
 .footer__container {
@@ -59,12 +64,53 @@
   text-align: center;
 }
 
-.footer__manifesto-cta {
+/* Final CTA of the page — was a plain text-link before, easy to miss
+   right after the manifesto headline. Now a full primary button so the
+   page's last word is also its strongest ask. */
+.footer__cta-btn {
   display: inline-flex;
-  margin-top: 22px;
-  background: none;
-  border: none;
-  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28px;
+  padding: 19px 40px;
+  font-size: 15px;
+}
+
+.footer__cta-btn:active {
+  transform: translateY(1px) scale(.99);
+  box-shadow: 2px 2px 0 rgba(200, 255, 46, .22);
+}
+
+.footer__cta-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.footer__cta-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: .02em;
+  color: var(--color-text-dim);
+}
+
+.footer__cta-hint-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+@media (max-width: 599px) {
+  .footer__cta-btn {
+    width: 100%;
+    padding: 18px 24px;
+  }
 }
 
 .footer__title {

@@ -163,17 +163,20 @@
       <a class="menu__link" href="#portfolio">
         <span class="menu__link-index">03</span><span class="menu__link-text">Проекты</span>
       </a>
+      <a class="menu__link" href="#trust">
+        <span class="menu__link-index">04</span><span class="menu__link-text">Условия и гарантии</span>
+      </a>
       <a class="menu__link" href="#configurator">
-        <span class="menu__link-index">04</span><span class="menu__link-text">Форматы сайтов</span>
+        <span class="menu__link-index">05</span><span class="menu__link-text">Форматы сайтов</span>
       </a>
       <a class="menu__link" href="#journey">
-        <span class="menu__link-index">05</span><span class="menu__link-text">Путь клиента</span>
+        <span class="menu__link-index">06</span><span class="menu__link-text">Путь клиента</span>
       </a>
       <a class="menu__link" href="#faq">
-        <span class="menu__link-index">06</span><span class="menu__link-text">Вопросы и ответы</span>
+        <span class="menu__link-index">07</span><span class="menu__link-text">Вопросы и ответы</span>
       </a>
       <a class="menu__link" href="#brief">
-        <span class="menu__link-index">07</span><span class="menu__link-text">Рассказать о проекте</span>
+        <span class="menu__link-index">08</span><span class="menu__link-text">Рассказать о проекте</span>
       </a>
     </div>
     <div class="menu__footer">
@@ -646,7 +649,7 @@
                 <div class="trust__contract-cta">
                   <p class="trust__doc-text">До начала работы фиксируем объём проекта, сроки, стоимость, порядок оплаты, количество правок и передачу прав.</p>
                   <button type="button" class="btn btn--primary trust__contract-btn" data-trust-contract-btn>Посмотреть шаблон договора</button>
-                  <p class="trust__contract-note">Шаблон откроется в отдельном окне.</p>
+                  <p class="trust__contract-note">Откроется окно с описанием, файлом договора и кнопкой скачивания.</p>
                 </div>
               </div>
 
@@ -755,16 +758,6 @@
             <p class="trust__nav-hint">Посмотрите все 5 разделов — здесь собраны условия работы и реальные доказательства.</p>
           </div>
 
-        </div>
-      </div>
-
-      <!-- Document preview — reuses window.LwsUtil for scroll-lock/focus-trap,
-           not a duplicate modal system. Populated per-letter by trust.js. -->
-      <div class="trust__viewer" data-trust-viewer aria-hidden="true">
-        <div class="trust__viewer-overlay" data-trust-viewer-overlay></div>
-        <div class="trust__viewer-window" role="dialog" aria-modal="true" aria-label="Просмотр документа">
-          <button type="button" class="trust__viewer-close" data-trust-viewer-close aria-label="Закрыть просмотр">✕</button>
-          <div class="trust__viewer-body" data-trust-viewer-body></div>
         </div>
       </div>
     </section>
@@ -1154,7 +1147,8 @@
 
       <div class="footer__manifesto">
         <h2 class="footer__title reveal-up">Собираем не страницы.<br>Собираем <span>путь к заявке</span>.</h2>
-        <button type="button" class="text-link footer__manifesto-cta reveal-up reveal-delay-1" data-open-project-modal data-source="footer" data-source-label="Обсудить проект">Обсудить проект →</button>
+        <button type="button" class="btn btn--primary footer__cta-btn reveal-up reveal-delay-1" data-open-project-modal data-source="footer" data-source-label="Обсудить проект">Обсудить проект</button>
+        <p class="footer__cta-hint reveal-up reveal-delay-2"><span class="footer__cta-hint-dot"></span>Ответим в течение 15 минут в рабочее время</p>
       </div>
 
       <div class="footer__mid reveal-up reveal-delay-1">
@@ -1183,6 +1177,7 @@
         <a class="footer__nav-link" href="#home">Главная</a>
         <a class="footer__nav-link" href="#assembly">Как собирается сайт</a>
         <a class="footer__nav-link" href="#portfolio">Проекты</a>
+        <a class="footer__nav-link" href="#trust">Условия и гарантии</a>
         <a class="footer__nav-link" href="#configurator">Форматы сайтов</a>
         <a class="footer__nav-link" href="#journey">Путь клиента</a>
         <a class="footer__nav-link" href="#faq">Вопросы и ответы</a>
@@ -1284,6 +1279,22 @@
           <button type="button" class="project-modal__secondary-btn" data-project-modal-close>Закрыть</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Trust document/letter preview — lives at the end of body (not inside
+       .trust) so its stacking is never at the mercy of a section-local
+       stacking context; a fixed z-index:var(--z-modal) descendant of an
+       ancestor with its own stacking context can still end up rendering
+       under unrelated fixed/sticky elements like the header, which is
+       exactly what happened while it lived inside .trust. Reuses
+       window.LwsUtil for scroll-lock/focus-trap, not a duplicate modal
+       system. Populated per-letter (or for the contract) by trust.js. -->
+  <div class="trust__viewer" data-trust-viewer aria-hidden="true">
+    <div class="trust__viewer-overlay" data-trust-viewer-overlay></div>
+    <div class="trust__viewer-window" role="dialog" aria-modal="true" aria-label="Просмотр документа">
+      <button type="button" class="trust__viewer-close" data-trust-viewer-close aria-label="Закрыть просмотр">✕</button>
+      <div class="trust__viewer-body" data-trust-viewer-body></div>
     </div>
   </div>
 

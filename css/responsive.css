@@ -63,6 +63,9 @@
 @media (max-width: 1199px) {
   :root {
     --section-padding: 44px;
+    --section-gap-compact: 40px;
+    --section-gap: 60px;
+    --section-gap-large: 88px;
   }
 }
 
@@ -70,6 +73,9 @@
   :root {
     --section-padding: 32px;
     --header-height: 76px;
+    --section-gap-compact: 32px;
+    --section-gap: 48px;
+    --section-gap-large: 72px;
   }
 }
 
@@ -77,6 +83,9 @@
   :root {
     --section-padding: 20px;
     --header-height: 64px;
+    --section-gap-compact: 24px;
+    --section-gap: 36px;
+    --section-gap-large: 56px;
   }
 }
 

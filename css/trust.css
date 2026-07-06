@@ -6,7 +6,12 @@
   position: relative;
   background: transparent;
   font-family: var(--font-body);
-  padding: calc(var(--section-padding) * 1.1) 0 calc(var(--section-padding) * 0.9);
+  /* Large top: Portfolio contributes zero bottom space of its own (fixed
+     118vh scene), so Trust alone has to create the breathing room after
+     the orbit. Standard bottom: Configurator's own top padding is
+     already substantial (its min-height:100vh centering isn't touched
+     here), so the combined gap stays generous without doubling up. */
+  padding: var(--section-gap-large) 0 var(--section-gap);
   overflow: hidden;
 }
 
@@ -1481,6 +1486,86 @@
   line-height: 1.5;
   color: var(--color-text-dim-4);
   text-align: center;
+}
+
+/* Contract card — honest DOCX download/open, not a fake inline preview
+   (browsers can't render .docx, and no safe local PDF converter exists
+   in this environment). */
+.trust__contract-doc-text {
+  margin: 0 0 20px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.trust__contract-doc-file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-soft);
+}
+
+.trust__contract-doc-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: var(--color-accent-on-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.trust__contract-doc-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.trust__contract-doc-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trust__contract-doc-info {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .02em;
+  color: var(--color-text-dim);
+}
+
+.trust__contract-doc-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.trust__contract-doc-btn {
+  flex: 1;
+  text-align: center;
+  padding: 13px 18px;
+  font-size: 13px;
+}
+
+@media (max-width: 599px) {
+  .trust__contract-doc-actions {
+    flex-direction: column;
+  }
 }
 
 .trust__voice {
