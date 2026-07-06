@@ -22,6 +22,7 @@ import {
 } from "../_shared/validation.ts";
 import { extractClientIp, hashIp } from "../_shared/ip.ts";
 import { checkRateLimits } from "../_shared/rate-limit.ts";
+import { notifyNewLead } from "../_shared/telegram.ts";
 
 const PROJECT_TYPES = [
   "landing",
@@ -265,6 +266,23 @@ export default {
           duplicate,
           durationMs: Date.now() - startedAt,
         });
+
+        // The row is already committed at this point — Telegram is a
+        // best-effort side effect only. A replay (duplicate) is not a new
+        // event and must not send a second notification. Any failure here
+        // is swallowed inside notifyNewLead() and never affects the
+        // response below.
+        if (!duplicate) {
+          await notifyNewLead({
+            submissionId: row.lead_number,
+            name,
+            phone,
+            projectType,
+            source,
+            pageUrl,
+            createdAt: row.created_at,
+          });
+        }
 
         return jsonResponse(
           duplicate ? 200 : 201,

@@ -25,6 +25,7 @@ import {
 import type { Json } from "../_shared/database.types.ts";
 import { extractClientIp, hashIp } from "../_shared/ip.ts";
 import { checkRateLimits } from "../_shared/rate-limit.ts";
+import { notifyNewBrief } from "../_shared/telegram.ts";
 
 // Exact literal option strings from js/brief.js QUIZ_STEPS — re-verified
 // against the current file, not assumed from memory. Any value outside
@@ -319,6 +320,25 @@ export default {
           duplicate,
           durationMs: Date.now() - startedAt,
         });
+
+        // Same reasoning as submit-lead: row already committed, Telegram
+        // is best-effort only, and a replay must not re-notify.
+        if (!duplicate) {
+          await notifyNewBrief({
+            submissionId: row.brief_number,
+            name,
+            contact,
+            format: answers.format,
+            stage: answers.stage,
+            goal: answers.goal,
+            content: answers.content,
+            timing: answers.timing,
+            channel: answers.channel,
+            comment,
+            pageUrl,
+            createdAt: row.created_at,
+          });
+        }
 
         return jsonResponse(
           duplicate ? 200 : 201,
