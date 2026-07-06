@@ -15,7 +15,7 @@
 
   var root, overlay, windowEl, body, formStateEl, successStateEl, form;
   var nameInput, phoneInput, typeButtons, typeDetailEl, submitBtn, submitLabelEl;
-  var honeypotInput, submitErrorEl, successIdEl;
+  var honeypotInput, submitErrorEl, successIdEl, consentInput;
   var lastFocusedTrigger = null;
   var selectedType = null;
   var currentIdempotencyKey = null;
@@ -126,7 +126,7 @@
   }
 
   function clearAllErrors() {
-    ['name', 'phone', 'type'].forEach(clearError);
+    ['name', 'phone', 'type', 'consent'].forEach(clearError);
   }
 
   // ---- submit-level error (network/server failure, not tied to a field) ----
@@ -160,6 +160,7 @@
     if (!name) { showError('name', 'Укажите имя'); ok = false; } else { clearError('name'); }
     if (phoneDigits.length !== 11) { showError('phone', 'Введите номер телефона'); ok = false; } else { clearError('phone'); }
     if (!selectedType) { showError('type', 'Выберите формат сайта'); ok = false; }
+    if (!consentInput.checked) { showError('consent'); ok = false; } else { clearError('consent'); }
 
     return ok;
   }
@@ -350,8 +351,9 @@
     honeypotInput = root.querySelector('[data-pm-honeypot]');
     submitErrorEl = root.querySelector('[data-pm-submit-error]');
     successIdEl = root.querySelector('[data-pm-success-id]');
+    consentInput = root.querySelector('[data-pm-field="consent"]');
 
-    if (!windowEl || !form || !nameInput || !phoneInput || !submitBtn) return;
+    if (!windowEl || !form || !nameInput || !phoneInput || !submitBtn || !consentInput) return;
 
     root.querySelectorAll('[data-project-modal-close]').forEach(function (btn) {
       btn.addEventListener('click', closeModal);
@@ -366,6 +368,9 @@
 
     nameInput.addEventListener('input', function () { clearError('name'); });
     phoneInput.addEventListener('input', onPhoneInput);
+    consentInput.addEventListener('change', function () {
+      if (consentInput.checked) clearError('consent');
+    });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();

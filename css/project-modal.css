@@ -224,6 +224,50 @@ body.is-modal-open main {
   font-size: 10.5px;
 }
 
+.project-modal__field--consent {
+  gap: 4px;
+}
+
+.project-modal__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.project-modal__consent-input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.project-modal__consent span {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-text-dim-4);
+}
+
+.project-modal__consent a {
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-accent-border);
+}
+
+.project-modal__consent a:hover,
+.project-modal__consent a:focus-visible {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.project-modal__consent-input.is-invalid {
+  outline: 1px solid #ff9c73;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 /* ===== Format cards ===== */
 .project-modal__types {
   display: grid;

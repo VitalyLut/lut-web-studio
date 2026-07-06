@@ -117,6 +117,7 @@
   <link rel="stylesheet" href="css/footer.css">
   <link rel="stylesheet" href="css/project-modal.css">
   <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/cookie-consent.css">
 </head>
 <body>
   <div class="site-bg" aria-hidden="true">
@@ -1255,6 +1256,14 @@
               <input type="text" id="pm-website" tabindex="-1" autocomplete="off" data-pm-honeypot>
             </div>
 
+            <div class="project-modal__field project-modal__field--consent">
+              <label class="project-modal__consent">
+                <input type="checkbox" class="project-modal__consent-input" id="pm-consent" data-pm-field="consent">
+                <span>Я соглашаюсь на <a href="/consent.html" target="_blank" rel="noopener">обработку персональных данных</a> и подтверждаю, что ознакомился с <a href="/privacy.html" target="_blank" rel="noopener">Политикой конфиденциальности</a>.</span>
+              </label>
+              <span class="field-error project-modal__error" data-pm-error="consent">Подтвердите согласие на обработку персональных данных</span>
+            </div>
+
             <button type="submit" class="project-modal__submit" data-pm-submit>
               <span class="project-modal__submit-glow" aria-hidden="true"></span>
               <span class="project-modal__submit-scan" aria-hidden="true"></span>
@@ -1279,6 +1288,7 @@
   </div>
 
   <script src="js/util.js"></script>
+  <script src="js/cookie-consent.js"></script>
   <script src="js/social-links.js"></script>
   <script src="js/main.js"></script>
   <script src="js/hero.js"></script>

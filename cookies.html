@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Политика использования cookie | LUT Web Studio</title>
 
-  <meta name="robots" content="noindex, follow">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://lutstudio.ru/cookies.html">
 
   <link rel="icon" type="image/png" href="assets/favicon/favicon-96x96.png" sizes="96x96">
@@ -22,14 +22,80 @@
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/legal.css">
+  <link rel="stylesheet" href="css/cookie-consent.css">
 </head>
 <body>
-  <main class="legal">
+  <main class="legal legal--doc">
     <div class="legal__container">
       <a class="legal__back" href="/">← На главную</a>
       <h1 class="legal__title">Политика использования cookie</h1>
-      <p class="legal__text">Документ готовится к публикации. Полная актуальная версия будет размещена на этой странице.</p>
+      <span class="legal__updated">Дата публикации: 6 июля 2026 года</span>
+      <p class="legal__lead">Эта страница объясняет, какие cookie и аналогичные технологии использует сайт <a href="https://lutstudio.ru/">lutstudio.ru</a> и как управлять своим выбором.</p>
+
+      <section class="legal__section" id="what">
+        <h2 class="legal__h2"><span class="legal__h2-num">01</span>Что такое cookie</h2>
+        <p>Cookie — небольшой фрагмент данных, который сайт сохраняет в браузере посетителя. Cookie помогают сайту запоминать технические настройки и, при согласии пользователя, собирать обезличенную статистику посещений.</p>
+      </section>
+
+      <section class="legal__section" id="technologies">
+        <h2 class="legal__h2"><span class="legal__h2-num">02</span>Какие технологии использует сайт</h2>
+
+        <h3 class="legal__h3">A. Необходимые</h3>
+        <p>Работают всегда, без них сайт не может корректно функционировать:</p>
+        <ul>
+          <li>сохранение вашего выбора в cookie-баннере (принять / только необходимые) — технически это не cookie, а <strong>локальное хранилище браузера (localStorage)</strong>, мы указываем это честно;</li>
+          <li>технические данные, необходимые для корректной работы интерфейса сайта.</li>
+        </ul>
+
+        <h3 class="legal__h3">B. Аналитические</h3>
+        <p><strong>Яндекс.Метрика</strong>, счётчик № 104469602. Функции:</p>
+        <ul>
+          <li>статистика посещений;</li>
+          <li>карта кликов;</li>
+          <li>Вебвизор (запись действий на сайте для анализа удобства интерфейса);</li>
+          <li>отслеживание переходов по ссылкам;</li>
+          <li>оценка поведения пользователей.</li>
+        </ul>
+        <p>Аналитика запускается только после того, как вы выбрали «Принять» в баннере cookie. До этого выбора запросы к Яндекс.Метрике не отправляются.</p>
+      </section>
+
+      <section class="legal__section" id="analytics-data">
+        <h2 class="legal__h2"><span class="legal__h2-num">03</span>Какие данные может получать аналитика</h2>
+        <p>В общем виде (без детализации до конкретного человека) Яндекс.Метрика может получать:</p>
+        <ul>
+          <li>IP-адрес и связанные с ним технические сведения;</li>
+          <li>тип устройства;</li>
+          <li>браузер и операционную систему;</li>
+          <li>посещённые страницы сайта;</li>
+          <li>источник перехода на сайт;</li>
+          <li>действия на сайте (клики, скролл, движение курсора — через Вебвизор);</li>
+          <li>дату и время посещения.</li>
+        </ul>
+      </section>
+
+      <section class="legal__section" id="manage">
+        <h2 class="legal__h2"><span class="legal__h2-num">04</span>Управление согласием</h2>
+        <p>При первом посещении сайта появляется баннер с двумя кнопками:</p>
+        <ul>
+          <li><strong>«Принять»</strong> — включает необходимые технологии и Яндекс.Метрику;</li>
+          <li><strong>«Только необходимые»</strong> — включает только необходимые для работы сайта технологии, без аналитики.</li>
+        </ul>
+        <p>Вы также можете в любой момент удалить сохранённый выбор через настройки своего браузера (очистка данных сайта/localStorage) — при следующем визите баннер появится снова.</p>
+        <p>Или воспользуйтесь кнопкой ниже — она сбросит сохранённый выбор и покажет баннер заново прямо сейчас:</p>
+        <button type="button" class="legal__reset-btn" data-cookie-reset-btn>Изменить настройки cookie</button>
+        <span class="legal__reset-status" data-cookie-reset-status role="status" aria-live="polite">Настройки сброшены — баннер показан ниже</span>
+        <div class="legal__note">
+          <p>Если вы уже дали согласие на Яндекс.Метрику в текущем визите и затем выберете «Только необходимые», это остановит запуск Метрики при следующих загрузках страницы. Технически невозможно мгновенно отозвать данные, которые уже были отправлены в рамках текущей сессии — это ограничение любой аналитики, а не только этого сайта.</p>
+        </div>
+      </section>
+
+      <section class="legal__section" id="contacts">
+        <h2 class="legal__h2"><span class="legal__h2-num">05</span>Контакты</h2>
+        <p>По вопросам, связанным с cookie и аналитикой, можно написать на <a href="mailto:lut-webstudio@yandex.ru">lut-webstudio@yandex.ru</a>.</p>
+      </section>
     </div>
   </main>
+
+  <script src="js/cookie-consent.js"></script>
 </body>
 </html>

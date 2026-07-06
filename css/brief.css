@@ -271,6 +271,50 @@
   margin-top: 1px;
 }
 
+.brief__field--consent {
+  gap: 4px;
+}
+
+.brief__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+}
+
+.brief__consent-input {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.brief__consent span {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-dim-4);
+}
+
+.brief__consent a {
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-accent-border);
+}
+
+.brief__consent a:hover,
+.brief__consent a:focus-visible {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.brief__consent-input.is-invalid {
+  outline: 1px solid #ff9c73;
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 /* ===== Nav ===== */
 .brief__quiz-nav {
   display: flex;

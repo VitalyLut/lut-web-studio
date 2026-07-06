@@ -1,6 +1,9 @@
-/* Minimal shared template for the temporary legal-page stubs and 404 —
-   deliberately not pulling in any section CSS: just enough to sit on the
-   site's dark background with correct type and a way back home. */
+/* Shared template for the legal document pages (privacy/consent/cookies)
+   and 404 — deliberately not pulling in any section CSS: just enough to
+   sit on the site's dark background with correct type and a way home.
+   .legal centers a SHORT stub vertically; full documents opt out of that
+   via .legal--doc (see below) since a long document reads better started
+   from the top than centered in the viewport. */
 .legal {
   min-height: 100vh;
   min-height: 100dvh;
@@ -13,6 +16,258 @@
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
+}
+
+/* Full legal documents (privacy/consent/cookies once filled in) — top
+   anchored, own scroll, roomy top clearance for the fixed header this
+   template doesn't otherwise render. */
+.legal--doc {
+  display: block;
+  padding: calc(var(--header-height) + 48px) var(--section-padding) 96px;
+}
+
+.legal--doc .legal__container {
+  max-width: 760px;
+}
+
+.legal__updated {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-label);
+  letter-spacing: .02em;
+  color: var(--color-text-dim);
+  margin: 16px 0 0;
+}
+
+.legal__lead {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 640px;
+  margin: 20px 0 0;
+}
+
+/* Table of contents — only used on the longest document (privacy). */
+.legal__toc {
+  margin: 40px 0 0;
+  padding: 20px 24px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-1);
+}
+
+.legal__toc-title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-label);
+  letter-spacing: .04em;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+.legal__toc ol {
+  margin: 0;
+  padding: 0 0 0 1.1em;
+  columns: 1;
+}
+
+.legal__toc li {
+  margin: 0 0 8px;
+}
+
+.legal__toc a {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid transparent;
+  transition: color var(--motion-micro) ease, border-color var(--motion-micro) ease;
+}
+
+.legal__toc a:hover,
+.legal__toc a:focus-visible {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent-border);
+}
+
+@media (min-width: 640px) {
+  .legal__toc ol {
+    columns: 2;
+    column-gap: 32px;
+  }
+}
+
+/* Document body typography */
+.legal__section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-border-faint);
+  scroll-margin-top: calc(var(--header-height) + 24px);
+}
+
+.legal__section:first-of-type {
+  margin-top: 56px;
+}
+
+.legal__h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h2);
+  line-height: 1.2;
+  color: var(--color-text-primary-strong);
+  margin: 0 0 16px;
+}
+
+.legal__h2-num {
+  color: var(--color-accent);
+  margin-right: .4em;
+}
+
+.legal__h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--color-text-primary);
+  margin: 28px 0 12px;
+}
+
+.legal__section p {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin: 0 0 16px;
+  max-width: 680px;
+}
+
+.legal__section ul,
+.legal__section ol {
+  margin: 0 0 16px;
+  padding-left: 1.25em;
+  max-width: 680px;
+}
+
+.legal__section li {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.legal__section li::marker {
+  color: var(--color-accent);
+}
+
+.legal__section a {
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-accent-border);
+  transition: color var(--motion-micro) ease, border-color var(--motion-micro) ease;
+}
+
+.legal__section a:hover,
+.legal__section a:focus-visible {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.legal__section strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* Callout note — used sparingly for things worth pausing on (e.g. the
+   analytics-consent boundary, or how to withdraw consent). */
+.legal__note {
+  margin: 20px 0;
+  padding: 16px 20px;
+  max-width: 680px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface-glass-start);
+}
+
+.legal__note p {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.legal__note p + p {
+  margin-top: 8px;
+}
+
+/* Operator details block — reused at the top and bottom of each doc */
+.legal__entity {
+  margin: 20px 0 0;
+  padding: 18px 20px;
+  max-width: 520px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-card);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+.legal__entity b {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* "Change cookie settings" button on cookies.html — a real button, not a
+   link, since it triggers JS (clears the stored choice + reopens the
+   banner) rather than navigating. */
+.legal__reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px 22px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: border-color var(--motion-micro) ease, color var(--motion-micro) ease, background var(--motion-micro) ease;
+}
+
+.legal__reset-btn:hover,
+.legal__reset-btn:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent-on-accent);
+  background: var(--color-accent);
+}
+
+.legal__reset-status {
+  display: inline-block;
+  margin-left: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-accent);
+  opacity: 0;
+  transition: opacity var(--motion-base) ease;
+}
+
+.legal__reset-status.is-visible {
+  opacity: 1;
+}
+
+@media (max-width: 599px) {
+  .legal--doc {
+    padding: calc(var(--header-height) + 24px) 20px 64px;
+  }
+
+  .legal__section {
+    margin-top: 36px;
+    padding-top: 24px;
+  }
+
+  .legal__toc {
+    padding: 16px 18px;
+  }
 }
 
 .legal__back {

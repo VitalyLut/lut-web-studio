@@ -237,7 +237,7 @@
     var swapTimer = null;
 
     var currentStep = 0;
-    var answers = { format: null, stage: null, goal: null, content: null, timing: null, channel: null, name: '', contact: '', comment: '' };
+    var answers = { format: null, stage: null, goal: null, content: null, timing: null, channel: null, name: '', contact: '', comment: '', consent: false };
     var submitted = false;
     var isSubmitting = false;
     var moduleEls = {};
@@ -290,6 +290,13 @@
             '<span class="brief__field-label">Комментарий <span>(необязательно)</span></span>' +
             '<textarea class="field-input brief__textarea" data-brief-field="comment" placeholder="Коротко о задаче, если хочется">' + esc(answers.comment) + '</textarea>' +
           '</div>' +
+          '<div class="brief__field brief__field--consent">' +
+            '<label class="brief__consent">' +
+              '<input type="checkbox" class="brief__consent-input" data-brief-consent' + (answers.consent ? ' checked' : '') + '>' +
+              '<span>Я соглашаюсь на <a href="/consent.html" target="_blank" rel="noopener">обработку персональных данных</a> и подтверждаю, что ознакомился с <a href="/privacy.html" target="_blank" rel="noopener">Политикой конфиденциальности</a>.</span>' +
+            '</label>' +
+            '<span class="field-error brief__field-error" data-brief-error="consent">Подтвердите согласие на обработку персональных данных</span>' +
+          '</div>' +
         '</div>' +
         '<span class="field-error brief__field-error" data-brief-submit-error></span>'
       );
@@ -338,6 +345,19 @@
       });
     }
 
+    function bindConsentInput() {
+      var input = quizContent.querySelector('[data-brief-consent]');
+      if (!input) return;
+      input.addEventListener('change', function () {
+        answers.consent = input.checked;
+        if (input.checked) {
+          input.classList.remove('is-invalid');
+          var err = quizContent.querySelector('[data-brief-error="consent"]');
+          if (err) err.classList.remove('is-visible');
+        }
+      });
+    }
+
     function bindOptionButtons(step) {
       var buttons = Array.prototype.slice.call(quizContent.querySelectorAll('[data-brief-option]'));
       buttons.forEach(function (btn) {
@@ -373,7 +393,7 @@
 
       function paint() {
         quizContent.innerHTML = step.isContact ? buildContactStep(step) : buildOptionsStep(step);
-        if (step.isContact) bindContactInputs(); else bindOptionButtons(step);
+        if (step.isContact) { bindContactInputs(); bindConsentInput(); } else bindOptionButtons(step);
         updateNav();
         updateProgress();
         void quizCard.offsetWidth;
@@ -527,10 +547,13 @@
       var contactEl = quizContent.querySelector('[data-brief-field="contact"]');
       var nameErr = quizContent.querySelector('[data-brief-error="name"]');
       var contactErr = quizContent.querySelector('[data-brief-error="contact"]');
+      var consentEl = quizContent.querySelector('[data-brief-consent]');
+      var consentErr = quizContent.querySelector('[data-brief-error="consent"]');
       var submitErrorEl = quizContent.querySelector('[data-brief-submit-error]');
       var validName = answers.name.trim().length > 0;
       var validContact = answers.contact.trim().length > 0;
-      if (!validName || !validContact) {
+      var validConsent = !!answers.consent;
+      if (!validName || !validContact || !validConsent) {
         if (!validName) {
           if (nameEl) nameEl.classList.add('is-invalid');
           if (nameErr) nameErr.classList.add('is-visible');
@@ -538,6 +561,10 @@
         if (!validContact) {
           if (contactEl) contactEl.classList.add('is-invalid');
           if (contactErr) contactErr.classList.add('is-visible');
+        }
+        if (!validConsent) {
+          if (consentEl) consentEl.classList.add('is-invalid');
+          if (consentErr) consentErr.classList.add('is-visible');
         }
         return;
       }
@@ -604,7 +631,7 @@
 
     function restart() {
       currentStep = 0;
-      answers = { format: null, stage: null, goal: null, content: null, timing: null, channel: null, name: '', contact: '', comment: '' };
+      answers = { format: null, stage: null, goal: null, content: null, timing: null, channel: null, name: '', contact: '', comment: '', consent: false };
       submitted = false;
       isSubmitting = false;
       moduleEls = {};

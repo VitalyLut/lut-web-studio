@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Согласие на обработку персональных данных | LUT Web Studio</title>
 
-  <meta name="robots" content="noindex, follow">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://lutstudio.ru/consent.html">
 
   <link rel="icon" type="image/png" href="assets/favicon/favicon-96x96.png" sizes="96x96">
@@ -22,14 +22,84 @@
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/legal.css">
+  <link rel="stylesheet" href="css/cookie-consent.css">
 </head>
 <body>
-  <main class="legal">
+  <main class="legal legal--doc">
     <div class="legal__container">
       <a class="legal__back" href="/">← На главную</a>
       <h1 class="legal__title">Согласие на обработку персональных данных</h1>
-      <p class="legal__text">Документ готовится к публикации. Полная актуальная версия будет размещена на этой странице.</p>
+      <span class="legal__updated">Дата публикации: 6 июля 2026 года</span>
+      <p class="legal__lead">Я, пользователь сайта <a href="https://lutstudio.ru/">https://lutstudio.ru/</a>, свободно, своей волей и в своём интересе даю согласие ИП Лут Виталию Андреевичу на обработку персональных данных, передаваемых мной через формы сайта и иные способы связи.</p>
+
+      <section class="legal__section" id="operator">
+        <h2 class="legal__h2"><span class="legal__h2-num">01</span>Оператор</h2>
+        <div class="legal__entity">
+          <b>ИП Лут Виталий Андреевич</b><br>
+          ИНН 220705104423<br>
+          ОГРНИП 326344300064900
+        </div>
+      </section>
+
+      <section class="legal__section" id="data-list">
+        <h2 class="legal__h2"><span class="legal__h2-num">02</span>Перечень данных</h2>
+        <p>Согласие даётся в отношении следующих категорий персональных данных, которые пользователь указывает добровольно при отправке формы:</p>
+        <ul>
+          <li>имя;</li>
+          <li>телефон или иной контакт для связи, указанный пользователем (например, никнейм в мессенджере);</li>
+          <li>данные о проекте: выбранный тип сайта, стадия проекта, цель, имеющиеся материалы, желаемые сроки, предпочитаемый канал связи;</li>
+          <li>комментарий, добровольно оставленный пользователем в свободной форме.</li>
+        </ul>
+        <p>Согласие не распространяется на данные, которые формы сайта фактически не запрашивают.</p>
+      </section>
+
+      <section class="legal__section" id="purposes">
+        <h2 class="legal__h2"><span class="legal__h2-num">03</span>Цели</h2>
+        <ul>
+          <li>обработка заявки;</li>
+          <li>обратная связь;</li>
+          <li>обсуждение проекта;</li>
+          <li>подготовка предложения;</li>
+          <li>заключение и исполнение договора;</li>
+          <li>выполнение заказанных работ.</li>
+        </ul>
+        <div class="legal__note">
+          <p>Это согласие относится только к обработке данных, переданных через форму. Аналитические технологии (Яндекс.Метрика) регулируются отдельно — через cookie-баннер на сайте, см. <a href="/cookies.html">Политику использования cookie</a>.</p>
+        </div>
+      </section>
+
+      <section class="legal__section" id="actions">
+        <h2 class="legal__h2"><span class="legal__h2-num">04</span>Перечень действий с персональными данными</h2>
+        <p>Согласие даётся на совершение следующих действий: сбор, запись, систематизация, накопление, хранение, уточнение, извлечение, использование, передача (предоставление, доступ) используемым техническим сервисам в необходимом объёме, блокирование, удаление, уничтожение.</p>
+      </section>
+
+      <section class="legal__section" id="method">
+        <h2 class="legal__h2"><span class="legal__h2-num">05</span>Способ обработки</h2>
+        <p>Обработка осуществляется с использованием средств автоматизации и без их использования.</p>
+      </section>
+
+      <section class="legal__section" id="duration">
+        <h2 class="legal__h2"><span class="legal__h2-num">06</span>Срок действия</h2>
+        <p>Согласие действует до достижения целей обработки, истечения необходимых сроков хранения или отзыва согласия — если иное не предусмотрено законодательством Российской Федерации.</p>
+      </section>
+
+      <section class="legal__section" id="revoke">
+        <h2 class="legal__h2"><span class="legal__h2-num">07</span>Отзыв</h2>
+        <p>Согласие может быть отозвано в любой момент направлением письма на адрес <a href="mailto:lut-webstudio@yandex.ru">lut-webstudio@yandex.ru</a>.</p>
+      </section>
+
+      <section class="legal__section" id="confirmation">
+        <h2 class="legal__h2"><span class="legal__h2-num">08</span>Подтверждение</h2>
+        <p>Отправляя форму на сайте с установленным флажком согласия, пользователь подтверждает:</p>
+        <ul>
+          <li>ознакомление с <a href="/privacy.html">Политикой в отношении обработки персональных данных</a>;</li>
+          <li>предоставление настоящего согласия;</li>
+          <li>добровольность передачи указанных данных.</li>
+        </ul>
+      </section>
     </div>
   </main>
+
+  <script src="js/cookie-consent.js"></script>
 </body>
 </html>
