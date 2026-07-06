@@ -3,13 +3,23 @@
 // never a precondition for treating the submission as accepted, never
 // throws out of this module, never logs the token or any submission PII.
 //
-// Official MAX Bot API (checked 2026-07-06, dev.max.ru/docs-api):
-//   POST https://platform-api2.max.ru/messages
+// Confirmed working contract (2026-07-06, verified with a real delivered
+// test message):
+//   POST https://platform-api.max.ru/messages?chat_id={chat_id}
 //   Authorization: <token>  (bare token, no "Bot " prefix — unlike Telegram)
-//   body: { chat_id, text }
-// platform-api2.max.ru is the current endpoint — platform-api.max.ru is
-// being retired (redirect deadline 2026-07-19), so the old host was never
-// used here.
+//   Content-Type: application/json
+//   body: { "text": "..." }  — chat_id is NOT repeated in the body, it is
+//   a query parameter only.
+//
+// platform-api.max.ru (not platform-api2.max.ru) is used deliberately:
+// platform-api2.max.ru failed at the TLS/transport layer in this runtime
+// (fetch threw before any HTTP response — same "unable to get local
+// issuer certificate" symptom reproduced locally with curl against that
+// host, consistent with MAX's own note that platform-api2.max.ru requires
+// the Mintsifry root CA in the trust store). platform-api.max.ru is the
+// old host, still functional during the transition period (redirect
+// deadline 2026-07-19 per MAX's docs) and is what real messages have been
+// confirmed delivered through.
 import {
   type BriefNotification,
   buildBriefMessage,
@@ -17,41 +27,39 @@ import {
   type LeadNotification,
 } from "./notification-format.ts";
 
-const MAX_API_URL = "https://platform-api2.max.ru/messages";
+const MAX_API_BASE_URL = "https://platform-api.max.ru/messages";
 const MAX_TIMEOUT_MS = 5000;
 
 async function sendMaxMessage(text: string): Promise<void> {
   const token = Deno.env.get("MAX_BOT_TOKEN");
-  const chatIdRaw = Deno.env.get("MAX_CHAT_ID");
+  const chatId = Deno.env.get("MAX_CHAT_ID");
 
-  if (!token || !chatIdRaw) {
+  if (!token || !chatId) {
     console.log(
       JSON.stringify({ fn: "max", outcome: "skipped_missing_config" }),
     );
     return;
   }
 
-  // MAX chat_id is numeric; fall back to the raw string if it somehow
-  // isn't, rather than silently sending a broken value.
-  const chatId = /^-?\d+$/.test(chatIdRaw) ? Number(chatIdRaw) : chatIdRaw;
+  const url = `${MAX_API_BASE_URL}?chat_id=${encodeURIComponent(chatId)}`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), MAX_TIMEOUT_MS);
 
   try {
-    const res = await fetch(MAX_API_URL, {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: token,
       },
-      body: JSON.stringify({ chat_id: chatId, text }),
+      body: JSON.stringify({ text }),
       signal: controller.signal,
     });
 
     if (!res.ok) {
-      // Never log the response body — some MAX API errors can echo parts
-      // of the request back, which would leak submission content.
+      // Safe technical code only — never the response body (could echo
+      // request content back) and never the token.
       console.log(
         JSON.stringify({
           fn: "max",
