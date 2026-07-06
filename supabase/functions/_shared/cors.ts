@@ -1,13 +1,15 @@
 // Strict origin allow-list — no wildcard, no arbitrary *.vercel.app preview
 // domains. Every entry here must be a real, known origin we control.
 //
-//   - production Vercel alias: confirmed 2026-07-06 as the actual "Visit"
-//     URL for this project (no custom domain connected yet)
-//   - lutstudio.ru / www.lutstudio.ru: not connected in Vercel yet, but
-//     listed ahead of time per explicit instruction — an unused origin in
-//     an allow-list grants nothing by itself (no real browser can ever
-//     send a request FROM a domain that isn't serving this frontend), and
-//     once the domain goes live this list won't need a follow-up deploy
+//   - lutstudio.ru / www.lutstudio.ru: the permanent production domain,
+//     connected in Vercel as of 2026-07-06 (www redirects to the bare
+//     domain via a 308 in Vercel, but browsers still send Origin as
+//     www.lutstudio.ru for any request made before that redirect settles,
+//     so both forms stay listed)
+//   - lut-web-studio.vercel.app: the original temporary Vercel alias —
+//     kept intentionally, still used for technical verification and as a
+//     production deployment target alongside the custom domain, not just
+//     a leftover
 //   - localhost dev origins: VS Code Live Server default (127.0.0.1:5500 /
 //     localhost:5500), confirmed as the actual local dev setup
 const ALLOWED_ORIGINS: readonly string[] = [

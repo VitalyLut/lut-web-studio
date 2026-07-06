@@ -23,6 +23,7 @@ import {
 import { extractClientIp, hashIp } from "../_shared/ip.ts";
 import { checkRateLimits } from "../_shared/rate-limit.ts";
 import { notifyNewLead } from "../_shared/telegram.ts";
+import { notifyNewLeadMax } from "../_shared/max.ts";
 
 const PROJECT_TYPES = [
   "landing",
@@ -270,10 +271,11 @@ export default {
         // The row is already committed at this point — Telegram is a
         // best-effort side effect only. A replay (duplicate) is not a new
         // event and must not send a second notification. Any failure here
-        // is swallowed inside notifyNewLead() and never affects the
-        // response below.
+        // is swallowed inside notifyNewLead()/notifyNewLeadMax() and never
+        // affects the response below. Telegram first, then MAX — both
+        // independently fault-tolerant, neither can affect the other.
         if (!duplicate) {
-          await notifyNewLead({
+          const notification = {
             submissionId: row.lead_number,
             name,
             phone,
@@ -281,7 +283,9 @@ export default {
             source,
             pageUrl,
             createdAt: row.created_at,
-          });
+          };
+          await notifyNewLead(notification);
+          await notifyNewLeadMax(notification);
         }
 
         return jsonResponse(

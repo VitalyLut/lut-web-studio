@@ -26,6 +26,7 @@ import type { Json } from "../_shared/database.types.ts";
 import { extractClientIp, hashIp } from "../_shared/ip.ts";
 import { checkRateLimits } from "../_shared/rate-limit.ts";
 import { notifyNewBrief } from "../_shared/telegram.ts";
+import { notifyNewBriefMax } from "../_shared/max.ts";
 
 // Exact literal option strings from js/brief.js QUIZ_STEPS — re-verified
 // against the current file, not assumed from memory. Any value outside
@@ -322,9 +323,10 @@ export default {
         });
 
         // Same reasoning as submit-lead: row already committed, Telegram
-        // is best-effort only, and a replay must not re-notify.
+        // and MAX are both best-effort only, and a replay must not
+        // re-notify either channel.
         if (!duplicate) {
-          await notifyNewBrief({
+          const notification = {
             submissionId: row.brief_number,
             name,
             contact,
@@ -337,7 +339,9 @@ export default {
             comment,
             pageUrl,
             createdAt: row.created_at,
-          });
+          };
+          await notifyNewBrief(notification);
+          await notifyNewBriefMax(notification);
         }
 
         return jsonResponse(

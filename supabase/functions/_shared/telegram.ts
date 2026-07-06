@@ -4,6 +4,13 @@
 // network error, non-2xx from Telegram, timeout) is swallowed and only
 // logged with a safe, PII-free outcome — never re-thrown, never surfaced
 // to the caller's HTTP response.
+import {
+  type BriefNotification,
+  buildBriefMessage,
+  buildLeadMessage,
+  type LeadNotification,
+} from "./notification-format.ts";
+
 const TELEGRAM_TIMEOUT_MS = 5000;
 
 async function sendTelegramMessage(text: string): Promise<void> {
@@ -56,68 +63,10 @@ async function sendTelegramMessage(text: string): Promise<void> {
   }
 }
 
-export interface LeadNotification {
-  submissionId: string;
-  name: string;
-  phone: string;
-  projectType: string;
-  source: string;
-  pageUrl: string;
-  createdAt: string;
-}
-
 export async function notifyNewLead(lead: LeadNotification): Promise<void> {
-  const text = [
-    "🟢 НОВАЯ ЗАЯВКА",
-    "",
-    `ID: ${lead.submissionId}`,
-    `Имя: ${lead.name}`,
-    `Телефон: ${lead.phone}`,
-    `Тип сайта: ${lead.projectType}`,
-    `Источник: ${lead.source}`,
-    `Страница: ${lead.pageUrl}`,
-    `Дата: ${lead.createdAt}`,
-  ].join("\n");
-
-  await sendTelegramMessage(text);
-}
-
-export interface BriefNotification {
-  submissionId: string;
-  name: string;
-  contact: string;
-  format: string;
-  stage: string;
-  goal: string;
-  content: string[];
-  timing: string;
-  channel: string;
-  comment: string | null;
-  pageUrl: string;
-  createdAt: string;
+  await sendTelegramMessage(buildLeadMessage(lead));
 }
 
 export async function notifyNewBrief(brief: BriefNotification): Promise<void> {
-  const text = [
-    "🟢 НОВЫЙ БРИФ",
-    "",
-    `ID: ${brief.submissionId}`,
-    `Имя: ${brief.name}`,
-    `Контакт: ${brief.contact}`,
-    "",
-    `Формат: ${brief.format}`,
-    `Стадия: ${brief.stage}`,
-    `Цель: ${brief.goal}`,
-    `Контент: ${brief.content.join(", ")}`,
-    `Сроки: ${brief.timing}`,
-    `Канал связи: ${brief.channel}`,
-    "",
-    "Комментарий:",
-    brief.comment || "—",
-    "",
-    `Страница: ${brief.pageUrl}`,
-    `Дата: ${brief.createdAt}`,
-  ].join("\n");
-
-  await sendTelegramMessage(text);
+  await sendTelegramMessage(buildBriefMessage(brief));
 }
