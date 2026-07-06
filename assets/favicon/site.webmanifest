@@ -1,6 +1,11 @@
 {
-  "name": "LUT WEB STUDIO",
-  "short_name": "LWS",
+  "name": "LUT Web Studio",
+  "short_name": "LUT",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#08080a",
+  "theme_color": "#d1f45f",
   "icons": [
     {
       "src": "web-app-manifest-192x192.png",
@@ -14,8 +19,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "theme_color": "#d1f45f",
-  "background_color": "#d1f45f",
-  "display": "standalone"
+  ]
 }
