@@ -23,6 +23,22 @@
   height: calc(var(--header-height) - 16px + var(--safe-top));
 }
 
+/* Mobile/tablet: cancel the scrolled height change entirely instead of
+   shrinking it. .site-header uses align-items:center with top:0 fixed
+   positioning, so shrinking its own height moves its vertical CENTER
+   (and therefore the logo/hamburger, both centered children) upward by
+   half the delta — a real, measured 8px shift on a 16px height change.
+   Desktop has enough header real estate for that compact-on-scroll
+   effect to read as intentional; on narrow widths it read as the
+   header/hamburger drifting toward the top edge. Height simply no
+   longer changes here, so there is nothing for the centering to
+   recompute around. */
+@media (max-width: 1023px) {
+  .site-header.is-scrolled {
+    height: calc(var(--header-height) + var(--safe-top));
+  }
+}
+
 .site-header__inner {
   width: 100%;
   max-width: var(--container-max);
