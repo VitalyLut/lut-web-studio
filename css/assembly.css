@@ -28,8 +28,21 @@
 }
 
 @media (max-width: 1023px) {
+  /* Was 260vh. INTRO/SEG/DONE_THRESHOLD in assembly.js are all
+     fractions of scroll progress, not absolute pixels, so shortening
+     this doesn't change WHEN (as a %) each layer or the done state
+     appears, only how much scroll distance getting through the whole
+     track takes — verified via the same station-by-station check used
+     for Journey's own track reduction (all 6 layers land at the
+     correct progress fraction, done state still triggers and stays
+     unclipped). Does not shorten the separate ~1 viewport-height of
+     normal scrolling needed after the track ends for the sticky stage
+     to fully scroll past (that's driven by .assembly__stage's own
+     height, not this), so it isn't a full fix for "big gap after the
+     block" — but reduces the total scroll to get through the section
+     either way. */
   .assembly__track {
-    height: 260vh;
+    height: 230vh;
   }
 
   .assembly__intro-mobile {
@@ -49,7 +62,7 @@
 
 @media (max-width: 599px) {
   .assembly__track {
-    height: 230vh;
+    height: 205vh;
   }
 }
 
@@ -121,18 +134,34 @@
    intro" complaint — the gap was real, just above the readout, not
    below it). Scene is flex:1 so it claims essentially all height the
    readout doesn't need, instead of a fixed short box floating in the
-   middle of extra space. */
+   middle of extra space.
+
+   Tried content-sizing .assembly__stage/.assembly__container here (the
+   same fix that worked for Journey's equivalent "empty tail" issue) —
+   reverted. Unlike Journey's final panel (position:absolute; inset:0
+   relative to its own scene, so it resizes with it), .assembly__complete
+   is positioned via a fixed translate3d(...,242px,...) relative to
+   .assembly__core specifically, not to this container — shrinking the
+   container/stage moved .assembly__complete outside the now-shorter
+   stage's own overflow:hidden bounds and clipped it completely
+   (confirmed: rendered at top:598/bottom:678 against a stage that had
+   shrunk to bottom:584 — 100% clipped, verified before reverting). Also
+   confirmed separately that .assembly__track's own height (unchanged
+   either way) is what actually determines how far you scroll before
+   Portfolio arrives, not this element's height, so the attempted fix
+   wasn't even solving the reported "gap before the next block" — that
+   needs a different fix (see .assembly__track's height below). */
 @media (max-width: 1023px) {
   .assembly__container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    /* Extra clearance (was 16px) on top of assembly.js's own core-height
-       scaling — real device text metrics can render .assembly__final a
-       little taller than this repo's own test environment measured, so
-       this errs toward a visibly generous gap rather than the bare
-       minimum that happened to just clear it. */
-    gap: 32px;
+    /* Bigger than the bare clearance the overlap fix needed (32px) —
+       even with zero bounding-box overlap, a semi-transparent card
+       sitting immediately adjacent to the text still read as visually
+       "layered" with it. This creates an unambiguous, unhurried
+       separation instead of a technically-clear-but-visually-tight one. */
+    gap: 56px;
     height: 100%;
     padding: calc(var(--header-height) + 12px) var(--section-padding) 10px;
   }
