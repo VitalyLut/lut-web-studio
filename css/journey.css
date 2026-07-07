@@ -857,10 +857,20 @@
     overflow: hidden;
   }
 
+  /* flex:1 (grow to fill whatever's left of the sticky stage below the
+     intro) used to force this to ~594px on a 390x844 viewport — far
+     taller than the compact rail+card content needs, which is what
+     let the rail's line stretch into empty space above/below the
+     nodes. flex:0 1 auto sizes this to its own content instead; the
+     leftover space in the (still 100vh, still sticky-pinned) stage
+     just becomes plain background below it. computeProgress() in
+     journey.js reads track/viewport geometry only, never this
+     element's size, so the scroll-jack timing is unaffected —
+     verified via the same station-frac/final/reverse-scroll checks
+     used before this change. */
   .journey__scene {
-    flex: 1;
+    flex: 0 1 auto;
     min-height: 0;
-    height: auto;
     display: grid;
     grid-template-columns: 44px 1fr;
     grid-template-rows: auto auto;
@@ -876,23 +886,29 @@
   /* Compact route — was a thin line + 22px dots stretched edge-to-edge
      across the scene's full height (grid-row:1/3, justify-content:
      space-between) via flex, which read as "one long technical scale"
-     with the dots lost on it. justify-content:center + a fixed gap
-     clusters the same 7 dots into one compact, readable group instead
-     of spanning the whole area — the scroll mechanic and progress math
-     in journey.js are untouched, this only changes how the SAME index/
-     progress values are laid out visually. Still grid-row:1/3 (the
-     full scene height) so it centers alongside .journey__card's own
-     align-self:center below rather than pinning to the top. */
+     with the dots lost on it. A prior fix added justify-content:center
+     to cluster the DOTS, but left align-self at its grid default
+     (stretch) — the rail's own BOX stayed the full grid-row height, so
+     .journey__rail-line's top/bottom insets (positioned relative to
+     that still-huge box) kept drawing ~125px of bare line above node
+     01 and below node 07 even though the dots themselves looked
+     clustered. align-self:center makes the box itself shrink to its
+     content (the 7 dots + gaps + padding) and centers THAT within the
+     grid area, matching .journey__card's own align-self:center below
+     — line insets now measure from the dots' own compact bounds, not
+     the scene's full height. Scroll mechanic/progress math in
+     journey.js untouched — this is layout only. */
   .journey__rail {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    align-self: center;
     gap: 15px;
     position: relative;
     grid-column: 1;
     grid-row: 1 / 3;
-    padding: 4px 0;
+    padding: 18px 0;
     z-index: 2;
     /* Reappear direction (final state ending): visibility flips back
        to visible immediately so the opacity fade-in is what's seen,
@@ -900,11 +916,16 @@
     transition: opacity .2s ease, visibility 0s linear 0s;
   }
 
+  /* Inset from the rail's own (now content-sized, see .journey__rail's
+     align-self:center above) box — the box's 18px padding already
+     clears each end dot, so a further 4px on top of that lands the
+     line's visible tips a short, deliberate stub beyond node 01/07
+     instead of running the length of the whole scene. */
   .journey__rail-line {
     position: absolute;
     left: 50%;
-    top: 17px;
-    bottom: 17px;
+    top: 4px;
+    bottom: 4px;
     width: 2px;
     background: rgba(255, 255, 255, .1);
     transform: translateX(-50%);
@@ -1092,8 +1113,8 @@
   }
 
   .journey__rail-line {
-    top: 15px;
-    bottom: 15px;
+    top: 4px;
+    bottom: 4px;
   }
 
   .journey__card {
