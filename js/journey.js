@@ -264,6 +264,11 @@
       }
 
       if (finalEl) finalEl.classList.toggle('is-visible', complete);
+      // Mobile-only in CSS (journey.css): mutes the rail/card behind
+      // the final panel instead of just relying on z-index, so passed
+      // stations don't stay visible around/through it once the route
+      // reads as complete.
+      section.classList.toggle('is-final', complete);
     }
 
     function updateVisual(p) {

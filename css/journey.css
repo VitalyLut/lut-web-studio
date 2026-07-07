@@ -11,7 +11,15 @@
 
 .journey__track {
   position: relative;
-  height: 350vh;
+  /* Was 350vh — station/progress/final timing are all driven by
+     computeProgress()'s fraction of (track height - viewport height),
+     not by absolute pixels, so shortening this doesn't change WHEN
+     (as a %) each station or the final card appears, only how much
+     scroll distance is spent getting there. ~23% shorter to remove
+     the long empty scroll "tail" past the last station (LWS-DESIGN-
+     MOTION-SPEC M5); reverted if testing shows dwell time per station
+     becomes too short to read comfortably. */
+  height: 270vh;
 }
 
 .journey__stage {
@@ -605,7 +613,11 @@
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(.92);
-  transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
+  /* <=0.35s so reverse-scroll drops this quickly instead of hanging
+     translucently over the station it's covering (LWS-DESIGN-MOTION-
+     SPEC M5) — applies to both the desktop overlay and the mobile
+     variant below, neither of which redeclares transition. */
+  transition: opacity .35s var(--ease-rise), transform .35s var(--ease-rise);
 }
 
 .journey__final.is-visible {
@@ -850,7 +862,7 @@
     min-height: 0;
     height: auto;
     display: grid;
-    grid-template-columns: 34px 1fr;
+    grid-template-columns: 44px 1fr;
     grid-template-rows: auto auto;
     gap: 14px;
     padding: 18px 16px;
@@ -861,23 +873,38 @@
     display: none;
   }
 
+  /* Compact route — was a thin line + 22px dots stretched edge-to-edge
+     across the scene's full height (grid-row:1/3, justify-content:
+     space-between) via flex, which read as "one long technical scale"
+     with the dots lost on it. justify-content:center + a fixed gap
+     clusters the same 7 dots into one compact, readable group instead
+     of spanning the whole area — the scroll mechanic and progress math
+     in journey.js are untouched, this only changes how the SAME index/
+     progress values are laid out visually. Still grid-row:1/3 (the
+     full scene height) so it centers alongside .journey__card's own
+     align-self:center below rather than pinning to the top. */
   .journey__rail {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 15px;
     position: relative;
     grid-column: 1;
     grid-row: 1 / 3;
     padding: 4px 0;
     z-index: 2;
+    /* Reappear direction (final state ending): visibility flips back
+       to visible immediately so the opacity fade-in is what's seen,
+       rather than the element snapping in only once already-opaque. */
+    transition: opacity .2s ease, visibility 0s linear 0s;
   }
 
   .journey__rail-line {
     position: absolute;
     left: 50%;
-    top: 11px;
-    bottom: 11px;
+    top: 17px;
+    bottom: 17px;
     width: 2px;
     background: rgba(255, 255, 255, .1);
     transform: translateX(-50%);
@@ -894,11 +921,15 @@
     transition: height .15s linear;
   }
 
+  /* ~34px — was 22px with an 8px mono label, easy to lose as "tiny
+     identical beads." Bigger circle + bigger digits (LWS-MASTER-AUDIT-
+     FABLE5 P1/M5: target ~32-40px) so each station reads as its own
+     readable stop, not a tick mark. */
   .journey__rail-dot {
     position: relative;
     z-index: 1;
-    width: 22px;
-    height: 22px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
     border-radius: 50%;
     background: var(--color-surface-1);
@@ -907,7 +938,7 @@
     align-items: center;
     justify-content: center;
     font-family: var(--font-mono);
-    font-size: 8px;
+    font-size: 11px;
     color: var(--color-text-dim-3);
     transition: background .3s ease, border-color .3s ease, box-shadow .3s ease, color .3s ease, transform .3s var(--ease-rise);
   }
@@ -922,8 +953,8 @@
     background: var(--color-accent);
     border-color: var(--color-accent);
     color: var(--color-accent-on-accent);
-    box-shadow: 0 0 0 4px rgba(200, 255, 46, .18), 0 0 14px rgba(200, 255, 46, .7);
-    transform: scale(1.2);
+    box-shadow: 0 0 0 5px rgba(200, 255, 46, .16), 0 0 20px rgba(200, 255, 46, .75);
+    transform: scale(1.15);
   }
 
   .journey__card,
@@ -952,6 +983,7 @@
     grid-column: 2;
     grid-row: 1 / -1;
     align-self: center;
+    transition: opacity .2s ease, visibility 0s linear 0s;
   }
 
   .journey__mock {
@@ -990,12 +1022,78 @@
     display: flex;
     transform: none;
   }
+
+  /* Compact final state — was full desktop-scale padding/typography
+     (30px pad, 22px headline, a 64px check-circle each with 18-20px of
+     its own margin) sized for a wide overlay; on a ~380px-wide mobile
+     card that stack of gaps read as oversized/bulky for what is a
+     compact confirmation moment. Trims padding and each element's own
+     spacing without dropping any of headline/check/caption/CTA. */
+  .journey__final {
+    padding: 24px 24px 22px;
+  }
+
+  .journey__final .status-pill {
+    margin-bottom: 10px;
+  }
+
+  .journey__final-headline {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .journey__final-check {
+    width: 50px;
+    height: 50px;
+    font-size: 21px;
+    margin-bottom: 12px;
+  }
+
+  .journey__final-caption {
+    font-size: 12.5px;
+    margin-bottom: 14px;
+  }
+
+  /* Route-completed, not "a card dropped on a line": once the final
+     state is showing, the rail/card behind it stop participating in
+     the composition instead of just sitting z-index'd underneath a
+     panel that doesn't fully cover them (see .journey__final's own
+     opaque-enough background above — the actual "dots visible around
+     the panel" bug was this pair still being laid out at full size
+     and opacity, not the panel's alpha). section.is-final is toggled
+     in lockstep with .journey__final.is-visible in journey.js. Direction-
+     asymmetry: this rule's own transition (delayed visibility) governs
+     going invisible; the plain .journey__rail/.journey__card rule below
+     governs coming back on reverse scroll (immediate visibility, so the
+     fade-in is visible from the start rather than snapping in at the end). */
+  .journey.is-final .journey__rail,
+  .journey.is-final .journey__card {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+  }
 }
 
 @media (max-width: 599px) {
   .journey__scene {
-    grid-template-columns: 28px 1fr;
+    grid-template-columns: 40px 1fr;
+    gap: 10px;
     padding: 18px 14px;
+  }
+
+  .journey__rail {
+    gap: 11px;
+  }
+
+  .journey__rail-dot {
+    width: 30px;
+    height: 30px;
+    font-size: 10px;
+  }
+
+  .journey__rail-line {
+    top: 15px;
+    bottom: 15px;
   }
 
   .journey__card {

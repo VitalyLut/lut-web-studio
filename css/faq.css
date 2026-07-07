@@ -339,6 +339,15 @@
   flex-wrap: wrap;
 }
 
+/* Groups a node with the arrow that follows it into one unbreakable
+   unit, so wrapping can only happen between steps, never leaving a
+   bare arrow orphaned at the start of a line. */
+.faq-viz__chain-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .faq-viz__node {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -948,9 +957,15 @@
     display: block;
   }
 
+  /* .browser-bar (see components.css) is position:absolute, height:38px
+     + a 1px bottom border — NOT part of this element's own in-flow
+     height, so its own top-padding is the only thing keeping content
+     below the bar's divider. 26px was less than the bar's own 39px,
+     which is exactly why the question row visually sat on/merged with
+     the divider instead of reading as a separate section beneath it. */
   .faq__panel-body {
     min-height: 0;
-    padding: 26px 20px 24px;
+    padding: 60px 20px 24px;
   }
 
   /* One header row instead of two: dots+status lived in the browser
@@ -978,10 +993,44 @@
   .faq__panel-num {
     display: none;
   }
+
+  /* Confident title, not a hero-H1-in-a-card: tighter line-height reads
+     calmer at 3 lines, and the size step down (still well short of a
+     drastic cut) keeps long real questions from dominating the card
+     now that they're also correctly clear of the browser-bar above. */
+  .faq__panel-question {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .faq__panel-answer {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .faq__panel-chips {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .faq-viz {
+    min-height: 0;
+    gap: 12px;
+    padding-top: 16px;
+  }
+
+  .faq-viz__chain,
+  .faq-viz__chain-step {
+    gap: 6px;
+  }
+
+  .faq-viz__node {
+    padding: 7px 11px;
+  }
 }
 
 @media (max-width: 599px) {
   .faq__panel-body {
-    padding: 22px 16px 20px;
+    padding: 54px 16px 20px;
   }
 }

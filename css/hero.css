@@ -255,6 +255,14 @@
 }
 
 .hero__mockup-stage.is-scattered .hero__mockup-card {
+  /* Longhand only (not the `transition` shorthand) — a shorthand here
+     would reset transition-delay to 0 for every card, since this
+     selector's specificity beats each card's own single-class rule
+     below that sets its stagger via transition-delay. Scatter is
+     faster than assemble (asymmetric duration by design: quick
+     apart, slower settle); the base rule two rules down keeps
+     governing the assemble direction when .is-scattered is removed. */
+  transition-duration: .7s, .5s;
   transform: translate3d(var(--sx), var(--sy), var(--sz)) rotate(var(--sr)) scale(var(--ss));
   opacity: var(--so);
 }
@@ -475,6 +483,38 @@
      user could see, no hint underneath them). */
   .hero__mockup-shell { order: 3; position: relative; z-index: 1; margin: 32px auto 0; }
 
+  /* Scatter geometry, mobile/tablet — desktop's deltas (up to -150px
+     on X, up to 188px on Y) are tuned for a much wider/taller stage;
+     unscaled, shards flew over the H1 above and past
+     .hero__mockup-shell's own top edge (LWS-MASTER-AUDIT-FABLE5
+     P1-5). ~45% of each desktop --sx/--sy keeps the same scatter
+     "shape" while staying inside the shell at 768-1023px, the least
+     compressed end of this range (--hero-scale shrinks the whole
+     stage further below that, so the same values read smaller still
+     on narrow phones). --hz/--sz/--sr/--ss/--so are untouched — only
+     the on-screen X/Y displacement needed correcting. */
+  .hero__mockup-card--navbar    { --sx: -32px; --sy: -20px; }
+  .hero__mockup-card--headline  { --sx: -68px; --sy: 18px; }
+  .hero__mockup-card--cta       { --sx: -26px; --sy: 68px; }
+  .hero__mockup-card--image     { --sx: 26px;  --sy: -33px; }
+  .hero__mockup-card--feature-a { --sx: -59px; --sy: 55px; }
+  .hero__mockup-card--feature-b { --sx: 10px;  --sy: 85px; }
+  .hero__mockup-card--feature-c { --sx: 27px;  --sy: 68px; }
+  .hero__mockup-card--footer    { --sx: -14px; --sy: 55px; }
+
+  /* Scattering opens gaps between the shards — without fading the
+     frame behind them along with it, its own opaque surface read as
+     a flat dark slab filling most of the shell instead of an open
+     scatter (LWS-MASTER-AUDIT-FABLE5 P1-5). is-faded is toggled in
+     hero.js in lockstep with is-scattered. */
+  .hero__mockup-frame {
+    transition: opacity .4s ease;
+  }
+
+  .hero__mockup-frame.is-faded {
+    opacity: .35;
+  }
+
   /* Solid plaque instead of bare text — legible regardless of what's
      behind it, and reads as part of the interactive scene rather than
      a caption that happens to sit nearby. */
@@ -510,5 +550,25 @@
 
   .hero__stats {
     gap: 14px;
+  }
+}
+
+/* ============================================================
+   Reduced motion — idle/ambient loops off. Scatter itself is already
+   skipped at the JS level (hero.js returns early before arming any
+   timer/observer), so this only needs to stop what pure CSS still
+   runs unconditionally: the mockup cards' float loop and the hint
+   icon's pulse. Equal specificity (2 classes) to the per-card
+   `.hero__mockup-card--X .hero__mockup-card-inner` rules above and
+   .hero__hint-icon's own rule, placed after both in source order, so
+   it wins on the cascade without needing !important.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .hero__mockup-stage .hero__mockup-card-inner {
+    animation: none;
+  }
+
+  .hero__hint-icon {
+    animation: none;
   }
 }

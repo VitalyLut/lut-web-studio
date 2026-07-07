@@ -85,7 +85,10 @@
       var steps = ['Задача', 'Структура', 'Дизайн', 'Tilda / Zero Block'];
       return viz(
         '<div class="faq-viz__chain">' +
-          steps.map(function (s) { return '<span class="faq-viz__node">' + s + '</span><span class="faq-viz__arrow">→</span>'; }).join('') +
+          // Node+arrow as one inline-flex unit so a narrow/wrapped line
+          // can't split them — an arrow wrapping onto its own line with
+          // nothing after it was the reported bug on narrow screens.
+          steps.map(function (s) { return '<span class="faq-viz__chain-step"><span class="faq-viz__node">' + s + '</span><span class="faq-viz__arrow">→</span></span>'; }).join('') +
           '<span class="faq-viz__node faq-viz__node--accent">Запуск</span>' +
         '</div>' +
         '<div class="faq-viz__status"><span class="status-pill__dot"></span>НЕ ШАБЛОН · СБОРКА ПОД ЗАДАЧУ</div>'
