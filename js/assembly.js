@@ -174,9 +174,19 @@
     // untouched — core's width was never resized, so that coordinate
     // space still matches what ex/cascadeSlot.x were tuned for.
     var CORE_BASE_HEIGHT = 620;
+    // Extra 0.72 on top of the height ratio itself — a bare 1:1 ratio
+    // left only ~17px between the tallest card and .assembly__final's
+    // text in this repo's own test environment, and real device text
+    // metrics (line-wrapping, font hinting) can render that text a
+    // little taller than that. This trades a slightly more compact
+    // mobile cascade for a clearance margin wide enough to hold up
+    // across real devices, not just the one this was measured on.
+    var MOBILE_SAFETY = 0.72;
     function coreYScale() {
       var h = core.offsetHeight;
-      return h ? Math.min(1, h / CORE_BASE_HEIGHT) : 1;
+      if (!h) return 1;
+      var ratio = h / CORE_BASE_HEIGHT;
+      return ratio >= 1 ? 1 : ratio * MOBILE_SAFETY;
     }
 
     function cascadeSlot(i, yScale) {

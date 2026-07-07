@@ -127,7 +127,12 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 16px;
+    /* Extra clearance (was 16px) on top of assembly.js's own core-height
+       scaling — real device text metrics can render .assembly__final a
+       little taller than this repo's own test environment measured, so
+       this errs toward a visibly generous gap rather than the bare
+       minimum that happened to just clear it. */
+    gap: 32px;
     height: 100%;
     padding: calc(var(--header-height) + 12px) var(--section-padding) 10px;
   }
@@ -664,7 +669,16 @@
 /* Completion state — a compact single-row status console, not a card.
    The "meaning" conclusion (headline + caption) already lives in the
    left .assembly__panel OK-block; this module's only job is to report
-   SYSTEM STATUS, so it stays to one line and never repeats that text. */
+   SYSTEM STATUS, so it stays to one line and never repeats that text.
+   max-width was 560px — .assembly__complete-card centers its own
+   content (badge + divider + two status pills) via justify-content,
+   so a box that much wider than the content actually needs just reads
+   as an oversized card with a lot of empty side padding inside its own
+   border/glow (the reported "too giant on the sides" complaint), not
+   as the compact console this comment already describes. 420px keeps
+   it comfortably in the same size family as the frontmost layer card
+   above it (see the layer-cascade note near .assembly__scene) instead
+   of dominating it. */
 .assembly__complete {
   position: absolute;
   left: 50%;
@@ -675,7 +689,7 @@
   pointer-events: none;
   z-index: 80;
   width: 100%;
-  max-width: 560px;
+  max-width: 420px;
 }
 
 .assembly__complete.is-visible {
@@ -705,13 +719,17 @@
    cancellation, measured empirically (not guessed) at a consistent
    ~1.14x across every width/breakpoint at the settled end state — that
    uncompensated ~14% is exactly the width the card was overflowing the
-   viewport by (the reported "edges go past the screen" bug). Width and
-   scale below are both the original values divided by that measured
-   ~1.14x, verified by measuring the actual rendered box afterward
-   rather than re-deriving the 3D math analytically. */
+   viewport by (the reported "edges go past the screen" bug). Scale
+   values below are the original ones divided by that measured ~1.14x,
+   verified by measuring the actual rendered box afterward rather than
+   re-deriving the 3D math analytically. Width is further reduced on
+   top of that (not just what the 1.14x correction alone needed) to
+   also address the separate "too giant / too much empty space on the
+   sides" complaint — same reasoning as the desktop max-width change
+   above, just per-breakpoint since scale differs at each. */
 @media (max-width: 1023px) {
   .assembly__complete {
-    width: min(79vw, 400px);
+    width: min(70vw, 340px);
     max-width: none;
     transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.018);
   }
@@ -727,7 +745,7 @@
 
 @media (max-width: 767px) {
   .assembly__complete {
-    width: min(80vw, 365px);
+    width: min(70vw, 320px);
     transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.068);
   }
 
@@ -738,7 +756,7 @@
 
 @media (max-width: 599px) {
   .assembly__complete {
-    width: min(80vw, 330px);
+    width: min(72vw, 290px);
     transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.122);
   }
 
@@ -765,7 +783,12 @@
 
 @media (max-width: 389px) {
   .assembly__complete {
-    width: min(80vw, 295px);
+    /* Not narrowed as much as the other breakpoints — .assembly__complete-badge
+       and .assembly__complete-status both contain white-space:nowrap
+       text (244px/256px respectively, measured) that doesn't wrap; a
+       narrower box here doesn't shrink the content, it clips it via
+       .glass-card's overflow:hidden. 290px clears both with margin. */
+    width: min(91vw, 290px);
     transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.286);
   }
 
