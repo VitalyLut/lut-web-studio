@@ -691,22 +691,33 @@
    module looks too small/uncertain" complaint). Appending scale(K) at
    the END of its own transform list (composition order: the innermost/
    rightmost function applies to the element's own box first) counters
-   exactly the ancestor scene's shrink for THIS element's rendered
-   size, while the preceding translate3d offset — evaluated after, in
-   the scene's already-scaled space — still lands in the same relative
-   spot near the bottom of the scaled scene. Combined with a real
-   viewport-relative width (not the desktop 560px cap), this renders at
-   a fixed, comfortable on-screen size regardless of how small the
-   scale tier shrinks the surrounding scene. */
+   the ancestor scene's 2D scale for THIS element's rendered size,
+   while the preceding translate3d offset — evaluated after, in the
+   scene's already-scaled space — still lands in the same relative spot
+   near the bottom of the scaled scene.
+
+   K itself (scale) is the exact reciprocal of .assembly__scene's own
+   scale (1/.86, 1/.82, 1/.78, 1/.68) so the 2D ancestor shrink cancels
+   precisely — but this element ALSO sits at translateZ(170px) inside
+   .assembly__scene's perspective(1600px) 3D space, and .assembly__core
+   (its other ancestor) carries its own JS-driven rotateX/rotateY. Both
+   add their own perspective-driven magnification on top of the 2D
+   cancellation, measured empirically (not guessed) at a consistent
+   ~1.14x across every width/breakpoint at the settled end state — that
+   uncompensated ~14% is exactly the width the card was overflowing the
+   viewport by (the reported "edges go past the screen" bug). Width and
+   scale below are both the original values divided by that measured
+   ~1.14x, verified by measuring the actual rendered box afterward
+   rather than re-deriving the 3D math analytically. */
 @media (max-width: 1023px) {
   .assembly__complete {
-    width: min(90vw, 460px);
+    width: min(79vw, 400px);
     max-width: none;
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.163);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.018);
   }
 
   .assembly__complete.is-visible {
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.163);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.018);
   }
 
   .assembly__complete-card {
@@ -716,23 +727,23 @@
 
 @media (max-width: 767px) {
   .assembly__complete {
-    width: min(92vw, 420px);
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.22);
+    width: min(80vw, 365px);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.068);
   }
 
   .assembly__complete.is-visible {
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.22);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.068);
   }
 }
 
 @media (max-width: 599px) {
   .assembly__complete {
-    width: min(92vw, 380px);
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.282);
+    width: min(80vw, 330px);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.122);
   }
 
   .assembly__complete.is-visible {
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.282);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.122);
   }
 
   .assembly__complete-card {
@@ -754,12 +765,12 @@
 
 @media (max-width: 389px) {
   .assembly__complete {
-    width: min(92vw, 340px);
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.47);
+    width: min(80vw, 295px);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 258px, 0) scale(1.286);
   }
 
   .assembly__complete.is-visible {
-    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.47);
+    transform: translate(-50%, -50%) translateZ(170px) translate3d(0, 242px, 0) scale(1.286);
   }
 }
 

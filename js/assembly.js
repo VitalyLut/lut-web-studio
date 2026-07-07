@@ -159,16 +159,36 @@
       completeEl.classList.toggle('is-visible', done);
     }
 
-    function cascadeSlot(i) {
-      // Step (40px) is tuned to match .assembly__layer-head's real
-      // rendered height (36px + a few px of breathing room): each
+    // .assembly__core is 580x620 on desktop — the coordinate space every
+    // cascadeSlot()/LAYERS[].ey value below was tuned in. CSS shrinks
+    // core's own HEIGHT at narrower breakpoints (620 -> 260 -> 220,
+    // width stays 580 throughout), but never told this JS, which kept
+    // computing y-offsets up to +-182px against a box that's now only
+    // 220-260px tall — cards escaped upward past their own core and
+    // overlapped .assembly__final's text above it (the reported "white
+    // text under the cards" bug). Reading core's real CSS height at
+    // runtime and scaling y-offsets by how much shorter it is than its
+    // native 620px keeps the cascade's shape proportional to whatever
+    // box it's actually laid out in, automatically, at every
+    // breakpoint, without duplicating breakpoint numbers into JS. X is
+    // untouched — core's width was never resized, so that coordinate
+    // space still matches what ex/cascadeSlot.x were tuned for.
+    var CORE_BASE_HEIGHT = 620;
+    function coreYScale() {
+      var h = core.offsetHeight;
+      return h ? Math.min(1, h / CORE_BASE_HEIGHT) : 1;
+    }
+
+    function cascadeSlot(i, yScale) {
+      // Step (40px, pre-scale) is tuned to match .assembly__layer-head's
+      // real rendered height (36px + a few px of breathing room): each
       // resting card shows exactly its header band, never a random
       // sliver of the next card's body — that partial-body peekaboo
       // was the main source of visual noise in the assembled stack.
       // Only the frontmost/last card (highest z) shows its full body.
       return {
         x: (i - 2.5) * 12,
-        y: (i - 2.5) * 40,
+        y: (i - 2.5) * 40 * yScale,
         z: i * 28
       };
     }
@@ -179,6 +199,8 @@
       var ry = lerp(-8, 0, fin);
       core.style.transform = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
 
+      var yScale = coreYScale();
+
       for (var i = 0; i < LAYER_COUNT; i++) {
         var el = layerEls[i];
         if (!el) continue;
@@ -186,10 +208,10 @@
         var ls = INTRO + i * SEG;
         var le = ls + SEG * 0.72;
         var a = easeOutCubic(clamp01((p - ls) / (le - ls)));
-        var slot = cascadeSlot(i);
+        var slot = cascadeSlot(i, yScale);
 
         var x = lerp(L.ex, slot.x, a);
-        var y = lerp(L.ey, slot.y, a);
+        var y = lerp(L.ey * yScale, slot.y, a);
         var z = lerp(L.ez, slot.z, a);
         var rot = lerp(L.er, 0, a);
         var sc = lerp(0.9, 1, a);
