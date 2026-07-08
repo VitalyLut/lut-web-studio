@@ -9,9 +9,21 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local-only Claude Code settings — not the whole .claude/ directory,
-# which also holds tracked project skills/config.
-.claude/settings.local.json
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local AI/tooling files
+.claude/
+.agents/
+.codex/
+AGENTS.md
 
 # Scratch patch backups from in-progress work sessions, never project content.
 .patches/
+
+# Internal audit and planning documents
+audit/
+LWS-DESKTOP-AUDIT-FINAL.md
+LWS-MASTER-SPEC-DESKTOP-FINAL.md

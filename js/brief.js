@@ -293,7 +293,7 @@
           '<div class="brief__field brief__field--consent">' +
             '<label class="brief__consent">' +
               '<input type="checkbox" class="brief__consent-input" data-brief-consent' + (answers.consent ? ' checked' : '') + '>' +
-              '<span>Я соглашаюсь на <a href="/consent.html" target="_blank" rel="noopener">обработку персональных данных</a> и подтверждаю, что ознакомился с <a href="/privacy.html" target="_blank" rel="noopener">Политикой конфиденциальности</a>.</span>' +
+              '<span>Я соглашаюсь на <a href="consent.html" target="_blank" rel="noopener">обработку персональных данных</a> и подтверждаю, что ознакомился с <a href="privacy.html" target="_blank" rel="noopener">Политикой конфиденциальности</a>.</span>' +
             '</label>' +
             '<span class="field-error brief__field-error" data-brief-error="consent">Подтвердите согласие на обработку персональных данных</span>' +
           '</div>' +
