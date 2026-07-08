@@ -69,7 +69,7 @@
       '<div class="cookie-consent__inner">' +
         '<div class="cookie-consent__copy">' +
           '<p class="cookie-consent__title">Настройки cookie</p>' +
-          '<p class="cookie-consent__text">Мы используем необходимые технологии для работы сайта и, с вашего согласия, Яндекс.Метрику для анализа посещаемости и улучшения сайта. <a class="cookie-consent__link" href="/cookies.html">Подробнее</a></p>' +
+          '<p class="cookie-consent__text">Мы используем необходимые технологии для работы сайта и, с вашего согласия, Яндекс.Метрику для анализа посещаемости и улучшения сайта. <a class="cookie-consent__link" href="cookies.html">Подробнее</a></p>' +
         '</div>' +
         '<div class="cookie-consent__actions">' +
           '<button type="button" class="cookie-consent__btn cookie-consent__btn--necessary" data-cookie-necessary>Только необходимые</button>' +

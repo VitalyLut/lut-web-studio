@@ -1,8 +1,8 @@
 {
   "name": "LUT Web Studio",
   "short_name": "LUT",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "../../",
+  "scope": "../../",
   "display": "standalone",
   "background_color": "#08080a",
   "theme_color": "#d1f45f",
