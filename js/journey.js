@@ -311,9 +311,18 @@
 
     layoutRoute();
     window.addEventListener('scroll', requestTick, { passive: true });
+    // Debounced: layoutRoute() reads getTotalLength() on the SVG path and
+    // writes every station/chip/connector's position — on desktop a manual
+    // window drag-resize can fire dozens of resize events per second, and
+    // recomputing on every single one is wasted work for a layout that
+    // only needs to be correct once the size has actually settled.
+    var resizeTimer = 0;
     window.addEventListener('resize', function () {
-      layoutRoute();
-      requestTick();
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(function () {
+        layoutRoute();
+        requestTick();
+      }, 150);
     });
     requestTick();
   }

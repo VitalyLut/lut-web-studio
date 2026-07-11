@@ -967,6 +967,30 @@
   }
 }
 
+/* Reduced-motion fallback grid, narrower ranges — the unconditional
+   repeat(3, 1fr) above was never given a mobile override, so at
+   <=1023px each card's own column shrank to a fixed ~1/3 of the
+   viewport (measured ~84px wide at 320px) regardless of what the card
+   actually needed to show: the layer-head (code + name + the small
+   caps tag) has no wrap-safe layout of its own at that width, so it
+   simply overflowed its column. This only ever affected the reduced-
+   motion fallback (the animated mode's own cards are unconditionally
+   380px, untouched here) — dropping to fewer, wider columns at the
+   same two breakpoints the rest of the site already uses for
+   tablet/phone lets each card's existing (already wrap-safe at normal
+   widths) internal layout render the way it was actually designed. */
+@media (prefers-reduced-motion: reduce) and (max-width: 1023px) {
+  .assembly__core {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 599px) {
+  .assembly__core {
+    grid-template-columns: 1fr;
+  }
+}
+
 .assembly__layer-desc {
   display: none;
   font-family: var(--font-body);

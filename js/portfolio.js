@@ -420,23 +420,46 @@
 
     tick(0);
 
+    // rAF loop only runs while the orbit is actually on screen — it used
+    // to reschedule itself unconditionally every frame for the entire
+    // page lifetime (skipping tick() but still paying for the callback),
+    // which is wasted CPU/battery once the user has scrolled past
+    // Portfolio for good. IO toggles isVisible and restarts the loop;
+    // lastT resets on restart so the first tick after a pause gets a
+    // near-zero dt instead of one large jump (which would otherwise
+    // read as a sudden lurch in the orbit's rotation/inertia).
     var isVisible = true;
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) { isVisible = entry.isIntersecting; });
-      }, { threshold: 0.05 });
-      io.observe(section);
-    }
-
+    var rafRunning = false;
     var lastT = 0;
+
     function loop(t) {
       if (!lastT) lastT = t;
       var dt = t - lastT;
       lastT = t;
-      if (isVisible) tick(dt);
+      tick(dt);
+      if (isVisible) {
+        requestAnimationFrame(loop);
+      } else {
+        rafRunning = false;
+      }
+    }
+
+    function startLoop() {
+      if (rafRunning) return;
+      rafRunning = true;
+      lastT = 0;
       requestAnimationFrame(loop);
     }
-    requestAnimationFrame(loop);
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) { isVisible = entry.isIntersecting; });
+        if (isVisible) startLoop();
+      }, { threshold: 0.05 });
+      io.observe(section);
+    }
+
+    startLoop();
   }
 
   document.addEventListener('DOMContentLoaded', initPortfolio);

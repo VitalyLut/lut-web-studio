@@ -25,9 +25,22 @@
     if (window.LwsUtil.reduceMotion()) return;
     if (window.LwsUtil.isTouch()) return;
 
-    document.addEventListener('mousemove', function (e) {
-      halo.style.transform = 'translate(' + e.clientX.toFixed(1) + 'px,' + e.clientY.toFixed(1) + 'px)';
+    // rAF-coalesced: mousemove can fire far more often than the display
+    // refreshes, so writing style on every single event does redundant
+    // work the browser would have overwritten before the next paint
+    // anyway. Collapsing to at most one write per frame is visually
+    // identical (the halo still tracks the latest known pointer
+    // position every frame) and cheaper.
+    var pendingX = 0, pendingY = 0, haloRafId = 0;
+    function applyHalo() {
+      haloRafId = 0;
+      halo.style.transform = 'translate(' + pendingX.toFixed(1) + 'px,' + pendingY.toFixed(1) + 'px)';
       halo.style.opacity = '1';
+    }
+    document.addEventListener('mousemove', function (e) {
+      pendingX = e.clientX;
+      pendingY = e.clientY;
+      if (!haloRafId) haloRafId = requestAnimationFrame(applyHalo);
     });
 
     document.addEventListener('mouseleave', function () {

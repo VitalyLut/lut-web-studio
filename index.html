@@ -98,26 +98,36 @@
   <link rel="manifest" href="assets/favicon/site.webmanifest">
   <meta name="theme-color" content="#d1f45f">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@600;700;800&family=Onest:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Self-hosted (assets/fonts/, see css/fonts.css) — replaces the
+       former Google Fonts CDN request. Preload only the two files
+       needed for the very first paint (Hero H1 + body/subtitle text,
+       both Cyrillic); every other weight/subset loads from fonts.css's
+       own @font-face rules on demand, same as before. -->
+  <link rel="preload" href="assets/fonts/golos-text-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/onest-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/hero.css">
-  <link rel="stylesheet" href="css/assembly.css">
-  <link rel="stylesheet" href="css/portfolio.css">
-  <link rel="stylesheet" href="css/trust.css">
-  <link rel="stylesheet" href="css/configurator.css">
-  <link rel="stylesheet" href="css/journey.css">
-  <link rel="stylesheet" href="css/faq.css">
-  <link rel="stylesheet" href="css/brief.css">
-  <link rel="stylesheet" href="css/footer.css">
-  <link rel="stylesheet" href="css/project-modal.css">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/cookie-consent.css">
+  <!-- .min.css — same 17 files, same order (order is load-bearing: later
+       files override earlier ones at equal specificity throughout this
+       codebase), each minified independently rather than bundled. See
+       PERF-NOTES.md for why bundling was deliberately not done.
+       Unminified sources stay in css/ for development. -->
+  <link rel="stylesheet" href="css/reset.min.css">
+  <link rel="stylesheet" href="css/fonts.min.css">
+  <link rel="stylesheet" href="css/variables.min.css">
+  <link rel="stylesheet" href="css/base.min.css">
+  <link rel="stylesheet" href="css/components.min.css">
+  <link rel="stylesheet" href="css/hero.min.css">
+  <link rel="stylesheet" href="css/assembly.min.css">
+  <link rel="stylesheet" href="css/portfolio.min.css">
+  <link rel="stylesheet" href="css/trust.min.css">
+  <link rel="stylesheet" href="css/configurator.min.css">
+  <link rel="stylesheet" href="css/journey.min.css">
+  <link rel="stylesheet" href="css/faq.min.css">
+  <link rel="stylesheet" href="css/brief.min.css">
+  <link rel="stylesheet" href="css/footer.min.css">
+  <link rel="stylesheet" href="css/project-modal.min.css">
+  <link rel="stylesheet" href="css/responsive.min.css">
+  <link rel="stylesheet" href="css/cookie-consent.min.css">
 </head>
 <body>
   <div class="site-bg" aria-hidden="true">
@@ -1303,19 +1313,24 @@
     </div>
   </div>
 
-  <script src="js/util.js"></script>
-  <script src="js/cookie-consent.js"></script>
-  <script src="js/social-links.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/hero.js"></script>
-  <script src="js/assembly.js"></script>
-  <script src="js/portfolio.js"></script>
-  <script src="js/trust.js"></script>
-  <script src="js/configurator.js"></script>
-  <script src="js/journey.js"></script>
-  <script src="js/faq.js"></script>
-  <script src="js/brief.js"></script>
-  <script src="js/footer.js"></script>
-  <script src="js/project-modal.js"></script>
+  <!-- .min.js — same 14 files, same order (util.js/social-links.js must
+       stay first: everything else reads window.LwsUtil /
+       window.renderLwsSocialLinks at DOMContentLoaded), minified
+       independently rather than bundled. Unminified sources stay in js/
+       for development. -->
+  <script src="js/util.min.js"></script>
+  <script src="js/cookie-consent.min.js"></script>
+  <script src="js/social-links.min.js"></script>
+  <script src="js/main.min.js"></script>
+  <script src="js/hero.min.js"></script>
+  <script src="js/assembly.min.js"></script>
+  <script src="js/portfolio.min.js"></script>
+  <script src="js/trust.min.js"></script>
+  <script src="js/configurator.min.js"></script>
+  <script src="js/journey.min.js"></script>
+  <script src="js/faq.min.js"></script>
+  <script src="js/brief.min.js"></script>
+  <script src="js/footer.min.js"></script>
+  <script src="js/project-modal.min.js"></script>
 </body>
 </html>

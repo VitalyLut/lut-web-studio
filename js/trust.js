@@ -15,12 +15,12 @@
   // a real recording is added — renderArchive()/bindVoicePlayer() already
   // branch on whichever fields are filled in, no component rewrite needed.
   var PROOF_ITEMS = [
-    { id: 'proof-01', company: 'ООО «4А Денталь»', type: 'letter', letterImage: 'assets/proof/letters/letter-01.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Краснодар', verified: true },
-    { id: 'proof-02', company: 'ООО «Эстетик Стом+»', type: 'letter', letterImage: 'assets/proof/letters/letter-02.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Казань', verified: true },
-    { id: 'proof-03', company: 'Milin Bouquet (ИП Усманов Р.Р.)', type: 'letter', letterImage: 'assets/proof/letters/letter-03.webp', audioFile: null, audioDuration: null, source: 'Благодарственное письмо-рекомендация', verified: true },
-    { id: 'proof-04', company: 'ООО «Стоматология «Арт-Дент»»', type: 'letter', letterImage: 'assets/proof/letters/letter-04.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Волгоград', verified: true },
-    { id: 'proof-05', company: 'ООО «Дента»', type: 'letter', letterImage: 'assets/proof/letters/letter-05.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Новороссийск', verified: true },
-    { id: 'proof-06', company: 'ООО «Солнечная стоматология»', type: 'letter', letterImage: 'assets/proof/letters/letter-06.webp', audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Казань', verified: true }
+    { id: 'proof-01', company: 'ООО «4А Денталь»', type: 'letter', letterImage: 'assets/proof/letters/letter-01.webp', letterW: 1131, letterH: 1600, audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Краснодар', verified: true },
+    { id: 'proof-02', company: 'ООО «Эстетик Стом+»', type: 'letter', letterImage: 'assets/proof/letters/letter-02.webp', letterW: 1206, letterH: 1565, audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Казань', verified: true },
+    { id: 'proof-03', company: 'Milin Bouquet (ИП Усманов Р.Р.)', type: 'letter', letterImage: 'assets/proof/letters/letter-03.webp', letterW: 1120, letterH: 1600, audioFile: null, audioDuration: null, source: 'Благодарственное письмо-рекомендация', verified: true },
+    { id: 'proof-04', company: 'ООО «Стоматология «Арт-Дент»»', type: 'letter', letterImage: 'assets/proof/letters/letter-04.webp', letterW: 1132, letterH: 1600, audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Волгоград', verified: true },
+    { id: 'proof-05', company: 'ООО «Дента»', type: 'letter', letterImage: 'assets/proof/letters/letter-05.webp', letterW: 1110, letterH: 1600, audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Новороссийск', verified: true },
+    { id: 'proof-06', company: 'ООО «Солнечная стоматология»', type: 'letter', letterImage: 'assets/proof/letters/letter-06.webp', letterW: 1130, letterH: 1600, audioFile: null, audioDuration: null, source: 'Официальное письмо с печатью · г. Казань', verified: true }
   ];
 
   // Content platforms only — Telegram/MAX/WhatsApp are contact channels,
@@ -61,7 +61,7 @@
       var hasLetter = !!item.letterImage;
       var hasAudio = !!item.audioFile;
       var inner = hasLetter
-        ? '<img src="' + item.letterImage + '" alt="' + (item.company ? 'Рекомендательное письмо — ' + item.company : 'Рекомендательное письмо') + '" loading="lazy" decoding="async">'
+        ? '<img src="' + item.letterImage + '" alt="' + (item.company ? 'Рекомендательное письмо — ' + item.company : 'Рекомендательное письмо') + '" width="' + item.letterW + '" height="' + item.letterH + '" loading="lazy" decoding="async">'
         : '<span class="trust__letter-head"></span>' +
           '<span class="trust__letter-lines">' +
             '<span></span><span></span><span></span>' +
@@ -123,7 +123,7 @@
     var hasLetter = !!item.letterImage;
     var hasAudio = !!item.audioFile;
     var letterHtml = hasLetter
-      ? '<img src="' + item.letterImage + '" alt="Рекомендательное письмо — ' + (item.company || '') + '" decoding="async">'
+      ? '<img src="' + item.letterImage + '" alt="Рекомендательное письмо — ' + (item.company || '') + '" width="' + item.letterW + '" height="' + item.letterH + '" decoding="async">'
       : '<div class="trust__viewer-doc-placeholder">' +
           '<span class="trust__viewer-doc-head"></span>' +
           '<span class="trust__viewer-doc-lines"><span></span><span></span><span></span><span></span></span>' +

@@ -126,16 +126,29 @@
     var tilt = frame.querySelector('[data-tilt]');
     if (!mockup || !tilt) return;
 
+    // rAF-coalesced write: the angle math (a cheap read of the already-
+    // laid-out rect) still runs on every mousemove, but the actual style
+    // write — the part that can force layout on a subsequent read — is
+    // collapsed to at most once per frame, same visual result.
+    var pendingTransform = null;
+    var tiltRafId = 0;
+    function applyTilt() {
+      tiltRafId = 0;
+      tilt.style.transform = pendingTransform;
+    }
+
     mockup.addEventListener('mousemove', function (e) {
       var rect = mockup.getBoundingClientRect();
       var px = (e.clientX - rect.left) / rect.width - 0.5;
       var py = (e.clientY - rect.top) / rect.height - 0.5;
-      tilt.style.transform =
+      pendingTransform =
         'rotateX(' + (-py * 9).toFixed(2) + 'deg) rotateY(' + (px * 12).toFixed(2) + 'deg)';
+      if (!tiltRafId) tiltRafId = requestAnimationFrame(applyTilt);
     });
 
     mockup.addEventListener('mouseleave', function () {
-      tilt.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      pendingTransform = 'rotateX(0deg) rotateY(0deg)';
+      if (!tiltRafId) tiltRafId = requestAnimationFrame(applyTilt);
     });
   }
 
@@ -144,16 +157,26 @@
 
     var buttons = frame.querySelectorAll('[data-magnet]');
     buttons.forEach(function (btn) {
+      // Same rAF-coalescing as initTilt above, one pending state per button.
+      var pendingTransform = null;
+      var magnetRafId = 0;
+      function applyMagnet() {
+        magnetRafId = 0;
+        btn.style.transform = pendingTransform;
+      }
+
       btn.addEventListener('mousemove', function (e) {
         var rect = btn.getBoundingClientRect();
         var mx = e.clientX - (rect.left + rect.width / 2);
         var my = e.clientY - (rect.top + rect.height / 2);
-        btn.style.transform =
+        pendingTransform =
           'translate(' + (mx * MAGNET_STRENGTH).toFixed(1) + 'px,' + (my * MAGNET_STRENGTH).toFixed(1) + 'px)';
+        if (!magnetRafId) magnetRafId = requestAnimationFrame(applyMagnet);
       });
 
       btn.addEventListener('mouseleave', function () {
-        btn.style.transform = 'translate(0px,0px)';
+        pendingTransform = 'translate(0px,0px)';
+        if (!magnetRafId) magnetRafId = requestAnimationFrame(applyMagnet);
       });
     });
   }
