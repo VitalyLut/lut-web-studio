@@ -45,18 +45,18 @@
     },
     {
       title: 'Здесь может быть ваш сайт', type: 'Новый проект', tag: 'Свободно',
-      description: 'Свободное место в подборке для бизнеса, которому нужен сайт с сильной структурой, визуалом и заявками.',
+      description: 'Свободное место в портфолио — для бизнеса, которому нужна сильная структура, визуал и заявки с первого дня.',
       domain: 'lutstudio.ru', url: '#contact', placeholder: true
     },
     {
-      title: 'Соберём ваш проект', type: 'LUT Web Studio', tag: 'Свободно',
-      description: 'Лендинг, корпоративный сайт или интернет-магазин — под задачу, нишу и путь клиента.',
+      title: 'Соберём ваш проект', type: 'Свободный слот', tag: 'Свободно',
+      description: 'Лендинг, корпоративный сайт или интернет-магазин — под вашу задачу, нишу и путь клиента до заявки.',
       domain: 'lutstudio.ru', url: '#contact', placeholder: true
     },
     {
-      title: 'Следующий кейс', type: 'В разработке', tag: 'Скоро',
-      description: 'Новая digital-система скоро появится в портфолио.',
-      domain: 'lutstudio.ru', url: '#', placeholder: true
+      title: 'Место для нового кейса', type: 'Свободный слот', tag: 'Свободно',
+      description: 'Ещё один свободный слот в портфолио. Обсудим задачу — и он станет вашим кейсом.',
+      domain: 'lutstudio.ru', url: '#contact', placeholder: true
     }
   ];
 
@@ -142,7 +142,7 @@
           '<div class="portfolio-card__placeholder-grid"></div>' +
           '<span class="portfolio-card__placeholder-mark">+</span>' +
           '<span class="portfolio-card__placeholder-text">' + project.description + '</span>' +
-          '<span class="portfolio-card__placeholder-cta">Обсудить проект</span>' +
+          '<span class="portfolio-card__placeholder-cta">Обсудить проект →</span>' +
         '</div>';
     } else if (project.image) {
       previewHTML = '<img src="' + project.image + '" alt="' + project.alt + '" width="' + project.imgW + '" height="' + project.imgH + '" loading="lazy" decoding="async">';

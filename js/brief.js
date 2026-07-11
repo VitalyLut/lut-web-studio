@@ -420,7 +420,7 @@
       if (submitted) return;
 
       if (placeholderEl) placeholderEl.classList.toggle('is-hidden', !!answers.format);
-      if (mockStatus) mockStatus.textContent = answers.format ? 'BUILDING' : 'EMPTY';
+      if (mockStatus) mockStatus.textContent = answers.format ? 'СОБИРАЕМ' : 'ПУСТО';
 
       if (answers.format) {
         var info = FORMAT_MAP[answers.format] || { headline: answers.format, sub: '', url: 'project.lutstudio.ru' };
@@ -487,11 +487,11 @@
     function renderSuccessLeft() {
       quizEl.innerHTML =
         '<div class="brief__success" data-brief-success>' +
-          '<span class="status-pill"><span class="status-pill__dot"></span>BRIEF READY</span>' +
+          '<span class="status-pill"><span class="status-pill__dot"></span>БРИФ ГОТОВ</span>' +
           '<span class="check-dot">✓</span>' +
           '<h3 class="brief__success-title">Спасибо, бриф собран.</h3>' +
           '<p class="brief__success-text">Скоро свяжемся с вами и подскажем следующий шаг.</p>' +
-          '<div class="brief__success-id"><span>BRIEF ID</span><b>' + briefId + '</b></div>' +
+          '<div class="brief__success-id"><span>НОМЕР БРИФА</span><b>' + briefId + '</b></div>' +
           '<button type="button" class="brief__restart-btn" data-brief-restart>Изменить ответы</button>' +
         '</div>';
       var successEl = quizEl.querySelector('[data-brief-success]');
@@ -526,14 +526,14 @@
       var final = document.createElement('div');
       final.className = 'brief-mock-final';
       final.innerHTML =
-        '<span class="status-pill"><span class="status-pill__dot"></span>BRIEF READY</span>' +
+        '<span class="status-pill"><span class="status-pill__dot"></span>БРИФ ГОТОВ</span>' +
         '<h3 class="brief-mock-final__title">Проект собран</h3>' +
         '<p class="brief-mock-final__text">Следующий шаг — обсудить детали.</p>' +
         '<div class="brief-mock-final__summary">' + summary + '</div>' +
-        '<div class="brief-mock-final__tech"><span>STATUS: <b>SENT</b></span><span>BRIEF ID: <b>' + briefId + '</b></span></div>';
+        '<div class="brief-mock-final__tech"><span>СТАТУС: <b>ОТПРАВЛЕНО</b></span><span>НОМЕР БРИФА: <b>' + briefId + '</b></span></div>';
       mockBody.innerHTML = '';
       mockBody.appendChild(final);
-      if (mockStatus) mockStatus.textContent = 'SENT';
+      if (mockStatus) mockStatus.textContent = 'ОТПРАВЛЕНО';
       if (mockProgressFill) mockProgressFill.style.width = '100%';
       if (reduceMotion) {
         final.classList.add('is-visible');
@@ -665,7 +665,7 @@
       mockBody.innerHTML = '<div class="brief__mock-placeholder" data-brief-placeholder><span class="brief__mock-placeholder-dot"></span>Проект ещё не собран</div>';
       placeholderEl = mockBody.querySelector('[data-brief-placeholder]');
       if (mockUrl) mockUrl.textContent = 'project.lutstudio.ru';
-      if (mockStatus) mockStatus.textContent = 'EMPTY';
+      if (mockStatus) mockStatus.textContent = 'ПУСТО';
       if (mockProgressFill) mockProgressFill.style.width = (100 / QUIZ_STEPS.length).toFixed(1) + '%';
 
       renderStep(true);

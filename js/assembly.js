@@ -6,12 +6,12 @@
 
   var LAYERS = [
     {
-      code: '01', name: 'Аналитика ниши', en: 'MARKET SCAN',
+      code: '01', name: 'Аналитика ниши', en: 'РЫНОК',
       desc: 'Разбираем бизнес, конкурентов, аудиторию и точки доверия, чтобы сайт не выглядел «как у всех», а попадал в реальные причины выбора.',
       ex: -80, ey: -170, ez: -30, er: -6
     },
     {
-      code: '02', name: 'Смыслы и оффер', en: 'MEANING LAYER',
+      code: '02', name: 'Смыслы и оффер', en: 'ОФФЕР',
       desc: 'Формулируем, что вы предлагаете, почему это важно для клиента и почему стоит обратиться именно к вам.',
       ex: 88, ey: -104, ez: -8, er: 5
     },
@@ -20,22 +20,22 @@
       // application) belongs to Journey. This layer is about ordering
       // blocks/hierarchy so people find what matters fast, not about
       // the path to submission.
-      code: '03', name: 'Структура и приоритеты', en: 'STRUCTURE LOGIC',
+      code: '03', name: 'Структура и приоритеты', en: 'ИЕРАРХИЯ',
       desc: 'Определяем порядок блоков и визуальную иерархию, чтобы человек сразу видел главное и не терялся в структуре страницы.',
       ex: -46, ey: -34, ez: 18, er: -4
     },
     {
-      code: '04', name: 'Визуальная система', en: 'VISUAL SYSTEM',
+      code: '04', name: 'Визуальная система', en: 'ДИЗАЙН-СИСТЕМА',
       desc: 'Создаём стиль под уровень бизнеса: типографику, сетку, цвета, карточки, акценты, ритм и ощущение бренда.',
       ex: 60, ey: 40, ez: -16, er: 6
     },
     {
-      code: '05', name: 'Интерфейс и анимации', en: 'MOTION INTERFACE',
+      code: '05', name: 'Интерфейс и анимации', en: 'АНИМАЦИИ',
       desc: 'Добавляем hover, scroll-анимации и микродвижение, чтобы сайт выглядел живым, современным и запоминался.',
       ex: -74, ey: 110, ez: 14, er: -5
     },
     {
-      code: '06', name: 'Запуск и заявки', en: 'LAUNCH CORE',
+      code: '06', name: 'Запуск и заявки', en: 'ЗАПУСК',
       desc: 'Адаптируем сайт под устройства, подключаем формы, мессенджеры, домен, базовую SEO-подготовку и проверяем всё перед запуском.',
       ex: 50, ey: 182, ez: -36, er: 4
     }
@@ -133,12 +133,12 @@
       if (done) {
         codeEl.textContent = 'OK';
         nameEl.textContent = 'Система собрана';
-        enEl.textContent = 'ASSEMBLY COMPLETE';
+        enEl.textContent = 'ПРОЕКТ СОБРАН';
         descEl.textContent = 'От первого экрана до заявки — единый работающий механизм.';
       } else if (index < 0) {
         codeEl.textContent = '00';
         nameEl.textContent = 'Готовность к сборке';
-        enEl.textContent = 'STANDBY';
+        enEl.textContent = 'ОЖИДАНИЕ';
         descEl.textContent = 'Листайте вниз — сайт собирается слой за слоем, из данных бизнеса в единую систему.';
       } else {
         var L = LAYERS[index];

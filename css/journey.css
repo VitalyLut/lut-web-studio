@@ -823,20 +823,28 @@
     height: 260vh;
   }
 
-  /* height:auto (was the inherited 100vh) — the sticky stage now sizes
-     to its own content (hud + the now-compact .journey__scene) instead
-     of always filling the full viewport, which is what left a large
-     plain-background gap below the compact interface. max-height:100vh
-     is a safety cap, not the normal case: computeProgress() in
-     journey.js reads track.offsetHeight/window.innerHeight only, never
-     this element's height, and empirically the sticky pin still holds
-     through the full scroll range at every height tested — a SHORTER
-     sticky element needs less remaining track height to stay stuck, so
-     this is, if anything, safer than the fixed 100vh was, not riskier. */
+  /* height:auto + align-items:flex-start (an earlier fix) shrank the
+     sticky stage down to exactly its own compact content instead of
+     filling the viewport — but a shorter box doesn't remove the extra
+     space, it just relocates it: since .journey__stage is the sticky
+     child of a much taller .journey__track spacer, whatever room the
+     content doesn't fill is still there, now showing as bare
+     .journey__track background below the (shorter, top-anchored) box
+     for the entire scroll — measured at ~150px on a 390x844 viewport
+     (content ~690px tall vs an 844px viewport). Reverting to the
+     desktop pattern — full height:100dvh (dual-declared with vh as the
+     no-dvh-support fallback, same idiom as .hero-viewport) plus
+     align-items:center — puts that same leftover space back to ~even
+     top/bottom margins around the content instead of dumping all of it
+     below, which reads as a deliberately centered scene rather than a
+     cut-off one. computeProgress() in journey.js reads
+     track.offsetHeight/window.innerHeight only, never this element's
+     own height or alignment, so neither this nor the max-height it
+     replaces has any effect on scroll-jack timing. */
   .journey__stage {
-    align-items: flex-start;
-    height: auto;
-    max-height: 100vh;
+    align-items: center;
+    height: 100vh;
+    height: 100dvh;
   }
 
   .journey__container {

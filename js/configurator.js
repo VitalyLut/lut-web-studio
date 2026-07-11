@@ -1,7 +1,7 @@
 (function () {
   var FORMATS = [
     {
-      id: 'landing', title: 'Лендинг', label: 'LANDING PAGE', price: 'от 50 000 ₽', url: 'landing.lutstudio.ru',
+      id: 'landing', title: 'Лендинг', label: 'ЛЕНДИНГ', price: 'от 50 000 ₽', url: 'landing.lutstudio.ru',
       headline: 'Лендинг, который ведёт к заявке',
       tagline: 'Структура, оффер, доверие и CTA в одной понятной странице.',
       description: 'Одностраничный сайт для услуги, продукта, эксперта или рекламной кампании. Быстро объясняет ценность и ведёт человека к заявке.',
@@ -10,7 +10,7 @@
       visualType: 'landing', ctaText: 'Обсудить лендинг'
     },
     {
-      id: 'corporate', title: 'Корпоративный сайт', label: 'COMPANY WEBSITE', price: 'от 90 000 ₽', url: 'company.lutstudio.ru',
+      id: 'corporate', title: 'Корпоративный сайт', label: 'КОРПОРАТИВНЫЙ САЙТ', price: 'от 90 000 ₽', url: 'company.lutstudio.ru',
       headline: 'Корпоративный сайт для доверия',
       tagline: 'Главная, услуги, команда, кейсы и контакты в одной системе.',
       description: 'Сайт для компании, клиники, студии, производства или сервиса. Помогает показать уровень бизнеса, направления, команду, кейсы и доверие.',
@@ -19,7 +19,7 @@
       visualType: 'corporate', ctaText: 'Обсудить сайт'
     },
     {
-      id: 'ecommerce', title: 'Интернет-магазин', label: 'E-COMMERCE', price: 'от 120 000 ₽', url: 'shop.lutstudio.ru',
+      id: 'ecommerce', title: 'Интернет-магазин', label: 'ИНТЕРНЕТ-МАГАЗИН', price: 'от 120 000 ₽', url: 'shop.lutstudio.ru',
       headline: 'Интернет-магазин с каталогом',
       tagline: 'Категории, товары, корзина и путь к покупке.',
       description: 'Сайт для продажи товаров, каталогов и небольших e-commerce-проектов. Продумываем категории, карточки товаров, корзину, оплату и путь к покупке.',
@@ -28,7 +28,7 @@
       visualType: 'ecommerce', ctaText: 'Обсудить магазин'
     },
     {
-      id: 'service', title: 'Сайт услуг', label: 'SERVICE WEBSITE', price: 'от 70 000 ₽', url: 'service.lutstudio.ru',
+      id: 'service', title: 'Сайт услуг', label: 'САЙТ УСЛУГ', price: 'от 70 000 ₽', url: 'service.lutstudio.ru',
       headline: 'Сайт услуг с записью',
       tagline: 'Услуги, цены, этапы и быстрый путь к обращению.',
       description: 'Формат для локального бизнеса, специалистов и сервисных компаний. Помогает понятно показать услуги, цены, этапы работы и привести клиента к записи или заявке.',
@@ -37,7 +37,7 @@
       visualType: 'service', ctaText: 'Обсудить сайт услуг'
     },
     {
-      id: 'redesign', title: 'Редизайн', label: 'REDESIGN', price: 'от 45 000 ₽', url: 'redesign.lutstudio.ru',
+      id: 'redesign', title: 'Редизайн', label: 'РЕДИЗАЙН', price: 'от 45 000 ₽', url: 'redesign.lutstudio.ru',
       headline: 'Редизайн без потери смысла',
       tagline: 'Усиливаем структуру, визуал, адаптив и путь пользователя.',
       description: 'Если сайт уже есть, но выглядит устаревшим, плохо объясняет ценность или не даёт заявок — усиливаем структуру, визуал, адаптив и путь пользователя.',
@@ -46,7 +46,7 @@
       visualType: 'redesign', ctaText: 'Обсудить редизайн'
     },
     {
-      id: 'tilda-upgrade', title: 'Доработки на Tilda', label: 'TILDA UPGRADE', price: 'от 15 000 ₽', url: 'tilda.lutstudio.ru',
+      id: 'tilda-upgrade', title: 'Доработки на Tilda', label: 'ДОРАБОТКИ TILDA', price: 'от 15 000 ₽', url: 'tilda.lutstudio.ru',
       headline: 'Доработки Tilda без хаоса',
       tagline: 'Zero Block, адаптив, формы, анимации и кастомный код.',
       description: 'Улучшаем уже существующий сайт на Tilda: Zero Block, адаптив, формы, анимации, визуальные правки, кастомный код и технические настройки.',
