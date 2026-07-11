@@ -401,7 +401,14 @@
     text-align: left;
   }
 
+  /* Grid, not flex-wrap: flex-wrap let the row break wherever icons ran
+     out of width, which read as a lopsided 6+1 (or similar) split
+     depending on exact viewport width. A fixed 4-column grid always
+     fills row 1 with the first 4 icons and wraps the rest to row 2,
+     regardless of how many social links exist. */
   .footer__socials-row {
+    display: grid;
+    grid-template-columns: repeat(4, 42px);
     justify-content: flex-start;
   }
 

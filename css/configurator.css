@@ -1547,9 +1547,16 @@
    configurator.js (mouseenter there is a hover-preview enhancement
    only), so no JS changes were needed for touch. */
 @media (max-width: 1023px) {
+  /* Bottom padding was a flat 48px regardless of how narrow the viewport
+     got, while every other static-flow section (Trust/FAQ/Brief/Footer)
+     uses the shared --section-gap token, which steps down further at
+     <=599px (48px -> 36px). That divergence read as an oversized "tail"
+     specifically on phones, compared to the tighter rhythm the rest of
+     the site settles into at the same widths — this just brings
+     Configurator's own bottom gap back in line with that shared scale. */
   .configurator {
     min-height: 0;
-    padding: calc(var(--header-height) + 32px) 0 48px;
+    padding: calc(var(--header-height) + 32px) 0 var(--section-gap);
   }
 
   /* Strict 2-column x 3-row grid, not two independently-wrapping

@@ -859,14 +859,14 @@
     margin-top: 10px;
   }
 
+  /* No line-clamp here on purpose — the shorter subtitle text (see
+     index.html) is written to read cleanly in full at this size; an
+     ellipsis-truncated subtitle previously read as a rendering defect,
+     not an intentional edit. */
   .journey__subtitle {
     margin-top: 8px;
     font-size: 12.5px;
     line-height: 1.45;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
   }
 
   /* flex:1 (grow to fill whatever's left of the sticky stage below the

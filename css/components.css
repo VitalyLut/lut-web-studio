@@ -344,6 +344,14 @@
   .menu__footer {
     margin-top: 32px;
   }
+
+  /* Same reasoning as the footer's own social row (css/footer.css): a
+     fixed 4-column grid always wraps cleanly to a 4-then-rest layout,
+     instead of an uneven flex-wrap break that depends on exact width. */
+  .menu__socials {
+    display: grid;
+    grid-template-columns: repeat(4, 44px);
+  }
 }
 
 @media (max-width: 599px) {
