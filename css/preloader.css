@@ -113,48 +113,70 @@
 }
 
 /* ===== Faucet — thick, graphite body with accent details only where
-   the spec calls for them (valve hub, liquid signal inside the
-   stream), not a fully acid-green fixture. vector-effect keeps every
-   stroke a constant SCREEN pixel width regardless of how much the
-   scene itself is scaled (mobile scene can be ~4x smaller than
-   desktop — a stroke sized in viewBox units would either vanish on
-   mobile or look bloated on desktop). ===== */
-.lwsload__pipe {
+   the spec calls for them (valve hub, nozzle opening, stream), not a
+   fully acid-green fixture. vector-effect keeps every stroke a
+   constant SCREEN pixel width regardless of how much the scene itself
+   is scaled (mobile scene can be ~3x smaller than desktop — a stroke
+   sized in viewBox units would either vanish on mobile or look
+   bloated on desktop).
+
+   Two-layer strokes (-outer/-inner sharing the same "d"/x1../y1..)
+   give the pipe and stem a visible body instead of a bare line: a
+   wide dark base stroke plus a narrower, slightly lighter one on top
+   reads as a rounded graphite tube with an inner channel, no
+   gradients or 3D shading involved. ===== */
+.lwsload__pipe-outer,
+.lwsload__pipe-inner,
+.lwsload__valve-stem-outer,
+.lwsload__valve-stem-inner {
   fill: none;
-  stroke: var(--color-border-strong);
-  stroke-width: 13px;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
-/* fill-box + center: rotate() below always pivots around the wheel's
-   own middle, regardless of the ancestor .lwsload__faucet-group's own
-   translateX (used to align the whole assembly to L's measured
-   center) — the two transforms are independent, applied in separate
-   local coordinate spaces. */
-.lwsload__valve {
-  transform-box: fill-box;
-  transform-origin: center;
+.lwsload__pipe-outer,
+.lwsload__valve-stem-outer {
+  stroke: var(--color-border-strong);
+  stroke-width: 22px;
 }
 
-.lwsload__valve-stem {
+.lwsload__pipe-inner,
+.lwsload__valve-stem-inner {
+  stroke: var(--color-surface-2);
+  stroke-width: 11px;
+}
+
+/* Elbow joint — a filled collar at the bend so it reads as a pipe
+   fitting, not just a rounded corner. */
+.lwsload__elbow-joint {
+  fill: var(--color-surface-2);
   stroke: var(--color-border-strong);
-  stroke-width: 10px;
-  stroke-linecap: round;
+  stroke-width: 3.5px;
   vector-effect: non-scaling-stroke;
 }
+
+/* .lwsload__valve (the <g> wrapping ring+spokes+hub) intentionally
+   has no CSS here — no transform-box/transform-origin. Its rotation
+   is driven by the native SVG transform="rotate(angle cx cy)"
+   attribute, set every frame in js/preloader.js using the ring's own
+   authored cx/cy as literal numbers. That pivots around the exact
+   same point regardless of this group's bounding box; the old CSS
+   transform-box:fill-box approach instead pivoted around the group's
+   *bounding-box center*, which drifted away from the ring's true
+   center by several px because the (now-removed-from-this-group)
+   stem extended the box asymmetrically. */
 
 .lwsload__valve-ring {
   fill: var(--color-surface-2);
   stroke: var(--color-border-strong);
-  stroke-width: 7px;
+  stroke-width: 9px;
   vector-effect: non-scaling-stroke;
 }
 
 .lwsload__valve-spoke {
   stroke: var(--color-border-strong);
-  stroke-width: 5px;
+  stroke-width: 6px;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
@@ -163,12 +185,30 @@
   fill: var(--color-accent);
 }
 
+.lwsload__nozzle-collar {
+  fill: var(--color-surface-2);
+  stroke: var(--color-border-strong);
+  stroke-width: 3.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.lwsload__nozzle-opening {
+  fill: var(--color-surface-3);
+  stroke: var(--color-border-strong);
+  stroke-width: 2.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+.lwsload__nozzle-hole {
+  fill: var(--color-bg);
+}
+
 .lwsload__stream {
   stroke: var(--color-accent);
-  stroke-width: 14px;
+  stroke-width: 18px;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 0 5px rgba(200, 255, 46, .35));
+  filter: drop-shadow(0 0 4px rgba(200, 255, 46, .3));
   transition: stroke-width .35s var(--ease-rise);
 }
 
@@ -187,24 +227,35 @@
     width: clamp(260px, min(98vw, 90vh), 640px);
   }
 
-  .lwsload__pipe {
-    stroke-width: 9px;
+  .lwsload__pipe-outer,
+  .lwsload__valve-stem-outer {
+    stroke-width: 15px;
   }
 
-  .lwsload__valve-stem {
-    stroke-width: 7px;
+  .lwsload__pipe-inner,
+  .lwsload__valve-stem-inner {
+    stroke-width: 7.5px;
+  }
+
+  .lwsload__elbow-joint,
+  .lwsload__nozzle-collar {
+    stroke-width: 2.5px;
+  }
+
+  .lwsload__nozzle-opening {
+    stroke-width: 2px;
   }
 
   .lwsload__valve-ring {
-    stroke-width: 5px;
+    stroke-width: 6px;
   }
 
   .lwsload__valve-spoke {
-    stroke-width: 3.5px;
+    stroke-width: 4px;
   }
 
   .lwsload__stream {
-    stroke-width: 9px;
+    stroke-width: 12px;
   }
 
   .lwsload__letter-outline {

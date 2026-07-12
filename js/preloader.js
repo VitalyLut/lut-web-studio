@@ -120,12 +120,31 @@
     // font metrics — measured here, once, and used to reposition all
     // three for perfectly even gaps centered in the 1000-wide
     // viewBox. The faucet group is then nudged by a single
-    // translateX so its spout still lands exactly on L's new center,
-    // rather than hand-tuning pixel offsets that would drift the
-    // moment the font or copy changes. ----
+    // translateX so the stream still lands exactly on L's vertical
+    // stroke, rather than hand-tuning pixel offsets that would drift
+    // the moment the font or copy changes. ----
     var VIEWBOX_WIDTH = 1000;
     var LETTER_GAP = 42;
-    var FAUCET_DESIGN_CENTER_X = 178; // spout tip x as authored in the markup above
+    // Stream x as authored in the markup above — chosen to already sit
+    // almost exactly on L's real measured stroke center (~123, see
+    // L_STROKE_CENTER_FRACTION below) so the runtime correction stays
+    // near zero. A large correction here is what caused the valve/pipe
+    // to run off the left edge on narrow viewports: shifting the whole
+    // faucet-group by a big translateX pushed the pipe's authored
+    // start (needed some distance to the left of the nozzle to read as
+    // "entering from the side") past the scene's own edge, which has
+    // very little spare margin on mobile (the scene is ~98vw there).
+    var FAUCET_DESIGN_CENTER_X = 123;
+
+    // L's own bounding box is centered on the WHOLE glyph (stroke +
+    // foot), not the vertical stroke the stream needs to hit — the
+    // foot pulls the box center well to the right of the stroke.
+    // Measured directly off the rendered glyph (pixel-sampled the
+    // stroke's left/right edges near the top of L, where only the
+    // stroke exists): the stroke's own center sits at ~29.4% of the
+    // full bbox width from its left edge. Fixed to this font/weight's
+    // "L", not a stand-in guess.
+    var L_STROKE_CENTER_FRACTION = 0.294;
 
     var letterIds = ['L', 'W', 'S'];
     var glyphEls = {};
@@ -149,8 +168,17 @@
       return { id: id, bbox: bbox, liquid: liquid, window: profile.letters[id], settled: false };
     });
 
-    var lCenterX = letters[0].bbox.x + letters[0].bbox.width / 2;
-    faucetGroup.style.transform = 'translateX(' + (lCenterX - FAUCET_DESIGN_CENTER_X).toFixed(1) + 'px)';
+    var lStrokeCenterX = letters[0].bbox.x + letters[0].bbox.width * L_STROKE_CENTER_FRACTION;
+    faucetGroup.style.transform = 'translateX(' + (lStrokeCenterX - FAUCET_DESIGN_CENTER_X).toFixed(1) + 'px)';
+
+    // Ring center as authored in the markup — the pivot for the SVG
+    // native rotate(angle cx cy) transform below. Using literal
+    // coordinates (not the group's own bounding box) means the
+    // rotation always pivots around this exact point regardless of
+    // what else lives in the group, so nothing can drift the way the
+    // old fill-box/transform-origin approach did.
+    var VALVE_CX = 75;
+    var VALVE_CY = 95;
 
     var swayPhaseOffsets = { L: 0, W: 1.4, S: 2.7 };
 
@@ -176,7 +204,7 @@
         ? easeOutSmallBack(valveP, profile.valveOvershoot / profile.valveAngle)
         : valveP;
       var angle = eased * profile.valveAngle;
-      valveEl.style.transform = 'rotate(' + angle.toFixed(2) + 'deg)';
+      valveEl.setAttribute('transform', 'rotate(' + angle.toFixed(2) + ' ' + VALVE_CX + ' ' + VALVE_CY + ')');
 
       // Stream: draws in (dash reveal) once the valve is most of the
       // way open, then thins to nothing right at the very end.

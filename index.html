@@ -158,27 +158,56 @@
           <clipPath id="lwsClipS"><use href="#lwsGlyphS"></use></clipPath>
         </defs>
 
-        <!-- Faucet: pipe enters from the left, valve sits at the bend,
-             spout drops straight down into L's horizontal center. The
-             whole group's x placement is corrected at runtime
-             (js/preloader.js) once L's actual measured width/center is
-             known, via a single translateX on this <g> — so the spout
-             always lands exactly on L's center regardless of font
-             metrics, without touching any coordinate below. -->
+        <!-- Faucet: pipe enters from the left, big side-mounted valve
+             wheel, rounded bend, nozzle. The whole group's x placement
+             is corrected at runtime (js/preloader.js) once L's actual
+             measured vertical-stroke center is known, via a single
+             translateX on this <g> — so the stream always lands
+             exactly there regardless of font metrics, without
+             touching any coordinate below.
+
+             Two-layer stroke (…-outer + …-inner, same "d") on the pipe
+             and stem reads as one thick graphite body with a visible
+             inner channel rather than a bare line. The elbow joint
+             and nozzle collar are separate filled shapes (not just a
+             rounded line join) so the bend and the outlet both read
+             as actual fittings.
+
+             data-valve wraps ONLY the parts that spin (ring, spokes,
+             hub) — the stem stays outside it and never rotates. Its
+             rotation is driven every frame via the native SVG
+             transform="rotate(angle cx cy)" attribute (js/preloader.js),
+             not a CSS transform-origin guess: rotate(a,cx,cy) always
+             pivots around the exact given point regardless of the
+             group's own bounding box, which is what the old
+             transform-box:fill-box approach got wrong — the stem
+             used to live inside the rotating group and extended its
+             fill-box asymmetrically, pulling the effective pivot
+             several px away from the ring's true center. -->
         <g class="lwsload__faucet-group" data-faucet-group>
-          <path class="lwsload__pipe" d="M14,140 H148 Q178,140 178,170 V270" />
+          <path class="lwsload__pipe-outer" d="M14,195 H103 Q123,195 123,215 V276" />
+          <path class="lwsload__pipe-inner" d="M14,195 H103 Q123,195 123,215 V276" />
+
+          <line class="lwsload__valve-stem-outer" x1="75" y1="195" x2="75" y2="153" />
+          <line class="lwsload__valve-stem-inner" x1="75" y1="195" x2="75" y2="153" />
+
+          <circle class="lwsload__elbow-joint" cx="113" cy="205" r="16" />
 
           <g class="lwsload__valve" data-valve>
-            <line class="lwsload__valve-stem" x1="148" y1="140" x2="148" y2="126" />
-            <circle class="lwsload__valve-ring" cx="148" cy="90" r="36" />
-            <line class="lwsload__valve-spoke" x1="148" y1="58" x2="148" y2="122" />
-            <line class="lwsload__valve-spoke" x1="116" y1="90" x2="180" y2="90" />
-            <line class="lwsload__valve-spoke" x1="125" y1="67" x2="171" y2="113" />
-            <line class="lwsload__valve-spoke" x1="125" y1="113" x2="171" y2="67" />
-            <circle class="lwsload__valve-hub" cx="148" cy="90" r="10" />
+            <circle class="lwsload__valve-ring" cx="75" cy="95" r="58" />
+            <line class="lwsload__valve-spoke" x1="17" y1="95" x2="133" y2="95" />
+            <line class="lwsload__valve-spoke" x1="46" y1="44.8" x2="104" y2="145.2" />
+            <line class="lwsload__valve-spoke" x1="46" y1="145.2" x2="104" y2="44.8" />
+            <circle class="lwsload__valve-hub" cx="75" cy="95" r="13" />
           </g>
 
-          <line class="lwsload__stream" data-stream x1="178" y1="270" x2="178" y2="340" />
+          <g class="lwsload__nozzle">
+            <rect class="lwsload__nozzle-collar" x="95" y="270" width="56" height="26" rx="13" />
+            <ellipse class="lwsload__nozzle-opening" cx="123" cy="296" rx="17" ry="7" />
+            <ellipse class="lwsload__nozzle-hole" cx="123" cy="296" rx="10" ry="4" />
+          </g>
+
+          <line class="lwsload__stream" data-stream x1="123" y1="296" x2="123" y2="345" />
         </g>
 
         <!-- Empty letters — always visible, defines the "container". -->
