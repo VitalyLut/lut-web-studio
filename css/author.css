@@ -29,6 +29,9 @@
   font-family: var(--font-body);
   padding: var(--section-gap) 0 var(--section-gap-large);
   overflow: hidden;
+  /* Same recipe as .legal__section — clears the fixed header when the
+     "Обо мне" menu/footer link lands here. */
+  scroll-margin-top: calc(var(--header-height) + 24px);
 }
 
 .author__container {
@@ -178,11 +181,22 @@
 
 /* ===== Portrait — single image, bottom-anchored ===== */
 
-/* Rises 14px and fades in as one piece — no segments, no split. */
+/* Rises 14px and fades in as one piece — no segments, no split.
+   width:max-content (not the default shrink-to-fit auto) is required
+   here: with only `left` set on an absolutely positioned box and
+   `width` auto, CSS shrink-to-fit caps the box at
+   (containing-block-width - left), i.e. half the canvas at left:50% —
+   at narrower desktop widths that cap (e.g. 467px at 1024px viewport)
+   falls BELOW the image's real height-derived width (526.6px),
+   silently shrinking the rendered portrait and throwing off every
+   position: N% coordinate below that assumes the full-size render.
+   width:max-content sizes the box to the image's actual preferred
+   width instead, regardless of available space. */
 .author__visual {
   position: absolute;
   bottom: 0;
   left: 50%;
+  width: max-content;
   transform: translateX(-50%) translateY(14px);
   height: 94%;
   z-index: 2;
@@ -259,20 +273,28 @@
   line-height: 1.4;
 }
 
-/* ===== Facts — one compact list, not four independently-placed
-   items. The group itself is the only absolutely-positioned element;
-   .author__fact children are back in normal flow (flex column), so
-   there's no percentage-top-against-collapsed-container trap to
-   guard against here the way the old per-item layout needed. ===== */
-.author__facts {
+/* ===== Aside — facts + blog block, one shared flex-column group.
+   The group itself is the only absolutely-positioned element; both
+   .author__facts and .author__blog (and .author__fact inside facts)
+   stay in normal flow, so there's no percentage-top-against-
+   transformed-ancestor trap to guard against — flex `gap` alone
+   guarantees facts and blog never collide, regardless of how many
+   lines the blog body text wraps to. ===== */
+.author__aside {
   position: absolute;
   left: 4%;
-  top: var(--author-facts-top, 40%);
+  top: var(--author-aside-top, 29%);
   z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  width: 170px;
+  gap: 18px;
+  width: 200px;
+}
+
+.author__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .author__fact {
@@ -311,16 +333,122 @@
   line-height: 1.4;
 }
 
+/* ===== Blog — reads as part of the left column (thin top rule, no
+   card/border/background), not a separate dashboard. Icons reuse the
+   sitewide .icon-btn (see components.css) sized down to fit the
+   200px column, rendered from the shared window.LWS_SOCIAL_LINKS
+   data source (js/author.js), same pattern trust.js already uses for
+   its own filtered/ordered subset. ===== */
+.author__blog {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 13px;
+  border-top: 1px solid var(--color-border-faint);
+}
+
+.author__blog-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--color-text-dim-4);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise);
+  transition-delay: .96s;
+}
+
+.author__blog-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise);
+  transition-delay: 1.03s;
+}
+
+.author__blog-socials {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* Opacity-only entrance (no transform) — .icon-btn:hover already sets
+   its own transform, and .author.is-active would otherwise need equal
+   specificity to reset ours, permanently outranking :hover once the
+   section has revealed (the same trap documented below for
+   .author__signature/.author__visual). Skipping transform here avoids
+   it entirely instead of fighting it with scoped selectors. */
+.author__blog-social {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity .35s var(--ease-rise), background var(--motion-micro) ease, color var(--motion-micro) ease, transform var(--motion-micro) ease;
+}
+
+.author__blog-social svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Four values, matching the transition-property order above (opacity,
+   background, color, transform) one-for-one — a single value here
+   would repeat across all four (CSS transition-delay list-matching
+   rule), delaying the hover response by over a second along with the
+   entrance fade. Only opacity gets the staggered entrance delay;
+   the hover-driven properties stay at 0s so the lift/color change is
+   instant on interaction, same as every other .icon-btn on the site. */
+.author__blog-social:nth-child(1) { transition-delay: 1.1s, 0s, 0s, 0s; }
+.author__blog-social:nth-child(2) { transition-delay: 1.15s, 0s, 0s, 0s; }
+.author__blog-social:nth-child(3) { transition-delay: 1.2s, 0s, 0s, 0s; }
+.author__blog-social:nth-child(4) { transition-delay: 1.25s, 0s, 0s, 0s; }
+
+.author.is-active .author__blog-label,
+.author.is-active .author__blog-text {
+  opacity: 1;
+  transform: none;
+}
+
+/* No transform:none here on purpose — .author__blog-social never sets
+   a base transform (opacity-only entrance, see comment above), so
+   this only needs to flip opacity. Adding transform:none would give
+   this rule (.author.is-active .author__blog-social, 3 classes) more
+   specificity than .icon-btn:hover (1 class + 1 pseudo), permanently
+   blocking the hover lift once the section is active — the exact
+   trap .author__signature/.author__visual work around below. */
+.author.is-active .author__blog-social {
+  opacity: 1;
+}
+
 /* ===== Directions — symmetric pairs flanking the portrait ===== */
 
+/* top-upper/top-lower are resolution-independent by construction:
+   .author__visual is always height:94% + bottom:0 inside the canvas,
+   so the portrait always spans the same 6%-100% band of canvas height
+   regardless of viewport — ear level and shoulder level land at the
+   same canvas % at every desktop width. Measured against the actual
+   photo (assets/images/author/vitaly-lut-cutout.webp, alpha-edge +
+   visual check): ears sit ~24% down the image (canvas ~28.6%), so 33%
+   reads as "just below ear"; the shoulder curve starts ~44-48% down
+   the image (canvas ~48-51%), so 50% sits on the shoulder/upper-chest
+   line. --author-dir-gap-upper/-lower DO need per-breakpoint tuning
+   (see media queries below) — the portrait's rendered height is
+   roughly fixed in px across most of the desktop range while the
+   canvas keeps widening, so a fixed gap keeps drifting away from the
+   body edge as viewport grows unless corrected per tier. */
 .author__directions {
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  --author-dir-top-upper: 24%;
-  --author-dir-top-lower: 42%;
-  --author-dir-gap: 16%;
+  --author-dir-top-upper: 33%;
+  --author-dir-top-lower: 50%;
+  --author-dir-gap-upper: 8%;
+  --author-dir-gap-lower: 13%;
 }
 
 .author__direction {
@@ -335,13 +463,26 @@
 /* Coordinates as custom properties (set per-breakpoint on
    .author__directions below) rather than four independent
    left/top pairs — dir 0/1 and 2/3 are always a mirrored pair at the
-   same height, so tuning one number (--author-dir-gap) keeps both
-   sides symmetric automatically instead of needing two edits kept in
-   sync by hand. */
-.author__direction[data-dir='0'] { top: var(--author-dir-top-upper); left: calc(50% - var(--author-dir-gap)); transition-delay: .58s; }
-.author__direction[data-dir='2'] { top: var(--author-dir-top-lower); left: calc(50% - var(--author-dir-gap)); transition-delay: .64s; }
-.author__direction[data-dir='1'] { top: var(--author-dir-top-upper); left: calc(50% + var(--author-dir-gap)); transition-delay: .7s; }
-.author__direction[data-dir='3'] { top: var(--author-dir-top-lower); left: calc(50% + var(--author-dir-gap)); transition-delay: .76s; }
+   same height, so tuning the two gap numbers keeps both sides
+   symmetric automatically instead of needing four edits kept in sync
+   by hand. Upper and lower pairs use separate gaps (not one shared
+   value) because the head and the shoulders are very different
+   widths — a single gap sized to clear the shoulders left the head
+   pair stranded far from the face.
+
+   dir 0/2 (left side) are flex-direction:row-reverse (dot last in the
+   visual order), so they're anchored via `right`, not `left` — with
+   `left`, the anchor point lands on the *label* (the box's now-first
+   visual edge), and the dot sits a whole label-width further toward
+   center than intended, which at these tighter gaps was enough to
+   land the ДИЗАЙН dot on the face. `right` anchors the box's far
+   (reversed) edge, which is where the dot actually is. dir 1/3 keep
+   `left`, since their normal (non-reversed) row already puts the dot
+   first, right at that edge. */
+.author__direction[data-dir='0'] { top: var(--author-dir-top-upper); right: calc(50% + var(--author-dir-gap-upper)); transition-delay: .58s; }
+.author__direction[data-dir='2'] { top: var(--author-dir-top-lower); right: calc(50% + var(--author-dir-gap-lower)); transition-delay: .64s; }
+.author__direction[data-dir='1'] { top: var(--author-dir-top-upper); left: calc(50% + var(--author-dir-gap-upper)); transition-delay: .7s; }
+.author__direction[data-dir='3'] { top: var(--author-dir-top-lower); left: calc(50% + var(--author-dir-gap-lower)); transition-delay: .76s; }
 
 .author.is-active .author__direction {
   opacity: 1;
@@ -410,10 +551,8 @@
   margin-top: 11px;
 }
 
-.author__lede p:nth-child(1) { transition-delay: .86s; }
-.author__lede p:nth-child(2) { transition-delay: .95s; }
-.author__lede p:nth-child(3) { transition-delay: 1.04s; }
-.author__lede p:nth-child(4) { transition-delay: 1.13s; }
+.author__lede p:nth-child(1) { transition-delay: 1.34s; }
+.author__lede p:nth-child(2) { transition-delay: 1.43s; }
 
 .author.is-active .author__lede p {
   opacity: 1;
@@ -437,7 +576,7 @@
   color: var(--color-text-dim-5);
   opacity: 0;
   transition: opacity .5s var(--ease-rise);
-  transition-delay: 1.25s;
+  transition-delay: 1.58s;
 }
 
 .author__phrase::before {
@@ -451,7 +590,7 @@
   transform: scaleY(0);
   transform-origin: top;
   transition: transform .5s var(--ease-rise);
-  transition-delay: 1.25s;
+  transition-delay: 1.58s;
 }
 
 .author.is-active .author__phrase {
@@ -485,6 +624,16 @@
   .author__facts {
     transition: transform .3s ease;
     transform: translate(calc(var(--nx, 0) * 4px), calc(var(--ny, 0) * 2.5px));
+  }
+
+  /* Slightly weaker than .author__facts (3.5/2.2 vs 4/2.5) — reads as
+     part of the same aside column without dominating it. Applied to
+     the block wrapper, not the individual icons, so this transform
+     and each icon's own :hover lift (.icon-btn:hover, components.css)
+     never fight for the same property on the same element. */
+  .author__blog {
+    transition: transform .3s ease;
+    transform: translate(calc(var(--nx, 0) * 3.5px), calc(var(--ny, 0) * 2.2px));
   }
 
   .author__lede {
@@ -536,6 +685,9 @@
   .author__signature,
   .author__fact,
   .author__direction,
+  .author__blog-label,
+  .author__blog-text,
+  .author__blog-social,
   .author__lede p,
   .author__phrase {
     opacity: 1;
@@ -567,14 +719,26 @@
 /* 1024-1279px: the same percentages resolve to noticeably fewer
    actual pixels than at 1440px+, which was tight enough to clip
    .author__lede against the window's own right edge and let the
-   right-side directions creep into its column. Both sides get pulled
-   in further, and the connector line is dropped short of even its
-   already-reduced 22px, to keep a hard, verified-empty gap between
-   the two regardless of paragraph wrap length. */
+   right-side directions creep into its column. Lede/phrase get pulled
+   in further AND pushed right (76% -> 79%) — at 1024px specifically,
+   79% still left the FRONTEND label only a few px from the first
+   lede line before the gap was widened; the connector line is also
+   dropped shorter, to keep a hard, verified-empty gap regardless of
+   paragraph wrap length.
+
+   The direction gaps go the other way (wider, not narrower) at this
+   tier: the portrait's rendered height barely changes across
+   1024-1919px (canvas height floors at 700px for most of that range),
+   but the canvas itself is narrower here, so the portrait fills a
+   *larger* fraction of canvas width — the same gap percentage that
+   clears the body at 1440px sits too close to it (or inside it) at
+   1152px, and 1024px is tighter still. Values re-measured against the
+   actual rendered silhouette edges (in-browser pixel sampling) at
+   this width, not scaled by formula. */
 @media (max-width: 1279px) {
   .author__lede,
   .author__phrase {
-    left: 76%;
+    left: 79%;
     right: 3%;
   }
 
@@ -584,11 +748,25 @@
   }
 
   .author__directions {
-    --author-dir-gap: 15%;
+    --author-dir-gap-upper: 11%;
+    --author-dir-gap-lower: 15%;
   }
 
   .author.is-active .author__direction-line {
-    width: 16px;
+    width: 14px;
+  }
+}
+
+/* 1600px+: canvas keeps its 1360px container ceiling until the
+   >=1920px root-token override widens it further (see
+   css/responsive.css), so this tier only visibly diverges from
+   1280-1599px once that override is active — the gap is pulled in
+   slightly to match the portrait's now-smaller fraction of a wider
+   canvas. */
+@media (min-width: 1600px) {
+  .author__directions {
+    --author-dir-gap-upper: 7%;
+    --author-dir-gap-lower: 12%;
   }
 }
 
@@ -675,6 +853,11 @@
     position: relative;
     top: auto !important;
     left: auto !important;
+    /* dir 0/2 are anchored via `right` on desktop (see the row-reverse
+       comment above) — without resetting it here too, that value
+       leaks into this position:relative mobile item and shifts it
+       left by ~50% of the row width, pushing ДИЗАЙН/TILDA off-screen. */
+    right: auto !important;
     flex-direction: row !important;
   }
 
@@ -682,9 +865,20 @@
     display: none;
   }
 
+  /* display:contents flattens .author__aside so its two children
+     (.author__facts, .author__blog) become direct flex items of
+     .author__canvas alongside bgtext/visual/signature/directions —
+     same technique .footer__socials already uses at its own mobile
+     breakpoint (css/footer.css) to reorder children without an extra
+     wrapping box. */
+  .author__aside {
+    display: contents;
+  }
+
   .author__facts {
     position: relative;
     left: auto;
+    top: auto;
     order: 5;
     width: 100%;
     display: grid;
@@ -699,12 +893,36 @@
     width: auto;
   }
 
+  .author__blog {
+    order: 6;
+    width: 100%;
+    padding-top: 20px;
+  }
+
+  .author__blog-text {
+    max-width: 440px;
+  }
+
+  .author__blog-socials {
+    gap: 10px;
+  }
+
+  .author__blog-social {
+    width: 36px;
+    height: 36px;
+  }
+
+  .author__blog-social svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .author__lede {
     position: relative;
     left: auto;
     right: auto;
     top: auto;
-    order: 6;
+    order: 7;
     width: 100%;
     min-width: 0;
   }
@@ -714,7 +932,7 @@
     left: auto;
     right: auto;
     bottom: auto;
-    order: 7;
+    order: 8;
     width: 100%;
     min-width: 0;
   }

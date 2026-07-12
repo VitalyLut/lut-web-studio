@@ -1,6 +1,28 @@
 (function () {
   var REVEAL_THRESHOLD = 0.3;
 
+  // "Веду блог" only ever shows these four networks, in this exact
+  // order — everything else in the shared window.LWS_SOCIAL_LINKS
+  // (MAX/Telegram/WhatsApp) stays out. Same filter+sort pattern
+  // js/trust.js already uses for its own subset (renderNetwork), so
+  // there's one established way to pull an ordered slice out of the
+  // shared source rather than two.
+  var BLOG_SOCIAL_ORDER = ['instagram', 'youtube', 'tiktok', 'vk'];
+
+  function renderBlogSocials(section) {
+    var mount = section.querySelector('[data-author-blog-socials]');
+    if (!mount || !window.LWS_SOCIAL_LINKS) return;
+
+    var items = window.LWS_SOCIAL_LINKS
+      .filter(function (s) { return BLOG_SOCIAL_ORDER.indexOf(s.id) !== -1; })
+      .sort(function (a, b) { return BLOG_SOCIAL_ORDER.indexOf(a.id) - BLOG_SOCIAL_ORDER.indexOf(b.id); });
+
+    mount.innerHTML = items.map(function (item) {
+      return '<a class="icon-btn author__blog-social" href="' + item.href + '" target="_blank" ' +
+        'rel="noopener noreferrer" aria-label="' + item.label + '">' + item.svg + '</a>';
+    }).join('');
+  }
+
   // Mask radius — within the spec'd 130-220px (X) / 80-150px (Y) range;
   // base alone is already a clearly visible reveal, velocity only adds
   // a modest stretch on top rather than carrying most of the size.
@@ -16,6 +38,8 @@
     if (!section) return;
 
     var reduceMotion = window.LwsUtil.reduceMotion();
+
+    renderBlogSocials(section);
 
     // One-shot trigger: adds .is-active, which the window/portrait
     // fade-up and every staggered text transition-delay key off of
