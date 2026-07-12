@@ -115,6 +115,7 @@
   <link rel="stylesheet" href="css/fonts.min.css">
   <link rel="stylesheet" href="css/variables.min.css">
   <link rel="stylesheet" href="css/base.min.css">
+  <link rel="stylesheet" href="css/preloader.min.css">
   <link rel="stylesheet" href="css/components.min.css">
   <link rel="stylesheet" href="css/hero.min.css">
   <link rel="stylesheet" href="css/assembly.min.css">
@@ -131,6 +132,49 @@
   <link rel="stylesheet" href="css/cookie-consent.min.css">
 </head>
 <body>
+  <!-- Preloader — homepage only (markup/CSS link/script live only in
+       this file). Visible by default in CSS alone, so it covers the
+       very first paint with no JS-load-order gap; js/preloader.js
+       just decides when to fade it out and unlock scroll. See
+       css/preloader.css for how the L->W->S liquid fill works. -->
+  <div class="lwsload" data-preloader role="status" aria-live="polite">
+    <div class="lwsload__grid" aria-hidden="true"></div>
+    <div class="lwsload__glow" aria-hidden="true"></div>
+    <span class="lwsload__sr">Загрузка страницы LUT Web Studio</span>
+    <div class="lwsload__stage">
+      <div class="lwsload__word" aria-hidden="true">
+        <span class="lwsload__letter lwsload__letter--l">
+          <svg class="lwsload__faucet" viewBox="0 0 120 100" aria-hidden="true">
+            <path class="lwsload__faucet-pipe" d="M118 18 H62 V44" />
+            <path class="lwsload__faucet-pipe" d="M62 44 Q62 60 48 60 Q36 60 36 72" />
+            <g class="lwsload__valve">
+              <circle cx="62" cy="30" r="13" />
+              <line x1="62" y1="16" x2="62" y2="44" />
+              <line x1="48" y1="30" x2="76" y2="30" />
+              <line x1="52" y1="20" x2="72" y2="40" />
+              <line x1="52" y1="40" x2="72" y2="20" />
+              <circle class="lwsload__valve-hub" cx="62" cy="30" r="4" />
+            </g>
+          </svg>
+          <span class="lwsload__stream"></span>
+          <span class="lwsload__letter-outline">L</span>
+          <span class="lwsload__letter-fill">L</span>
+        </span>
+        <span class="lwsload__letter lwsload__letter--w">
+          <span class="lwsload__letter-outline">W</span>
+          <span class="lwsload__letter-fill">W</span>
+        </span>
+        <span class="lwsload__letter lwsload__letter--s">
+          <span class="lwsload__letter-outline">S</span>
+          <span class="lwsload__letter-fill">S</span>
+        </span>
+      </div>
+    </div>
+  </div>
+  <noscript>
+    <style>[data-preloader] { display: none !important; }</style>
+  </noscript>
+
   <div class="site-bg" aria-hidden="true">
     <div class="bg-layer bg-atmosphere"></div>
     <div class="bg-layer bg-grid"></div>
@@ -1410,12 +1454,15 @@
     </div>
   </div>
 
-  <!-- .min.js — same 14 files, same order (util.js/social-links.js must
+  <!-- .min.js — same 15 files, same order (util.js/social-links.js must
        stay first: everything else reads window.LwsUtil /
        window.renderLwsSocialLinks at DOMContentLoaded), minified
        independently rather than bundled. Unminified sources stay in js/
-       for development. -->
+       for development. preloader.js runs right after util.js — its
+       whole job (lock scroll, decide when to fade the overlay) should
+       start as early as possible relative to everything else. -->
   <script src="js/util.min.js"></script>
+  <script src="js/preloader.min.js"></script>
   <script src="js/cookie-consent.min.js"></script>
   <script src="js/social-links.min.js"></script>
   <script src="js/main.min.js"></script>

@@ -92,6 +92,7 @@
   --z-hamburger: 5;
   --z-header: 100;
   --z-modal: 300;
+  --z-preloader: 1000;
 
   /* Motion — durations only (easing curves above stay as-is). Scoped to
      components.css's shared, generic rules (hover states, panel
