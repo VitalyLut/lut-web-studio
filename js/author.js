@@ -1,8 +1,14 @@
 (function () {
   var REVEAL_THRESHOLD = 0.3;
-  var MAX_DEPTH_PX = 3;
-  var FILL_BASE = 62;
-  var FILL_STRETCH_MAX = 46;
+
+  // Mask radius — within the spec'd 130-220px (X) / 80-150px (Y) range;
+  // base alone is already a clearly visible reveal, velocity only adds
+  // a modest stretch on top rather than carrying most of the size.
+  var FILL_BASE_X = 170;
+  var FILL_BASE_Y = 110;
+  var FILL_STRETCH_MAX_X = 45;
+  var FILL_STRETCH_MAX_Y = 35;
+  var FILL_VELOCITY_SCALE = 2.4;
   var FILL_DECAY_MS = 320;
 
   function initAuthor() {
@@ -31,6 +37,8 @@
 
     if (reduceMotion) return;
 
+    var stage = section.querySelector('[data-author-stage]');
+    var canvas = section.querySelector('[data-author-canvas]');
     var fills = Array.prototype.slice.call(section.querySelectorAll('[data-author-fill]'));
     var hoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
@@ -44,109 +52,109 @@
       inView = true;
     }
 
-    // ---- Desktop: cursor-fill (letters fill locally under the
-    // pointer) + depth-response parallax. Both gated on the same
-    // hover-capable check; neither runs on touch. ----
-    if (hoverCapable) {
-      var stage = section.querySelector('[data-author-stage]');
-      var bgtext = section.querySelector('[data-author-bgtext]');
+    // ---- Desktop: single pointermove on the whole canvas drives both
+    // the letter cursor-fill and the parallax depth-response. Listening
+    // on .author__canvas (not .author__bgtext) means the event keeps
+    // firing even while the pointer is over the portrait — the portrait
+    // sits visually on top (z-index) but is a descendant of canvas, so
+    // canvas still receives the bubbled event; decorative layers
+    // (portrait, outline/fill text, connector lines/dots) additionally
+    // get pointer-events:none in CSS so they never become an
+    // accidental dead zone even for elements that aren't canvas
+    // descendants of the bubble path. ----
+    if (hoverCapable && canvas && stage) {
+      var lastX = null;
+      var lastY = null;
+      var pendingEvent = null;
+      var moveRafId = 0;
+      var decayRafId = 0;
 
-      if (stage) {
-        var pendingDx = 0;
-        var pendingDy = 0;
-        var depthRafId = 0;
-
-        function applyDepth() {
-          depthRafId = 0;
-          stage.style.setProperty('--dx', pendingDx.toFixed(2));
-          stage.style.setProperty('--dy', pendingDy.toFixed(2));
+      function stopDecay() {
+        if (decayRafId) {
+          cancelAnimationFrame(decayRafId);
+          decayRafId = 0;
         }
+      }
 
-        stage.addEventListener('mousemove', function (e) {
-          if (!inView) return;
-          var rect = stage.getBoundingClientRect();
-          var px = (e.clientX - rect.left) / rect.width - 0.5;
-          var py = (e.clientY - rect.top) / rect.height - 0.5;
-          pendingDx = px * 2 * MAX_DEPTH_PX;
-          pendingDy = py * 2 * MAX_DEPTH_PX;
-          if (!depthRafId) depthRafId = requestAnimationFrame(applyDepth);
-        });
+      function applyFrame() {
+        moveRafId = 0;
+        var e = pendingEvent;
+        if (!e) return;
 
-        stage.addEventListener('mouseleave', function () {
-          pendingDx = 0;
-          pendingDy = 0;
-          if (!depthRafId) depthRafId = requestAnimationFrame(applyDepth);
+        // Parallax signal — normalized -1..1 across the whole stage,
+        // read by css/author.css via --nx/--ny on every depth layer.
+        var stageRect = stage.getBoundingClientRect();
+        var nx = ((e.clientX - stageRect.left) / stageRect.width - 0.5) * 2;
+        var ny = ((e.clientY - stageRect.top) / stageRect.height - 0.5) * 2;
+        nx = Math.max(-1, Math.min(1, nx));
+        ny = Math.max(-1, Math.min(1, ny));
+        stage.style.setProperty('--nx', nx.toFixed(3));
+        stage.style.setProperty('--ny', ny.toFixed(3));
+
+        // Letter cursor-fill — each line's mask is positioned relative
+        // to that line's OWN rect, recomputed every frame (so it stays
+        // correct even as the parallax transform above shifts bgtext).
+        var vx = lastX === null ? 0 : e.clientX - lastX;
+        var vy = lastY === null ? 0 : e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        fills.forEach(function (el) {
+          var r = el.getBoundingClientRect();
+          var fw = FILL_BASE_X + Math.min(FILL_STRETCH_MAX_X, Math.abs(vx) * FILL_VELOCITY_SCALE);
+          var fh = FILL_BASE_Y + Math.min(FILL_STRETCH_MAX_Y, Math.abs(vy) * FILL_VELOCITY_SCALE);
+          el.style.setProperty('--fx', (e.clientX - r.left).toFixed(1) + 'px');
+          el.style.setProperty('--fy', (e.clientY - r.top).toFixed(1) + 'px');
+          el.style.setProperty('--fw', fw.toFixed(1) + 'px');
+          el.style.setProperty('--fh', fh.toFixed(1) + 'px');
         });
       }
 
-      if (bgtext && fills.length) {
-        var lastX = null;
-        var lastY = null;
-        var fillRafId = 0;
-        var decayRafId = 0;
-        var targets = fills.map(function () { return { fx: 50, fy: 50, fw: 0, fh: 0 }; });
+      canvas.addEventListener('pointermove', function (e) {
+        if (!inView) return;
+        if (e.pointerType && e.pointerType !== 'mouse') return;
+        stopDecay();
+        pendingEvent = e;
+        if (!moveRafId) moveRafId = requestAnimationFrame(applyFrame);
+      });
 
-        function applyFills() {
-          fillRafId = 0;
+      canvas.addEventListener('pointerleave', function () {
+        lastX = null;
+        lastY = null;
+
+        // Parallax returns to center smoothly via each layer's own CSS
+        // transition (see the depth-response rules) — just needs the
+        // signal set back to 0 here.
+        stage.style.setProperty('--nx', '0');
+        stage.style.setProperty('--ny', '0');
+
+        // Fill mask has no CSS transition on mask-size (custom
+        // properties inside a radial-gradient() argument don't
+        // transition), so it decays via a short rAF loop instead.
+        stopDecay();
+        var start = performance.now();
+        var startSizes = fills.map(function (el) {
+          return {
+            fw: parseFloat(el.style.getPropertyValue('--fw')) || 0,
+            fh: parseFloat(el.style.getPropertyValue('--fh')) || 0
+          };
+        });
+
+        function decay(now) {
+          var t = Math.min(1, (now - start) / FILL_DECAY_MS);
+          var k = 1 - t;
           fills.forEach(function (el, i) {
-            var t = targets[i];
-            el.style.setProperty('--fx', t.fx.toFixed(1) + 'px');
-            el.style.setProperty('--fy', t.fy.toFixed(1) + 'px');
-            el.style.setProperty('--fw', t.fw.toFixed(1) + 'px');
-            el.style.setProperty('--fh', t.fh.toFixed(1) + 'px');
+            el.style.setProperty('--fw', (startSizes[i].fw * k).toFixed(1) + 'px');
+            el.style.setProperty('--fh', (startSizes[i].fh * k).toFixed(1) + 'px');
           });
-        }
-
-        function stopDecay() {
-          if (decayRafId) {
-            cancelAnimationFrame(decayRafId);
+          if (t < 1) {
+            decayRafId = requestAnimationFrame(decay);
+          } else {
             decayRafId = 0;
           }
         }
-
-        bgtext.addEventListener('mousemove', function (e) {
-          if (!inView) return;
-          stopDecay();
-          var vx = lastX === null ? 0 : e.clientX - lastX;
-          var vy = lastY === null ? 0 : e.clientY - lastY;
-          lastX = e.clientX;
-          lastY = e.clientY;
-
-          fills.forEach(function (el, i) {
-            var rect = el.getBoundingClientRect();
-            targets[i].fx = e.clientX - rect.left;
-            targets[i].fy = e.clientY - rect.top;
-            targets[i].fw = FILL_BASE + Math.min(FILL_STRETCH_MAX, Math.abs(vx) * 3.2);
-            targets[i].fh = FILL_BASE + Math.min(FILL_STRETCH_MAX, Math.abs(vy) * 3.2);
-          });
-
-          if (!fillRafId) fillRafId = requestAnimationFrame(applyFills);
-        });
-
-        bgtext.addEventListener('mouseleave', function () {
-          lastX = null;
-          lastY = null;
-          stopDecay();
-          var start = performance.now();
-          var startSizes = targets.map(function (t) { return { fw: t.fw, fh: t.fh }; });
-
-          function decay(now) {
-            var t = Math.min(1, (now - start) / FILL_DECAY_MS);
-            var k = 1 - t;
-            targets.forEach(function (target, i) {
-              target.fw = startSizes[i].fw * k;
-              target.fh = startSizes[i].fh * k;
-            });
-            applyFills();
-            if (t < 1) {
-              decayRafId = requestAnimationFrame(decay);
-            } else {
-              decayRafId = 0;
-            }
-          }
-          decayRafId = requestAnimationFrame(decay);
-        });
-      }
+        decayRafId = requestAnimationFrame(decay);
+      });
 
       return;
     }

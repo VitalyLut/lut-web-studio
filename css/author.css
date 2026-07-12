@@ -141,16 +141,20 @@
   color: transparent;
   -webkit-text-stroke: 1px rgba(200, 255, 46, .16);
   text-stroke: 1px rgba(200, 255, 46, .16);
+  pointer-events: none;
 }
 
 /* Fill sits exactly over the outline, solid accent color, revealed
    only where the mask (cursor-follow on desktop, scroll-progress on
    mobile) is opaque — a local reveal of the letters themselves, not a
-   glow/spotlight shape around them. */
+   glow/spotlight shape around them. pointer-events:none so it (and
+   the outline above) never becomes the pointermove target itself —
+   that listener lives on .author__canvas now, see js/author.js. */
 .author__bgtext-fill {
   position: absolute;
   inset: 0;
   color: var(--color-accent);
+  pointer-events: none;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   /* Base (touch/no-hover): a hard-edged rising fill line driven by
@@ -198,6 +202,11 @@
   width: auto;
   object-fit: contain;
   object-position: bottom center;
+  /* Decorative w.r.t. pointer interaction — never intercepts the
+     canvas-level pointermove, so the cursor-fill effect on the
+     background typography keeps updating even while the pointer is
+     visually over the photo. */
+  pointer-events: none;
 }
 
 /* ===== Signature ===== */
@@ -250,40 +259,36 @@
   line-height: 1.4;
 }
 
-/* ===== Facts — left edge ===== */
-
-/* position:static (not absolute) so this wrapper doesn't itself
-   become the containing block its .author__fact children resolve
-   their percentage `top` against — that block needs to stay
-   .author__canvas. height:100% matters too: the depth-response rule
-   below applies `transform` to this element on hover-capable devices,
-   and a `transform` forces a new containing block for absolutely
-   positioned descendants *regardless* of `position: static` — without
-   an explicit height here matching the canvas, that switch would
-   silently collapse every fact's `top: N%` back to 0 the moment a
-   mouse is present, even though it renders correctly with no mouse. */
+/* ===== Facts — one compact list, not four independently-placed
+   items. The group itself is the only absolutely-positioned element;
+   .author__fact children are back in normal flow (flex column), so
+   there's no percentage-top-against-collapsed-container trap to
+   guard against here the way the old per-item layout needed. ===== */
 .author__facts {
-  position: static;
-  height: 100%;
-}
-
-.author__fact {
   position: absolute;
   left: 4%;
+  top: var(--author-facts-top, 40%);
   z-index: 3;
   display: flex;
   flex-direction: column;
+  gap: 22px;
+  width: 170px;
+}
+
+.author__fact {
+  position: static;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  width: 168px;
   opacity: 0;
   transform: scale(.98);
   transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise);
 }
 
-.author__fact:nth-child(1) { top: 22%; transition-delay: .68s; }
-.author__fact:nth-child(2) { top: 35%; transition-delay: .75s; }
-.author__fact:nth-child(3) { top: 66%; transition-delay: .82s; }
-.author__fact:nth-child(4) { top: 79%; transition-delay: .89s; }
+.author__fact:nth-child(1) { transition-delay: .68s; }
+.author__fact:nth-child(2) { transition-delay: .75s; }
+.author__fact:nth-child(3) { transition-delay: .82s; }
+.author__fact:nth-child(4) { transition-delay: .89s; }
 
 .author.is-active .author__fact {
   opacity: 1;
@@ -313,6 +318,9 @@
   inset: 0;
   z-index: 3;
   pointer-events: none;
+  --author-dir-top-upper: 24%;
+  --author-dir-top-lower: 42%;
+  --author-dir-gap: 16%;
 }
 
 .author__direction {
@@ -324,10 +332,16 @@
   transition: opacity .4s var(--ease-rise);
 }
 
-.author__direction[data-dir='0'] { top: 30%; left: 26%; transition-delay: .58s; }
-.author__direction[data-dir='2'] { top: 46%; left: 26%; transition-delay: .64s; }
-.author__direction[data-dir='1'] { top: 30%; left: 63%; transition-delay: .7s; }
-.author__direction[data-dir='3'] { top: 46%; left: 63%; transition-delay: .76s; }
+/* Coordinates as custom properties (set per-breakpoint on
+   .author__directions below) rather than four independent
+   left/top pairs — dir 0/1 and 2/3 are always a mirrored pair at the
+   same height, so tuning one number (--author-dir-gap) keeps both
+   sides symmetric automatically instead of needing two edits kept in
+   sync by hand. */
+.author__direction[data-dir='0'] { top: var(--author-dir-top-upper); left: calc(50% - var(--author-dir-gap)); transition-delay: .58s; }
+.author__direction[data-dir='2'] { top: var(--author-dir-top-lower); left: calc(50% - var(--author-dir-gap)); transition-delay: .64s; }
+.author__direction[data-dir='1'] { top: var(--author-dir-top-upper); left: calc(50% + var(--author-dir-gap)); transition-delay: .7s; }
+.author__direction[data-dir='3'] { top: var(--author-dir-top-lower); left: calc(50% + var(--author-dir-gap)); transition-delay: .76s; }
 
 .author.is-active .author__direction {
   opacity: 1;
@@ -356,7 +370,7 @@
 }
 
 .author.is-active .author__direction-line {
-  width: 22px;
+  width: 18px;
 }
 
 .author__direction-label {
@@ -376,7 +390,7 @@
    rendering/paragraph wrap count. */
 .author__lede {
   position: absolute;
-  left: 72%;
+  left: 76%;
   right: 4%;
   top: 22%;
   z-index: 3;
@@ -413,7 +427,7 @@
 
 .author__phrase {
   position: absolute;
-  left: 70%;
+  left: 74%;
   right: 4%;
   bottom: 5%;
   z-index: 3;
@@ -449,25 +463,48 @@
 }
 
 /* ============================================================
-   Depth-response — desktop/mouse only, four layers at different
-   depths, all driven by the same --dx/--dy signal from js/author.js.
-   The window frame and browser-bar are excluded entirely (never
-   receive a transform), so the chrome itself never moves.
+   Depth-response — desktop/mouse only. A single pointermove on
+   .author__canvas (js/author.js) drives one normalized signal,
+   --nx/--ny (-1..1across the stage), which every layer below reads at
+   its own amplitude — closer layers move less and eventually reverse
+   direction, standard parallax depth cueing. Left (facts) and right
+   (lede) groups use the *same magnitude*, opposite sign, so both
+   sides read as equally "alive" instead of one side dominating.
+   transition:transform gives the "return to 0 smoothly on pointer
+   leave" behavior for free, since js/author.js just resets --nx/--ny
+   to 0 on pointerleave rather than animating them itself. The window
+   frame and browser-bar are excluded entirely (never receive a
+   transform), so the chrome itself never moves.
    ============================================================ */
 @media (hover: hover) and (pointer: fine) {
   .author__bgtext {
-    transform: translateX(-50%) translate(calc(var(--dx, 0) * 1px), calc(var(--dy, 0) * 1px));
+    transition: opacity .8s var(--ease-rise), transform .3s ease;
+    transform: translateX(-50%) translate(calc(var(--nx, 0) * 8px), calc(var(--ny, 0) * 5px));
   }
 
-  .author__facts,
-  .author__lede,
+  .author__facts {
+    transition: transform .3s ease;
+    transform: translate(calc(var(--nx, 0) * 4px), calc(var(--ny, 0) * 2.5px));
+  }
+
+  .author__lede {
+    transition: transform .3s ease;
+    transform: translate(calc(var(--nx, 0) * -4px), calc(var(--ny, 0) * -2.5px));
+  }
+
   .author__directions {
-    transform: translate(calc(var(--dx, 0) * .5px), calc(var(--dy, 0) * .5px));
+    transition: transform .3s ease;
+    transform: translate(calc(var(--nx, 0) * 2.5px), calc(var(--ny, 0) * 1.75px));
   }
 
-  .author__phrase,
+  .author__phrase {
+    transition: opacity .5s var(--ease-rise), transform .3s ease;
+    transform: translate(calc(var(--nx, 0) * -2px), calc(var(--ny, 0) * -1px));
+  }
+
   .author__title-accent {
-    transform: translate(calc(var(--dx, 0) * -.3px), calc(var(--dy, 0) * -.3px));
+    transition: transform .3s ease;
+    transform: translate(calc(var(--nx, 0) * -2px), calc(var(--ny, 0) * -1px));
   }
 
   /* .author__signature and .author__visual both carry their own
@@ -481,11 +518,11 @@
      active, this is the ONLY rule setting transform on either
      element, so the depth offset applies correctly from then on. */
   .author.is-active .author__signature {
-    transform: translate(calc(var(--dx, 0) * -.3px), calc(var(--dy, 0) * -.3px));
+    transform: translate(calc(var(--nx, 0) * 1.75px), calc(var(--ny, 0) * 1px));
   }
 
   .author.is-active .author__visual {
-    transform: translateX(-50%) translate(calc(var(--dx, 0) * .15px), calc(var(--dy, 0) * .15px));
+    transform: translateX(-50%) translate(calc(var(--nx, 0) * .75px), calc(var(--ny, 0) * .5px));
   }
 }
 
@@ -512,7 +549,7 @@
   }
 
   .author__direction-line {
-    width: 22px;
+    width: 18px;
     transition: none;
   }
 
@@ -546,10 +583,9 @@
     font-size: 13px;
   }
 
-  .author__direction[data-dir='0'],
-  .author__direction[data-dir='2'] { left: 22%; }
-  .author__direction[data-dir='1'],
-  .author__direction[data-dir='3'] { left: 58%; }
+  .author__directions {
+    --author-dir-gap: 15%;
+  }
 
   .author.is-active .author__direction-line {
     width: 16px;
