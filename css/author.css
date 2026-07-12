@@ -1,25 +1,26 @@
 /* ============================================================
-   AUTHOR — editorial founder profile ("АВТОРСКИЙ ПРОФИЛЬ")
+   AUTHOR — founder profile inside a browser-window frame
    ============================================================
-   Full rebuild (previous two-column focus-mask version removed
-   entirely, no legacy selectors/keyframes carried over). Sits
-   between Trust (proof/process) and Configurator (format picker),
-   same as before: trust -> the person -> the decision.
+   Full rebuild of the previous free-floating poster layout: the
+   whole scene (background typography, portrait, facts, directions,
+   copy) now lives inside one .author__window, styled with the same
+   "browser chrome" recipe already used by Hero/Configurator/Journey
+   (border-radius: var(--radius-mockup), background: var(--color-surface-1),
+   border: var(--color-border-soft), box-shadow: var(--shadow-deep)) and
+   topped with the sitewide shared .browser-bar component (see
+   components.css) — reused verbatim, not reimplemented. No other
+   section defines a single shared "frame" class (each names its own:
+   .configurator__mock, .journey__mock, .trust__core...), so
+   .author__window follows that exact same established convention
+   rather than inventing a new shared component that would need
+   retrofitting into five other sections to be "reused" — the shared,
+   reusable part is the token set + .browser-bar, both used as-is.
 
-   Desktop (>=1024px) is a free-form poster composition — a single
-   .author__stage with every child position:absolute against
-   percentage anchors, not a grid. That's a deliberate departure
-   from the rest of the site's column layouts: this section is meant
-   to read as a poster, not another two-column card. Mobile collapses
-   to plain stacked flow in source order (badge -> title -> bgtext ->
-   portrait -> signature -> facts -> body copy -> phrase), which is
-   why the HTML is authored in that exact order — desktop repositions
-   via absolute placement, it never reorders.
-
-   Animation: portrait assembles from vertical clip-path segments
-   ("SBORKA"), triggered once via IntersectionObserver adding
-   .is-active (see js/author.js), same one-shot pattern as the rest
-   of the site's scroll reveals.
+   Portrait is bottom-anchored inside .author__canvas (object-position:
+   bottom center) so its lower edge and the canvas's lower edge are the
+   same line — the crop reads as intentional (cut off by the window's
+   own bottom edge) rather than an arbitrary crop floating over the
+   page background.
    ============================================================ */
 
 .author {
@@ -30,7 +31,7 @@
   overflow: hidden;
 }
 
-.author__stage {
+.author__container {
   position: relative;
   width: 100%;
   max-width: var(--container-max);
@@ -38,52 +39,83 @@
   padding: 0 var(--section-padding);
 }
 
-/* ============================================================
-   Mobile-first base — plain stacked flow. Desktop overrides
-   (position:absolute poster) live in the >=1024px block below.
-   ============================================================ */
+/* ===== Heading — outside the window, plain flow ===== */
 
-.author__badge {
+.author__heading {
+  max-width: 720px;
+  margin: 0 auto 28px;
+  text-align: center;
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(10px);
   transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
 }
 
-.author.is-active .author__badge {
+.author.is-active .author__heading {
   opacity: 1;
   transform: none;
 }
 
 .author__title {
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   font-family: var(--font-display);
   font-size: var(--fs-h2);
   line-height: var(--lh-heading);
   letter-spacing: var(--ls-heading);
   font-weight: 700;
   color: var(--color-text-primary-strong);
+}
+
+.author__title-accent {
+  color: var(--color-accent);
+}
+
+/* ===== Window shell — shared browser-chrome tokens ===== */
+
+.author__window {
+  position: relative;
+  border-radius: var(--radius-mockup);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-deep), inset 0 1px 0 rgba(255, 255, 255, .05);
+  overflow: hidden;
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .55s var(--ease-rise), transform .55s var(--ease-rise);
+  transform: translateY(14px);
+  transition: opacity .6s var(--ease-rise), transform .6s var(--ease-rise);
   transition-delay: .1s;
 }
 
-.author.is-active .author__title {
+.author.is-active .author__window {
   opacity: 1;
   transform: none;
 }
 
-/* Background outline typography — stroke-only via -webkit-text-stroke
-   (the standard technique for this look; Firefox without stroke
-   support just falls back to filled text at the same low opacity,
-   an acceptable degrade, not a blocker). Purely decorative. */
+/* .browser-bar itself is the shared sitewide component (components.css)
+   — only its content (the label) is section-specific. */
+.author__window .browser-bar__url {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.author__canvas {
+  position: relative;
+  height: clamp(700px, 74vh, 780px);
+  padding-top: 38px;
+  overflow: hidden;
+}
+
+/* ===== Background outline/fill typography ===== */
+
 .author__bgtext {
-  margin-top: 28px;
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
   text-align: center;
-  pointer-events: none;
+  z-index: 1;
   opacity: 0;
   transition: opacity .8s var(--ease-rise);
-  transition-delay: .05s;
+  transition-delay: .2s;
 }
 
 .author.is-active .author__bgtext {
@@ -91,62 +123,97 @@
 }
 
 .author__bgtext-line {
+  position: relative;
+  display: block;
+  line-height: .96;
+}
+
+.author__bgtext-outline,
+.author__bgtext-fill {
   display: block;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(48px, 16vw, 96px);
-  line-height: .96;
+  font-size: clamp(48px, 15vw, 88px);
   letter-spacing: .01em;
+}
+
+.author__bgtext-outline {
   color: transparent;
   -webkit-text-stroke: 1px rgba(200, 255, 46, .16);
   text-stroke: 1px rgba(200, 255, 46, .16);
 }
 
-.author__portrait {
-  position: relative;
-  margin: 8px auto 0;
-  height: clamp(320px, 60vh, 520px);
-  width: auto;
-  max-width: 88vw;
-  aspect-ratio: 1023 / 1537;
-}
-
-.author__portrait-seg {
+/* Fill sits exactly over the outline, solid accent color, revealed
+   only where the mask (cursor-follow on desktop, scroll-progress on
+   mobile) is opaque — a local reveal of the letters themselves, not a
+   glow/spotlight shape around them. */
+.author__bgtext-fill {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
+  color: var(--color-accent);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* Base (touch/no-hover): a hard-edged rising fill line driven by
+     --author-fill-progress (see js/author.js scroll handler) — same
+     stop position on both color stops on purpose, so it's a sharp
+     "waterline" rather than a soft gradient. */
+  -webkit-mask-image: linear-gradient(to top, #000 var(--author-fill-progress, 0%), transparent var(--author-fill-progress, 0%));
+  mask-image: linear-gradient(to top, #000 var(--author-fill-progress, 0%), transparent var(--author-fill-progress, 0%));
+}
+
+/* Desktop/mouse: overrides the mask with a small ellipse that tracks
+   the cursor (--fx/--fy/--fw/--fh set per mousemove frame in
+   js/author.js, decayed back to 0 on mouseleave) — a local reveal of
+   the letters themselves, not a glow shape around them. */
+@media (hover: hover) and (pointer: fine) {
+  .author__bgtext-fill {
+    -webkit-mask-image: radial-gradient(ellipse var(--fw, 0px) var(--fh, 0px) at var(--fx, 50%) var(--fy, 50%), #000 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse var(--fw, 0px) var(--fh, 0px) at var(--fx, 50%) var(--fy, 50%), #000 55%, transparent 100%);
+  }
+}
+
+/* ===== Portrait — single image, bottom-anchored ===== */
+
+/* Rises 14px and fades in as one piece — no segments, no split. */
+.author__visual {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  height: 94%;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity .9s var(--ease-rise), transform .9s var(--ease-rise);
+  transition-delay: .15s;
+}
+
+.author.is-active .author__visual {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.author__portrait-img {
   display: block;
-  transition: transform 1.1s var(--ease-rise);
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom center;
 }
 
-/* 3 mobile segments — even thirds. Desktop redefines these to 5
-   segments below. Small, varied initial offsets (translate only —
-   clip-path itself never animates, each segment always shows exactly
-   its own fixed slice). */
-.author__portrait-seg[data-seg='0'] { clip-path: inset(0 66.667% 0 0); transform: translate(-5px, -12px); }
-.author__portrait-seg[data-seg='1'] { clip-path: inset(0 33.333% 0 33.333%); transform: translate(6px, 14px); }
-.author__portrait-seg[data-seg='2'] { clip-path: inset(0 0 0 66.667%); transform: translate(-6px, -10px); }
-.author__portrait-seg[data-seg='3'],
-.author__portrait-seg[data-seg='4'] { display: none; }
-
-.author.is-active .author__portrait-seg {
-  transform: translate(0, 0);
-}
+/* ===== Signature ===== */
 
 .author__signature {
+  position: absolute;
+  left: 4%;
+  bottom: 5%;
+  z-index: 3;
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1px solid var(--color-border-faint);
   opacity: 0;
   transform: translateY(10px);
   transition: opacity .55s var(--ease-rise), transform .55s var(--ease-rise);
-  transition-delay: .55s;
+  transition-delay: .5s;
 }
 
 .author.is-active .author__signature {
@@ -159,7 +226,7 @@
   padding-left: 16px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 18px;
+  font-size: 17px;
   color: var(--color-text-primary-strong);
   white-space: nowrap;
 }
@@ -178,34 +245,45 @@
 }
 
 .author__signature-role {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-muted);
   line-height: 1.4;
 }
 
-/* Facts — free-standing value/label pairs, no card, no table. */
+/* ===== Facts — left edge ===== */
+
+/* position:static (not absolute) so this wrapper doesn't itself
+   become the containing block its .author__fact children resolve
+   their percentage `top` against — that block needs to stay
+   .author__canvas. height:100% matters too: the depth-response rule
+   below applies `transform` to this element on hover-capable devices,
+   and a `transform` forces a new containing block for absolutely
+   positioned descendants *regardless* of `position: static` — without
+   an explicit height here matching the canvas, that switch would
+   silently collapse every fact's `top: N%` back to 0 the moment a
+   mouse is present, even though it renders correctly with no mouse. */
 .author__facts {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px 16px;
-  margin-top: 26px;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-border-faint);
+  position: static;
+  height: 100%;
 }
 
 .author__fact {
+  position: absolute;
+  left: 4%;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 168px;
   opacity: 0;
   transform: scale(.98);
   transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise);
 }
 
-.author__fact:nth-child(1) { transition-delay: .75s; }
-.author__fact:nth-child(2) { transition-delay: .82s; }
-.author__fact:nth-child(3) { transition-delay: .89s; }
-.author__fact:nth-child(4) { transition-delay: .96s; }
+.author__fact:nth-child(1) { top: 22%; transition-delay: .68s; }
+.author__fact:nth-child(2) { top: 35%; transition-delay: .75s; }
+.author__fact:nth-child(3) { top: 66%; transition-delay: .82s; }
+.author__fact:nth-child(4) { top: 79%; transition-delay: .89s; }
 
 .author.is-active .author__fact {
   opacity: 1;
@@ -215,45 +293,49 @@
 .author__fact-value {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 18px;
+  font-size: 17px;
   color: var(--color-text-primary-strong);
   line-height: 1.2;
 }
 
 .author__fact-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: .04em;
   color: var(--color-text-dim);
   line-height: 1.4;
 }
 
-/* Direction labels — decorative on mobile (no room for connector
-   lines to mean anything at that width), shown as a plain inline
-   list instead. Desktop turns these into positioned connector-line
-   labels around the portrait; see the >=1024px block. */
+/* ===== Directions — symmetric pairs flanking the portrait ===== */
+
 .author__directions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 18px;
-  margin-top: 22px;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
 }
 
 .author__direction {
+  position: absolute;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   opacity: 0;
   transition: opacity .4s var(--ease-rise);
 }
 
-.author__direction:nth-child(1) { transition-delay: .62s; }
-.author__direction:nth-child(2) { transition-delay: .67s; }
-.author__direction:nth-child(3) { transition-delay: .72s; }
-.author__direction:nth-child(4) { transition-delay: .77s; }
+.author__direction[data-dir='0'] { top: 30%; left: 26%; transition-delay: .58s; }
+.author__direction[data-dir='2'] { top: 46%; left: 26%; transition-delay: .64s; }
+.author__direction[data-dir='1'] { top: 30%; left: 63%; transition-delay: .7s; }
+.author__direction[data-dir='3'] { top: 46%; left: 63%; transition-delay: .76s; }
 
 .author.is-active .author__direction {
   opacity: 1;
+}
+
+.author__direction[data-dir='0'],
+.author__direction[data-dir='2'] {
+  flex-direction: row-reverse;
 }
 
 .author__direction-dot {
@@ -265,39 +347,59 @@
 }
 
 .author__direction-line {
-  display: none;
+  display: block;
+  height: 1px;
+  width: 0;
+  background: var(--color-border-strong);
+  transition: width .45s var(--ease-rise);
+  transition-delay: .8s;
+}
+
+.author.is-active .author__direction-line {
+  width: 22px;
 }
 
 .author__direction-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: .06em;
   color: var(--color-text-dim-4);
+  white-space: nowrap;
 }
 
+/* ===== Body copy — right side ===== */
+
+/* left AND right both set (no width) — an explicit, hard boundary
+   that .author__direction[data-dir='1'/'3'] must stay clear of,
+   rather than a width that floats its left edge based on content and
+   can drift into the directions' territory depending on font
+   rendering/paragraph wrap count. */
 .author__lede {
-  margin-top: 24px;
-  max-width: none;
+  position: absolute;
+  left: 72%;
+  right: 4%;
+  top: 22%;
+  z-index: 3;
 }
 
 .author__lede p {
   margin: 0;
-  font-size: var(--fs-body);
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--color-text-muted);
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(10px);
   transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
 }
 
 .author__lede p + p {
-  margin-top: 13px;
+  margin-top: 11px;
 }
 
-.author__lede p:nth-child(1) { transition-delay: 1.05s; }
-.author__lede p:nth-child(2) { transition-delay: 1.16s; }
-.author__lede p:nth-child(3) { transition-delay: 1.27s; }
-.author__lede p:nth-child(4) { transition-delay: 1.38s; }
+.author__lede p:nth-child(1) { transition-delay: .86s; }
+.author__lede p:nth-child(2) { transition-delay: .95s; }
+.author__lede p:nth-child(3) { transition-delay: 1.04s; }
+.author__lede p:nth-child(4) { transition-delay: 1.13s; }
 
 .author.is-active .author__lede p {
   opacity: 1;
@@ -310,16 +412,18 @@
 }
 
 .author__phrase {
-  position: relative;
-  margin: 26px 0 0;
-  padding-left: 18px;
-  max-width: none;
-  font-size: 15px;
-  line-height: 1.55;
+  position: absolute;
+  left: 70%;
+  right: 4%;
+  bottom: 5%;
+  z-index: 3;
+  padding-left: 16px;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--color-text-dim-5);
   opacity: 0;
   transition: opacity .5s var(--ease-rise);
-  transition-delay: 1.55s;
+  transition-delay: 1.25s;
 }
 
 .author__phrase::before {
@@ -333,7 +437,7 @@
   transform: scaleY(0);
   transform-origin: top;
   transition: transform .5s var(--ease-rise);
-  transition-delay: 1.55s;
+  transition-delay: 1.25s;
 }
 
 .author.is-active .author__phrase {
@@ -345,24 +449,53 @@
 }
 
 /* ============================================================
-   Reduced motion — everything visible immediately, no segment
-   motion, no bgtext fade, no connector-line growth, no cursor
-   depth-response (that last one is gated in JS itself).
+   Depth-response — desktop/mouse only, four layers at different
+   depths, all driven by the same --dx/--dy signal from js/author.js.
+   The window frame and browser-bar are excluded entirely (never
+   receive a transform), so the chrome itself never moves.
    ============================================================ */
-@media (prefers-reduced-motion: reduce) {
-  /* !important: .author.is-active .author__portrait-seg (2 classes)
-     outranks the bare .author__portrait-seg selector below it, so
-     without !important the settle transition would still be able to
-     run. Same fix, same reasoning as trust.css's own reduced-motion
-     block and this file's own earlier version. */
-  .author__portrait-seg {
-    transform: translate(0, 0) !important;
-    transition: none !important;
+@media (hover: hover) and (pointer: fine) {
+  .author__bgtext {
+    transform: translateX(-50%) translate(calc(var(--dx, 0) * 1px), calc(var(--dy, 0) * 1px));
   }
 
-  .author__badge,
-  .author__title,
-  .author__bgtext,
+  .author__facts,
+  .author__lede,
+  .author__directions {
+    transform: translate(calc(var(--dx, 0) * .5px), calc(var(--dy, 0) * .5px));
+  }
+
+  .author__phrase,
+  .author__title-accent {
+    transform: translate(calc(var(--dx, 0) * -.3px), calc(var(--dy, 0) * -.3px));
+  }
+
+  /* .author__signature and .author__visual both carry their own
+     transform-based entrance offset in the base rules above
+     (translateY(10px) / translateY(14px)) — overriding the bare
+     selector here (equal specificity, later in the file) would beat
+     that base rule and cancel the entrance rise before .is-active
+     ever lands, regardless of scroll position. Scoping the
+     depth-response transform to the .is-active variant only avoids
+     that: the entrance transition still runs untouched, and once
+     active, this is the ONLY rule setting transform on either
+     element, so the depth offset applies correctly from then on. */
+  .author.is-active .author__signature {
+    transform: translate(calc(var(--dx, 0) * -.3px), calc(var(--dy, 0) * -.3px));
+  }
+
+  .author.is-active .author__visual {
+    transform: translateX(-50%) translate(calc(var(--dx, 0) * .15px), calc(var(--dy, 0) * .15px));
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .author__heading,
+  .author__window,
+  .author__visual,
   .author__signature,
   .author__fact,
   .author__direction,
@@ -377,260 +510,189 @@
     transform: scaleY(1);
     transition: none;
   }
+
+  .author__direction-line {
+    width: 22px;
+    transition: none;
+  }
+
+  .author__bgtext-fill {
+    -webkit-mask-image: none;
+    mask-image: none;
+    opacity: .55;
+  }
 }
 
 /* ============================================================
-   Desktop (>=1024px) — poster composition. Every .author__stage
-   child becomes position:absolute against percentage anchors; the
-   stage itself gets an explicit height so absolutely-positioned
-   children have something to anchor against (they don't otherwise
-   contribute to intrinsic height).
+   Responsive
    ============================================================ */
-@media (min-width: 1024px) {
-  .author {
-    padding: var(--section-gap) 0 var(--section-gap-large);
-  }
 
-  .author__stage {
-    height: clamp(780px, 90vh, 940px);
-  }
-
-  .author__badge,
-  .author__title,
-  .author__bgtext,
-  .author__portrait,
-  .author__signature,
+/* 1024-1279px: the same percentages resolve to noticeably fewer
+   actual pixels than at 1440px+, which was tight enough to clip
+   .author__lede against the window's own right edge and let the
+   right-side directions creep into its column. Both sides get pulled
+   in further, and the connector line is dropped short of even its
+   already-reduced 22px, to keep a hard, verified-empty gap between
+   the two regardless of paragraph wrap length. */
+@media (max-width: 1279px) {
   .author__lede,
   .author__phrase {
-    position: absolute;
+    left: 76%;
+    right: 3%;
   }
 
-  .author__badge {
-    top: 3%;
-    left: var(--section-padding);
-    z-index: 3;
+  .author__lede p,
+  .author__phrase {
+    font-size: 13px;
   }
 
-  .author__title {
-    top: 9%;
-    left: var(--section-padding);
-    width: 38%;
-    margin-top: 0;
-    z-index: 3;
+  .author__direction[data-dir='0'],
+  .author__direction[data-dir='2'] { left: 22%; }
+  .author__direction[data-dir='1'],
+  .author__direction[data-dir='3'] { left: 58%; }
+
+  .author.is-active .author__direction-line {
+    width: 16px;
+  }
+}
+
+/* Tablet / phone — window stays, canvas becomes a normal vertical
+   flow instead of an absolute-position poster. Source order already
+   matches the required mobile sequence: bgtext -> portrait ->
+   signature -> directions -> facts -> lede -> phrase. */
+@media (max-width: 1023px) {
+  .author {
+    padding: var(--section-gap-compact) 0 var(--section-gap);
+  }
+
+  .author__heading {
+    text-align: left;
+    margin-bottom: 20px;
+  }
+
+  .author__window .browser-bar {
+    height: 32px;
+  }
+
+  .author__window .browser-bar__dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .author__window .browser-bar__url {
+    font-size: 9px;
+    padding: 2px 9px;
+  }
+
+  .author__canvas {
+    height: auto;
+    padding: 32px 5% 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
   }
 
   .author__bgtext {
-    top: 4%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 96%;
-    margin-top: 0;
-    z-index: 1;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    order: 1;
   }
 
-  .author__bgtext-line {
-    font-size: clamp(90px, 11.5vw, 210px);
+  .author__bgtext-line { line-height: 1; }
+
+  .author__visual {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: translateY(14px);
+    height: clamp(300px, 56vh, 480px);
+    margin: -40px auto 0;
+    order: 2;
   }
 
-  .author__portrait {
-    top: 5%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin: 0;
-    height: 84%;
-    width: auto;
-    z-index: 2;
+  .author.is-active .author__visual {
+    transform: translateY(0);
   }
 
   .author__signature {
-    bottom: 4%;
-    left: var(--section-padding);
-    margin-top: 0;
-    z-index: 3;
+    position: relative;
+    left: auto;
+    bottom: auto;
+    order: 3;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border-faint);
   }
-
-  .author__facts {
-    display: block;
-    position: static;
-  }
-
-  .author__fact {
-    position: absolute;
-    left: var(--section-padding);
-    width: 190px;
-    z-index: 3;
-  }
-
-  .author__fact:nth-child(1) { top: 38%; }
-  .author__fact:nth-child(2) { top: 49%; }
-  .author__fact:nth-child(3) { top: 60%; }
-  .author__fact:nth-child(4) { top: 71%; }
 
   .author__directions {
-    display: block;
-    position: static;
+    position: relative;
+    inset: auto;
+    order: 4;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 10px;
   }
 
   .author__direction {
-    position: absolute;
-    gap: 8px;
-    z-index: 3;
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    flex-direction: row !important;
   }
 
   .author__direction-line {
-    display: block;
-    height: 1px;
-    background: var(--color-border-strong);
+    display: none;
   }
 
-  /* Left-side directions: dot near the portrait, line + label
-     running further left, away from center. Anchored with `left` at
-     the portrait's left edge so the dot (last in DOM, first visually
-     once reversed) lands there regardless of label length — anchoring
-     these with `right` instead would let box width vary the dot's
-     position unpredictably. */
-  .author__direction[data-dir='0'],
-  .author__direction[data-dir='2'] {
-    flex-direction: row-reverse;
+  .author__facts {
+    position: relative;
+    left: auto;
+    order: 5;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 16px;
   }
 
-  .author__direction[data-dir='0'] { top: 41%; left: 27%; }
-  .author__direction[data-dir='2'] { top: 59%; left: 25%; }
-
-  .author__direction[data-dir='0'] .author__direction-line,
-  .author__direction[data-dir='2'] .author__direction-line {
-    width: 0;
-    transition: width .45s var(--ease-rise);
-    transition-delay: .68s;
-  }
-
-  .author.is-active .author__direction[data-dir='0'] .author__direction-line,
-  .author.is-active .author__direction[data-dir='2'] .author__direction-line {
-    width: 46px;
-  }
-
-  /* Right-side directions: dot near the portrait's right edge, line
-     + label running further right. Anchored with `left` (not `right`)
-     for the same reason as above, and kept above .author__lede's own
-     top so the two never share a row. */
-  .author__direction[data-dir='1'] { top: 19%; left: 63%; }
-  .author__direction[data-dir='3'] { top: 26%; left: 61%; }
-
-  .author__direction[data-dir='1'] .author__direction-line,
-  .author__direction[data-dir='3'] .author__direction-line {
-    width: 0;
-    transition: width .45s var(--ease-rise);
-    transition-delay: .73s;
-  }
-
-  .author.is-active .author__direction[data-dir='1'] .author__direction-line,
-  .author.is-active .author__direction[data-dir='3'] .author__direction-line {
-    width: 46px;
+  .author__fact {
+    position: relative;
+    top: auto !important;
+    left: auto;
+    width: auto;
   }
 
   .author__lede {
-    top: 32%;
-    right: var(--section-padding);
-    width: 26%;
-    margin-top: 0;
-    z-index: 3;
-  }
-
-  .author__lede p {
-    font-size: 14.5px;
-    line-height: 1.5;
-  }
-
-  .author__lede p + p {
-    margin-top: 11px;
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    order: 6;
+    width: 100%;
+    min-width: 0;
   }
 
   .author__phrase {
-    bottom: 6%;
-    right: var(--section-padding);
-    width: 30%;
-    margin-top: 0;
-    z-index: 3;
-  }
-
-  /* 5 desktop segments — fifths, replacing the 3-segment mobile
-     defaults above. */
-  .author__portrait-seg[data-seg='0'] { clip-path: inset(0 80% 0 0); transform: translate(-6px, -14px); display: block; }
-  .author__portrait-seg[data-seg='1'] { clip-path: inset(0 60% 0 20%); transform: translate(5px, -9px); display: block; }
-  .author__portrait-seg[data-seg='2'] { clip-path: inset(0 40% 0 40%); transform: translate(-8px, 11px); display: block; }
-  .author__portrait-seg[data-seg='3'] { clip-path: inset(0 20% 0 60%); transform: translate(7px, 17px); display: block; }
-  .author__portrait-seg[data-seg='4'] { clip-path: inset(0 0 0 80%); transform: translate(-4px, -10px); display: block; }
-
-  /* Depth-response — desktop mouse only, positions set by js/author.js
-     via --dx/--dy (rAF-throttled). Background text and foreground
-     labels shift a few px in opposite directions; the portrait itself
-     never moves. */
-  .author__bgtext {
-    transform: translateX(-50%) translate(calc(var(--dx, 0) * 1px), calc(var(--dy, 0) * 1px));
-  }
-
-  .author__title,
-  .author__lede,
-  .author__phrase,
-  .author__signature {
-    transform: translate(calc(var(--dx, 0) * -.6px), calc(var(--dy, 0) * -.6px));
-  }
-
-  .author.is-active .author__title,
-  .author.is-active .author__signature {
-    transform: translate(calc(var(--dx, 0) * -.6px), calc(var(--dy, 0) * -.6px));
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    order: 7;
+    width: 100%;
+    min-width: 0;
   }
 }
 
-@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
-  .author__bgtext,
-  .author__title,
-  .author__lede,
-  .author__phrase,
-  .author__signature {
-    transform: translateX(-50%);
-  }
-
-  .author__title,
-  .author__lede,
-  .author__phrase,
-  .author__signature {
-    transform: none;
-  }
-
-  .author__direction-line {
-    width: 46px !important;
-    transition: none !important;
-  }
-}
-
-/* Narrower desktop range — the 38%-wide title column is fewer actual
-   pixels here than at 1440px+, so it wraps to an extra line unless
-   widened. Fact positions already carry enough top clearance (38%+)
-   to absorb that extra line regardless, but widening keeps the
-   heading itself closer to its intended 3-line shape. */
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .author__title {
-    width: 46%;
-    font-size: 32px;
-  }
-}
-
-@media (min-width: 1440px) {
-  .author__fact {
-    width: 210px;
-  }
-
-  .author__lede,
-  .author__phrase {
-    width: 25%;
-  }
-}
-
-/* Compact phone — facts already default to 2x2 above; drop to a
-   single column only where 2x2 genuinely feels tight. */
-@media (max-width: 389px) {
+@media (max-width: 599px) {
   .author__facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 389px) {
+  .author__facts,
+  .author__directions {
     grid-template-columns: 1fr;
   }
 }
