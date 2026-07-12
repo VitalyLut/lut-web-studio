@@ -135,40 +135,64 @@
   <!-- Preloader — homepage only (markup/CSS link/script live only in
        this file). Visible by default in CSS alone, so it covers the
        very first paint with no JS-load-order gap; js/preloader.js
-       just decides when to fade it out and unlock scroll. See
-       css/preloader.css for how the L->W->S liquid fill works. -->
+       drives the whole liquid-fill timeline via one rAF loop (valve
+       angle, stream stroke-dash, per-letter wave path) and decides
+       when to fade the overlay out. Faucet, valve, stream and all
+       three letters share ONE svg viewBox, so the stream and L's
+       center are defined in the same coordinate system and can never
+       drift apart at any viewport size — see css/preloader.css for
+       the responsive scene sizing and js/preloader.js for the liquid
+       mask/wave math. -->
   <div class="lwsload" data-preloader role="status" aria-live="polite">
     <div class="lwsload__grid" aria-hidden="true"></div>
-    <div class="lwsload__glow" aria-hidden="true"></div>
     <span class="lwsload__sr">Загрузка страницы LUT Web Studio</span>
-    <div class="lwsload__stage">
-      <div class="lwsload__word" aria-hidden="true">
-        <span class="lwsload__letter lwsload__letter--l">
-          <svg class="lwsload__faucet" viewBox="0 0 120 100" aria-hidden="true">
-            <path class="lwsload__faucet-pipe" d="M118 18 H62 V44" />
-            <path class="lwsload__faucet-pipe" d="M62 44 Q62 60 48 60 Q36 60 36 72" />
-            <g class="lwsload__valve">
-              <circle cx="62" cy="30" r="13" />
-              <line x1="62" y1="16" x2="62" y2="44" />
-              <line x1="48" y1="30" x2="76" y2="30" />
-              <line x1="52" y1="20" x2="72" y2="40" />
-              <line x1="52" y1="40" x2="72" y2="20" />
-              <circle class="lwsload__valve-hub" cx="62" cy="30" r="4" />
-            </g>
-          </svg>
-          <span class="lwsload__stream"></span>
-          <span class="lwsload__letter-outline">L</span>
-          <span class="lwsload__letter-fill">L</span>
-        </span>
-        <span class="lwsload__letter lwsload__letter--w">
-          <span class="lwsload__letter-outline">W</span>
-          <span class="lwsload__letter-fill">W</span>
-        </span>
-        <span class="lwsload__letter lwsload__letter--s">
-          <span class="lwsload__letter-outline">S</span>
-          <span class="lwsload__letter-fill">S</span>
-        </span>
-      </div>
+    <div class="lwsload__scene">
+      <div class="lwsload__glow" aria-hidden="true"></div>
+      <svg class="lwsload__svg" viewBox="0 0 1000 820" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <text id="lwsGlyphL" class="lwsload__glyph" x="66" y="692">L</text>
+          <text id="lwsGlyphW" class="lwsload__glyph" x="329" y="692">W</text>
+          <text id="lwsGlyphS" class="lwsload__glyph" x="711" y="692">S</text>
+          <clipPath id="lwsClipL"><use href="#lwsGlyphL"></use></clipPath>
+          <clipPath id="lwsClipW"><use href="#lwsGlyphW"></use></clipPath>
+          <clipPath id="lwsClipS"><use href="#lwsGlyphS"></use></clipPath>
+        </defs>
+
+        <!-- Faucet: pipe enters from the left, valve sits at the bend,
+             spout drops straight down into L's horizontal center. The
+             whole group's x placement is corrected at runtime
+             (js/preloader.js) once L's actual measured width/center is
+             known, via a single translateX on this <g> — so the spout
+             always lands exactly on L's center regardless of font
+             metrics, without touching any coordinate below. -->
+        <g class="lwsload__faucet-group" data-faucet-group>
+          <path class="lwsload__pipe" d="M14,140 H148 Q178,140 178,170 V270" />
+
+          <g class="lwsload__valve" data-valve>
+            <line class="lwsload__valve-stem" x1="148" y1="140" x2="148" y2="126" />
+            <circle class="lwsload__valve-ring" cx="148" cy="90" r="36" />
+            <line class="lwsload__valve-spoke" x1="148" y1="58" x2="148" y2="122" />
+            <line class="lwsload__valve-spoke" x1="116" y1="90" x2="180" y2="90" />
+            <line class="lwsload__valve-spoke" x1="125" y1="67" x2="171" y2="113" />
+            <line class="lwsload__valve-spoke" x1="125" y1="113" x2="171" y2="67" />
+            <circle class="lwsload__valve-hub" cx="148" cy="90" r="10" />
+          </g>
+
+          <line class="lwsload__stream" data-stream x1="178" y1="270" x2="178" y2="340" />
+        </g>
+
+        <!-- Empty letters — always visible, defines the "container". -->
+        <use href="#lwsGlyphL" class="lwsload__letter-outline"></use>
+        <use href="#lwsGlyphW" class="lwsload__letter-outline"></use>
+        <use href="#lwsGlyphS" class="lwsload__letter-outline"></use>
+
+        <!-- Liquid — one wavy-top path per letter, clipped to that
+             letter's own glyph shape, level/wave computed per frame
+             in js/preloader.js. -->
+        <g clip-path="url(#lwsClipL)"><path class="lwsload__liquid" data-liquid="L"></path></g>
+        <g clip-path="url(#lwsClipW)"><path class="lwsload__liquid" data-liquid="W"></path></g>
+        <g clip-path="url(#lwsClipS)"><path class="lwsload__liquid" data-liquid="S"></path></g>
+      </svg>
     </div>
   </div>
   <noscript>

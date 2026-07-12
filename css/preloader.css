@@ -1,34 +1,36 @@
 /* ============================================================
    PRELOADER — "LWS liquid fill". Homepage only: the markup/link/
-   script only exist in index.html, so there is nothing to gate at
-   runtime on other pages (privacy/cookies/consent/404) — the
-   component itself still no-ops safely if [data-preloader] is
-   absent (see js/preloader.js), in case it's ever reused elsewhere.
+   script only exist in index.html — the component itself still
+   no-ops safely if [data-preloader] is absent (see js/preloader.js),
+   in case it's ever reused elsewhere.
 
    Visible state is the CSS default (no JS required to show it — the
    very first paint already covers the screen), so there's no
    flash-of-unstyled-content risk from JS load order. js/preloader.js
    only decides WHEN to add .is-done (fade out + remove).
 
-   Letters are plain HTML text (not SVG glyphs) in two stacked
-   layers — .lwsload__letter-outline (dim, defines the box) and
-   .lwsload__letter-fill (accent-colored, clipped) — the same
-   two-layer trick the Author section's cursor-fill already uses
-   (css/author.css .author__bgtext-outline/-fill), just with a
-   clip-path polygon instead of a mask-image gradient, since the
-   fill boundary here needs a wavy edge, not a straight one. Polygon
-   point lists interpolate natively between keyframes (same vertex
-   count throughout), so the whole rise+wobble+settle is one CSS
-   animation per letter — no @property registration, no JS tweening.
+   Faucet, valve, stream and all three letters live inside ONE inline
+   svg (viewBox 0 0 1000 620) — a single coordinate system, so the
+   stream and L's own center can never drift apart at any viewport
+   size the way two independently-positioned elements could. Letters
+   are real <text> in the site's own display font (already the first
+   thing preloaded in <head>), clipPath'd per letter so each one's
+   liquid can rise independently. The liquid's wavy top edge is a
+   quadratic-bezier path computed every frame by js/preloader.js
+   (level + amplitude + a slow per-letter sine sway) — no CSS
+   keyframes for the fill itself, since a smooth continuously-rising
+   wave needs a continuously-recomputed shape, not a handful of fixed
+   keyframe stops (the previous clip-path:polygon() version's
+   angular, jump-cut look came from exactly that — a handful of
+   discrete polygon stops with straight edges between them).
    ============================================================ */
 
 .lwsload {
   position: fixed;
   inset: 0;
   z-index: var(--z-preloader);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   background: var(--color-bg);
   overflow: hidden;
   transition: opacity .5s var(--ease-rise), visibility 0s linear 0s;
@@ -41,12 +43,6 @@
     linear-gradient(rgba(255, 255, 255, .03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
   background-size: 34px 34px;
-}
-
-.lwsload__glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(50% 42% at 50% 56%, var(--glow-accent-soft), transparent 72%);
 }
 
 .lwsload__sr {
@@ -68,200 +64,159 @@
   pointer-events: none;
 }
 
-/* ===== Stage / word ===== */
-
-.lwsload__stage {
+/* ===== Scene — one wrapper, geometric + visual center of the
+   viewport. Sized from BOTH vw and vh (via the aspect-ratio-derived
+   vh term) so it never balloons on ultra-wide monitors and never
+   overflows a short/landscape viewport — see the mobile override for
+   the different vw/vh mix mobile needs (letters much closer to full
+   width there, per spec). ===== */
+.lwsload__scene {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: clamp(460px, min(64vw, 70.7vh), 1040px);
+  aspect-ratio: 1000 / 820;
 }
 
-.lwsload__word {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  margin-top: 2.35em;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(72px, 16vw, 220px);
-  line-height: 1;
-  letter-spacing: -.01em;
+.lwsload__glow {
+  position: absolute;
+  inset: -18%;
+  background: radial-gradient(52% 46% at 50% 54%, var(--glow-accent-soft), transparent 72%);
+  pointer-events: none;
 }
 
-.lwsload__letter {
+.lwsload__svg {
   position: relative;
-  display: inline-block;
-}
-
-.lwsload__letter-outline,
-.lwsload__letter-fill {
   display: block;
-}
-
-.lwsload__letter-outline {
-  color: var(--color-surface-3);
-  -webkit-text-stroke: 1px var(--color-border-strong);
-  text-stroke: 1px var(--color-border-strong);
-}
-
-/* Per-letter fill — same @keyframes for all three, only the timing
-   (delay/duration) differs, so L -> W -> S reads as one continuous
-   pour gathering pace rather than three separate effects. */
-.lwsload__letter-fill {
-  position: absolute;
-  inset: 0;
-  color: var(--color-accent);
-  clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 75% 100%, 50% 100%, 25% 100%, 0% 100%);
-  animation: lwsFill var(--fill-duration, .8s) var(--ease-rise) var(--fill-delay, 0s) both;
-}
-
-.lwsload__letter--l .lwsload__letter-fill { --fill-delay: .15s; --fill-duration: .8s; }
-.lwsload__letter--w .lwsload__letter-fill { --fill-delay: .95s; --fill-duration: .65s; }
-.lwsload__letter--s .lwsload__letter-fill { --fill-delay: 1.6s; --fill-duration: .55s; }
-
-@keyframes lwsFill {
-  0%   { clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 75% 100%, 50% 100%, 25% 100%, 0% 100%); }
-  30%  { clip-path: polygon(0% 100%, 100% 100%, 100% 70%,  75% 64%,  50% 74%,  25% 62%,  0% 68%); }
-  55%  { clip-path: polygon(0% 100%, 100% 100%, 100% 40%,  75% 32%,  50% 45%,  25% 30%,  0% 38%); }
-  75%  { clip-path: polygon(0% 100%, 100% 100%, 100% 16%,  75% 10%,  50% 20%,  25% 9%,   0% 14%); }
-  90%  { clip-path: polygon(0% 100%, 100% 100%, 100% 2%,   75% 5%,   50% 0%,   25% 4%,   0% 1%); }
-  100% { clip-path: polygon(0% 100%, 100% 100%, 100% 0%,   75% 0%,   50% 0%,   25% 0%,   0% 0%); }
-}
-
-/* ===== Faucet + valve + stream — anchored to the L letter only, so
-   the spout always lines up with L's horizontal center regardless of
-   viewport/font metrics, without any JS position math. ===== */
-
-.lwsload__letter--l {
-  z-index: 1;
-}
-
-/* translateX(-30%) puts the spout tip (x=36 of the 0-120 viewBox,
-   i.e. 30% in) exactly on the SVG's own left edge anchor (left:50% of
-   the L letter) — so the spout always lines up with L's horizontal
-   center regardless of viewport width or font metrics. */
-.lwsload__faucet {
-  position: absolute;
-  left: 50%;
-  bottom: 100%;
-  transform: translateX(-30%);
-  width: 1.65em;
-  height: 1.2em;
+  width: 100%;
+  height: 100%;
   overflow: visible;
 }
 
-.lwsload__faucet-pipe {
-  fill: none;
-  stroke: var(--color-border-strong);
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* ===== Letters ===== */
+
+.lwsload__glyph {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 360px;
+  letter-spacing: -.01em;
 }
 
+.lwsload__letter-outline {
+  fill: var(--color-surface-3);
+  stroke: var(--color-border-strong);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+}
+
+.lwsload__liquid {
+  fill: var(--color-accent);
+  filter: drop-shadow(0 0 7px rgba(200, 255, 46, .3));
+}
+
+/* ===== Faucet — thick, graphite body with accent details only where
+   the spec calls for them (valve hub, liquid signal inside the
+   stream), not a fully acid-green fixture. vector-effect keeps every
+   stroke a constant SCREEN pixel width regardless of how much the
+   scene itself is scaled (mobile scene can be ~4x smaller than
+   desktop — a stroke sized in viewBox units would either vanish on
+   mobile or look bloated on desktop). ===== */
+.lwsload__pipe {
+  fill: none;
+  stroke: var(--color-border-strong);
+  stroke-width: 13px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* fill-box + center: rotate() below always pivots around the wheel's
+   own middle, regardless of the ancestor .lwsload__faucet-group's own
+   translateX (used to align the whole assembly to L's measured
+   center) — the two transforms are independent, applied in separate
+   local coordinate spaces. */
 .lwsload__valve {
   transform-box: fill-box;
   transform-origin: center;
-  animation: lwsValveTurn .65s var(--ease-pop) forwards;
 }
 
-.lwsload__valve circle:first-child {
+.lwsload__valve-stem {
+  stroke: var(--color-border-strong);
+  stroke-width: 10px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.lwsload__valve-ring {
   fill: var(--color-surface-2);
   stroke: var(--color-border-strong);
-  stroke-width: 4;
+  stroke-width: 7px;
+  vector-effect: non-scaling-stroke;
 }
 
-.lwsload__valve line {
+.lwsload__valve-spoke {
   stroke: var(--color-border-strong);
-  stroke-width: 4;
+  stroke-width: 5px;
   stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
 .lwsload__valve-hub {
   fill: var(--color-accent);
 }
 
-@keyframes lwsValveTurn {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(165deg); }
-}
-
 .lwsload__stream {
-  position: absolute;
-  left: 50%;
-  bottom: 100%;
-  transform: translateX(-50%);
-  width: 5px;
-  height: .55em;
-  border-radius: 3px;
-  background: linear-gradient(to bottom, transparent, var(--color-accent) 25%, var(--color-accent) 85%, transparent);
-  opacity: 0;
-  transform-origin: top center;
-  animation: lwsStream 1.05s var(--ease-rise) .3s forwards;
+  stroke: var(--color-accent);
+  stroke-width: 14px;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 5px rgba(200, 255, 46, .35));
+  transition: stroke-width .35s var(--ease-rise);
 }
 
-@keyframes lwsStream {
-  0%   { opacity: 0; transform: translateX(-50%) scaleY(0); }
-  18%  { opacity: 1; transform: translateX(-50%) scaleY(1); }
-  72%  { opacity: 1; transform: translateX(-50%) scaleY(1); }
-  100% { opacity: 0; transform: translateX(-50%) scaleY(1); }
+.lwsload__stream.is-ending {
+  stroke-width: 0;
 }
 
 /* ============================================================
-   Reduced motion — same end state (LWS fully filled, then gone),
-   far less motion getting there: no wave wobble (flat rise only,
-   fewer/no intermediate stops), no continuous valve flourish (one
-   short turn), shorter overall timeline. js/preloader.js also uses a
-   shorter minimum display time in this mode.
+   Responsive — the scene's own clamp()/aspect-ratio already scales
+   the whole composition fluidly; only the stroke widths (kept
+   constant-px via vector-effect above) need a distinct, thinner set
+   of values on narrow viewports, per spec's separate mobile ranges.
    ============================================================ */
-@media (prefers-reduced-motion: reduce) {
-  .lwsload,
-  .lwsload.is-done {
-    transition: opacity .25s linear, visibility 0s linear;
+@media (max-width: 1023px) {
+  .lwsload__scene {
+    width: clamp(260px, min(98vw, 90vh), 640px);
   }
 
-  .lwsload__letter-fill {
-    animation-name: lwsFillFlat;
-    animation-timing-function: ease-out;
+  .lwsload__pipe {
+    stroke-width: 9px;
   }
 
-  .lwsload__letter--l .lwsload__letter-fill { --fill-delay: .05s; --fill-duration: .35s; }
-  .lwsload__letter--w .lwsload__letter-fill { --fill-delay: .4s;  --fill-duration: .3s; }
-  .lwsload__letter--s .lwsload__letter-fill { --fill-delay: .7s;  --fill-duration: .3s; }
-
-  @keyframes lwsFillFlat {
-    0%   { clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 75% 100%, 50% 100%, 25% 100%, 0% 100%); }
-    100% { clip-path: polygon(0% 100%, 100% 100%, 100% 0%,   75% 0%,   50% 0%,   25% 0%,   0% 0%); }
+  .lwsload__valve-stem {
+    stroke-width: 7px;
   }
 
-  .lwsload__valve {
-    animation-duration: .2s;
+  .lwsload__valve-ring {
+    stroke-width: 5px;
+  }
+
+  .lwsload__valve-spoke {
+    stroke-width: 3.5px;
   }
 
   .lwsload__stream {
-    animation-duration: .55s;
-    animation-delay: .05s;
+    stroke-width: 9px;
   }
 
-  @keyframes lwsStream {
-    0%   { opacity: 0; transform: translateX(-50%) scaleY(0); }
-    25%  { opacity: 1; transform: translateX(-50%) scaleY(1); }
-    75%  { opacity: 1; transform: translateX(-50%) scaleY(1); }
-    100% { opacity: 0; transform: translateX(-50%) scaleY(1); }
+  .lwsload__letter-outline {
+    stroke-width: 1.5px;
   }
 }
 
-/* ============================================================
-   Responsive — the clamp() on .lwsload__word already scales the
-   whole composition (letters, faucet, stream, valve are all sized in
-   em relative to it) fluidly with viewport width, so no breakpoint
-   overrides are needed for the composition itself. Only the reserved
-   top margin (room for the faucet) is trimmed slightly at narrow
-   widths, where the clamp's vw term pulls the letter size down faster
-   than the faucet needs.
-   ============================================================ */
-@media (max-width: 389px) {
-  .lwsload__word {
-    margin-top: 2.1em;
+/* Very short viewports (landscape phones) — the vh term in the scene
+   width formula already shrinks the whole scene to fit, this only
+   trims the outer glow's bleed so it doesn't clip harshly. */
+@media (max-height: 420px) {
+  .lwsload__glow {
+    inset: -8%;
   }
 }
