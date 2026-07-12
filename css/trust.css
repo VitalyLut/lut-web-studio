@@ -8,9 +8,9 @@
   font-family: var(--font-body);
   /* Large top: Portfolio contributes zero bottom space of its own (fixed
      118vh scene), so Trust alone has to create the breathing room after
-     the orbit. Standard bottom: Configurator's own top padding is
-     already substantial (its min-height:100vh centering isn't touched
-     here), so the combined gap stays generous without doubling up. */
+     the orbit. Standard bottom: Author (the next section) uses a
+     standard top of its own, so the combined gap reads as a normal
+     section-to-section beat rather than a jump cut. */
   padding: var(--section-gap-large) 0 var(--section-gap);
   overflow: hidden;
 }

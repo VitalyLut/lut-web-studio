@@ -1,0 +1,478 @@
+/* ============================================================
+   AUTHOR — founder profile
+   ============================================================
+   Static section (no scroll-jacking), same general approach as
+   Trust/Configurator/Brief/FAQ. Sits between Trust (proof/process)
+   and Configurator (format picker) on purpose: trust -> the person
+   behind it -> the decision. Not in the header/footer nav by request
+   — reachable only by scrolling.
+
+   Animation is a one-shot "focus pull" on the portrait (see the
+   authorFocusReveal/authorRingTravel keyframes below), plus a staggered
+   text reveal — both triggered once by js/author.js adding .is-active
+   via IntersectionObserver. Deliberately NOT reusing the sitewide
+   .reveal/.reveal-up utility: that one includes a blur(4px) step,
+   and a blurred reveal is exactly the effect already used elsewhere
+   sitewide that this section's spec asks to avoid repeating.
+   ============================================================ */
+
+.author {
+  position: relative;
+  background: transparent;
+  font-family: var(--font-body);
+  /* Standard top: Trust's own bottom padding is already standard, so
+     the combined gap reads as a normal section-to-section beat, not a
+     jump cut. Large bottom: the actual "narrative pause" the spec asks
+     for belongs here, right before Configurator's own substantial
+     top clearance — two generous gaps stacked deliberately, marking
+     the shift from "the person" back into "pick a format" mode. */
+  padding: var(--section-gap) 0 var(--section-gap-large);
+  overflow: hidden;
+}
+
+.author__container {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--section-padding);
+  z-index: 3;
+}
+
+.author__grid {
+  display: grid;
+  grid-template-columns: 44fr 56fr;
+  gap: 64px;
+  align-items: start;
+}
+
+/* ===== LEFT — portrait + signature ===== */
+
+.author__photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1023 / 1537;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-elevated);
+  transition: border-color .4s ease, box-shadow .4s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .author__photo:hover {
+    border-color: var(--color-accent-border);
+    box-shadow: var(--shadow-elevated), 0 0 46px var(--glow-accent-soft);
+  }
+}
+
+.author__photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  display: block;
+}
+
+/* Bottom layer — always present, permanently dimmed. This is the "dark
+   studio scene" read before focus lands; once the top layer's clip-path
+   opens over it, this is simply covered, never separately animated. */
+.author__photo-img--base {
+  filter: brightness(.52) contrast(.95) saturate(.9);
+}
+
+/* Top layer — full-quality duplicate of the same file (same src, so
+   the browser serves it from cache — no second network request; see
+   the QA report for the measured confirmation). Revealed by an
+   expanding clip-path circle rather than a mask-image gradient: circle()
+   keyframes interpolate reliably cross-browser, where animating
+   gradient stops directly does not without @property support. */
+.author__photo-img--focus {
+  clip-path: circle(2% at 50% 74%);
+}
+
+.author.is-active .author__photo-img--focus {
+  animation: authorFocusReveal 1.4s var(--ease-rise) forwards;
+}
+
+/* Circle center travels from the L logo (~74% down the frame) up to
+   the face (~38-46%), growing the whole way, ending past 100% radius
+   so the corners of a non-circular frame are fully cleared. */
+@keyframes authorFocusReveal {
+  0%   { clip-path: circle(2% at 50% 74%); }
+  32%  { clip-path: circle(11% at 50% 73%); }
+  55%  { clip-path: circle(30% at 50% 46%); }
+  80%  { clip-path: circle(62% at 50% 38%); }
+  100% { clip-path: circle(120% at 50% 45%); }
+}
+
+/* Thin focus-ring — appears at the logo, rides the same path as the
+   clip-path center, fades out once the portrait is fully open. Purely
+   decorative, transform/opacity only. */
+.author__photo-ring {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  left: 50%;
+  top: 74%;
+  margin: -32px 0 0 -32px;
+  border: 1px solid var(--color-accent);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 0 20px var(--glow-accent);
+}
+
+.author.is-active .author__photo-ring {
+  animation: authorRingTravel 1.4s var(--ease-rise) forwards;
+}
+
+@keyframes authorRingTravel {
+  0%   { opacity: 0; top: 74%; transform: scale(.6); }
+  18%  { opacity: 1; top: 74%; transform: scale(1); }
+  55%  { opacity: 1; top: 46%; transform: scale(1.6); }
+  78%  { opacity: 0; top: 38%; transform: scale(2.4); }
+  100% { opacity: 0; top: 38%; transform: scale(2.4); }
+}
+
+/* Cursor glow — desktop/mouse only, position set by js/author.js via
+   --gx/--gy custom properties (rAF-throttled). Same plus-lighter blend
+   already used by the sitewide cursor halo (base.css .site-halo), not
+   a new technique. */
+.author__photo-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(240px circle at var(--gx, 50%) var(--gy, 50%), rgba(200, 255, 46, .18), transparent 62%);
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .author__photo:hover .author__photo-glow {
+    opacity: 1;
+  }
+}
+
+.author__signature {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-border-faint);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .55s var(--ease-rise), transform .55s var(--ease-rise);
+  transition-delay: .95s;
+}
+
+.author.is-active .author__signature {
+  opacity: 1;
+  transform: none;
+}
+
+.author__signature-name {
+  position: relative;
+  padding-left: 16px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-text-primary-strong);
+  white-space: nowrap;
+}
+
+.author__signature-name::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+.author__signature-role {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* ===== RIGHT — badge / title / copy / facts / phrase ===== */
+
+.author__badge {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .5s var(--ease-rise), transform .5s var(--ease-rise);
+  transition-delay: .15s;
+}
+
+.author.is-active .author__badge {
+  opacity: 1;
+  transform: none;
+}
+
+.author__title {
+  margin: 20px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  font-weight: 700;
+  color: var(--color-text-primary-strong);
+}
+
+.author__title-line {
+  display: block;
+  overflow: hidden;
+}
+
+.author__title-line-in {
+  display: block;
+  transform: translateY(105%);
+  transition: transform .65s var(--ease-rise);
+}
+
+.author__title-line:nth-child(1) .author__title-line-in { transition-delay: .32s; }
+.author__title-line:nth-child(2) .author__title-line-in { transition-delay: .44s; }
+.author__title-line:nth-child(3) .author__title-line-in { transition-delay: .56s; }
+
+.author.is-active .author__title-line-in {
+  transform: none;
+}
+
+.author__lede {
+  margin-top: 22px;
+  max-width: 58ch;
+}
+
+.author__lede p {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity .55s var(--ease-rise), transform .55s var(--ease-rise);
+}
+
+.author__lede p + p {
+  margin-top: 14px;
+}
+
+.author__lede p:nth-child(1) { transition-delay: .68s; }
+.author__lede p:nth-child(2) { transition-delay: .82s; }
+.author__lede p:nth-child(3) { transition-delay: .96s; }
+.author__lede p:nth-child(4) { transition-delay: 1.1s; }
+
+.author.is-active .author__lede p {
+  opacity: 1;
+  transform: none;
+}
+
+.author__lede p:first-child {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* Facts — a plain row of value/label pairs, not another dashboard tile.
+   One thin top rule per item is the only framing; no card background,
+   no border box, no nested panels. */
+.author__facts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--color-border-faint);
+}
+
+.author__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: scale(.98);
+  transition: opacity .4s var(--ease-rise), transform .4s var(--ease-rise);
+}
+
+.author__fact:nth-child(1) { transition-delay: 1.28s; }
+.author__fact:nth-child(2) { transition-delay: 1.36s; }
+.author__fact:nth-child(3) { transition-delay: 1.44s; }
+.author__fact:nth-child(4) { transition-delay: 1.52s; }
+
+.author.is-active .author__fact {
+  opacity: 1;
+  transform: none;
+}
+
+.author__fact-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--color-text-primary-strong);
+  line-height: 1.2;
+}
+
+.author__fact-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--color-text-dim);
+  line-height: 1.4;
+}
+
+.author__phrase {
+  position: relative;
+  margin: 30px 0 0;
+  padding-left: 18px;
+  max-width: 52ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-text-dim-5);
+  opacity: 0;
+  transition: opacity .5s var(--ease-rise);
+  transition-delay: 1.65s;
+}
+
+.author__phrase::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+  width: 2px;
+  background: var(--color-accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform .5s var(--ease-rise);
+  transition-delay: 1.65s;
+}
+
+.author.is-active .author__phrase {
+  opacity: 1;
+}
+
+.author.is-active .author__phrase::before {
+  transform: scaleY(1);
+}
+
+/* ============================================================
+   Reduced motion — portrait fully sharp immediately, no clip-path
+   motion, no ring, no cursor glow reaction, text visible with no
+   stagger. Matches the sitewide .reveal/.reveal-up override pattern.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* !important here, not elsewhere in this file: .author.is-active
+     .author__photo-img--focus (2 classes) outranks the bare
+     .author__photo-img--focus below it, so without !important the
+     authorFocusReveal animation would still win and keep running once
+     JS adds .is-active — same fix already used for this exact
+     specificity conflict in trust.css's own reduced-motion block. */
+  .author__photo-img--focus {
+    clip-path: none !important;
+    animation: none !important;
+  }
+
+  .author__photo-ring {
+    display: none;
+  }
+
+  .author__badge,
+  .author__title-line-in,
+  .author__signature,
+  .author__lede p,
+  .author__fact,
+  .author__phrase {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .author__phrase::before {
+    transform: scaleY(1);
+    transition: none;
+  }
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 1199px) {
+  .author__grid {
+    gap: 44px;
+  }
+
+  .author__facts {
+    gap: 16px;
+  }
+}
+
+/* Portrait tablet / phone — collapse to a single flex column and
+   reorder to the owner's spec: badge -> title -> photo -> signature
+   -> body copy -> facts -> phrase. .author__visual/.author__content
+   go display:contents so their children reorder directly as siblings
+   inside .author__grid, same technique Trust already uses one level
+   up (see trust.css's own max-width:1023px reorder block). */
+@media (max-width: 1023px) {
+  .author {
+    padding: var(--section-gap-compact) 0 var(--section-gap);
+  }
+
+  .author__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .author__visual,
+  .author__content {
+    display: contents;
+  }
+
+  .author__badge { order: 1; }
+  .author__title { order: 2; margin-top: 16px; }
+  .author__photo { order: 3; margin-top: 26px; width: 100%; height: 52vh; aspect-ratio: auto; }
+  .author__signature { order: 4; }
+  .author__lede { order: 5; }
+  .author__facts { order: 6; }
+  .author__phrase { order: 7; }
+}
+
+@media (max-width: 767px) {
+  .author__facts {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 22px;
+  }
+}
+
+@media (max-width: 599px) {
+  .author {
+    padding: var(--section-gap-compact) 0 var(--section-gap);
+  }
+
+  .author__photo { height: 46vh; }
+
+  .author__title { font-size: clamp(24px, 6vw + 6px, 32px); }
+
+  .author__lede { max-width: none; }
+
+  .author__phrase { max-width: none; }
+}
+
+@media (max-width: 389px) {
+  .author__facts {
+    grid-template-columns: 1fr;
+    row-gap: 16px;
+  }
+
+  .author__photo { height: 44vh; }
+}
