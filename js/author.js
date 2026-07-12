@@ -1,5 +1,6 @@
 (function () {
-  var FOCUS_THRESHOLD = 0.32;
+  var REVEAL_THRESHOLD = 0.3;
+  var MAX_DEPTH_PX = 3;
 
   function initAuthor() {
     var section = document.querySelector('[data-author]');
@@ -7,10 +8,11 @@
 
     var reduceMotion = window.LwsUtil.reduceMotion();
 
-    // One-shot trigger: adds .is-active, which both the clip-path
-    // portrait reveal and the staggered text transitions key off of
-    // (see css/author.css). unobserve() after firing rules out any
-    // repeat run on a later scroll back into view.
+    // One-shot trigger: adds .is-active, which the portrait segment
+    // settle, the bgtext/label reveals and their staggered
+    // transition-delays all key off of (see css/author.css).
+    // unobserve() after firing rules out a repeat run on a later
+    // scroll back into view.
     if (reduceMotion || !('IntersectionObserver' in window)) {
       section.classList.add('is-active');
     } else {
@@ -21,21 +23,18 @@
           revealIo.unobserve(section);
           break;
         }
-      }, { threshold: FOCUS_THRESHOLD });
+      }, { threshold: REVEAL_THRESHOLD });
       revealIo.observe(section);
     }
 
-    // Cursor glow — desktop/mouse only. Reduced motion and touch both
-    // skip this entirely (touch has no hover to react to anyway).
+    // Depth-response — desktop/mouse only. Reduced motion and touch
+    // both skip this entirely.
     if (reduceMotion || window.LwsUtil.isTouch()) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-    var photo = section.querySelector('[data-author-photo]');
-    if (!photo) return;
+    var stage = section.querySelector('[data-author-stage]');
+    if (!stage) return;
 
-    // Mirrors the section's own IntersectionObserver rather than
-    // reusing it, since this one needs to keep reporting in/out on
-    // every crossing (not unobserve after the first hit) to gate the
-    // mousemove listener while the section is off-screen.
     var inView = false;
     if ('IntersectionObserver' in window) {
       var visIo = new IntersectionObserver(function (entries) {
@@ -46,22 +45,30 @@
       inView = true;
     }
 
-    var pendingX = 50;
-    var pendingY = 50;
-    var glowRafId = 0;
+    var pendingDx = 0;
+    var pendingDy = 0;
+    var depthRafId = 0;
 
-    function applyGlow() {
-      glowRafId = 0;
-      photo.style.setProperty('--gx', pendingX.toFixed(1) + '%');
-      photo.style.setProperty('--gy', pendingY.toFixed(1) + '%');
+    function applyDepth() {
+      depthRafId = 0;
+      stage.style.setProperty('--dx', pendingDx.toFixed(2));
+      stage.style.setProperty('--dy', pendingDy.toFixed(2));
     }
 
-    photo.addEventListener('mousemove', function (e) {
+    stage.addEventListener('mousemove', function (e) {
       if (!inView) return;
-      var rect = photo.getBoundingClientRect();
-      pendingX = ((e.clientX - rect.left) / rect.width) * 100;
-      pendingY = ((e.clientY - rect.top) / rect.height) * 100;
-      if (!glowRafId) glowRafId = requestAnimationFrame(applyGlow);
+      var rect = stage.getBoundingClientRect();
+      var px = (e.clientX - rect.left) / rect.width - 0.5;
+      var py = (e.clientY - rect.top) / rect.height - 0.5;
+      pendingDx = px * 2 * MAX_DEPTH_PX;
+      pendingDy = py * 2 * MAX_DEPTH_PX;
+      if (!depthRafId) depthRafId = requestAnimationFrame(applyDepth);
+    });
+
+    stage.addEventListener('mouseleave', function () {
+      pendingDx = 0;
+      pendingDy = 0;
+      if (!depthRafId) depthRafId = requestAnimationFrame(applyDepth);
     });
   }
 
