@@ -316,12 +316,18 @@
   transform: translateY(0);
 }
 
-/* ---- Menu — portrait tablet / phone ----
-   Desktop centers 7 links + footer vertically because they always fit
-   the viewport. Below 1024px that stops being true (7 links at 34px
-   each + footer can exceed a phone's height), so the menu switches to
-   a top-anchored, internally-scrollable flow instead of clipping. */
-@media (max-width: 1023px) {
+/* ---- Menu — portrait tablet / phone, and any short viewport ----
+   Desktop centers 9 links + footer vertically, which only looks right
+   when the viewport is tall enough to hold that whole block below the
+   header — narrow phones aren't the only case that fails this: a wide
+   but short laptop browser window (~1440x900 and shorter is common)
+   has plenty of width but not enough height, so the vertically
+   centered block starts above the header and overlaps the logo and
+   the "MENU" label, which never move (the label is pinned just below
+   the header; centering doesn't know about it). Below either
+   threshold the menu switches to the same top-anchored, internally
+   -scrollable flow instead of centering into an overlap. */
+@media (max-width: 1023px), (max-height: 1023px) {
   .menu {
     padding: calc(64px + var(--safe-top)) max(var(--section-padding), var(--safe-right)) calc(28px + var(--safe-bottom)) max(var(--section-padding), var(--safe-left));
     justify-content: flex-start;
