@@ -203,11 +203,15 @@
             <ellipse class="lwsload__nozzle-hole" cx="123" cy="296" rx="10" ry="4" />
           </g>
 
-          <!-- y2 is corrected at runtime to reach L's actual visible
-               ink (not just its padded bounding box — see
+          <!-- y1 sits at the nozzle-hole's own lower edge (hole is
+               cy=296 ry=4, so 300) with a flush (butt, not round) cap
+               so the water visibly starts inside the dark hole itself
+               instead of the rounded cap bulging up past it into the
+               collar. y2 is corrected at runtime to reach L's actual
+               visible ink (not just its padded bounding box — see
                L_INK_TOP_FRACTION in js/preloader.js) so there is no
                empty gap between the stream and the letter. -->
-          <line class="lwsload__stream" data-stream x1="123" y1="296" x2="123" y2="440" />
+          <line class="lwsload__stream" data-stream x1="123" y1="300" x2="123" y2="440" />
         </g>
 
         <!-- Empty letters — always visible, defines the "container". -->

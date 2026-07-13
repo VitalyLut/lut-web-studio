@@ -200,7 +200,12 @@
 .lwsload__stream {
   stroke: var(--color-accent);
   stroke-width: 18px;
-  stroke-linecap: round;
+  /* butt, not round: a round cap's bulge (half the stroke width, in
+     constant screen px via vector-effect below) would stick up past
+     the nozzle hole into the collar, making the water look like it
+     starts above the hole instead of inside it. A flush cap starts
+     exactly at y1, which is set to the hole's own lower edge. */
+  stroke-linecap: butt;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 0 4px rgba(200, 255, 46, .3));
   transition: stroke-width .35s var(--ease-rise);

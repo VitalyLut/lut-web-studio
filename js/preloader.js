@@ -157,6 +157,16 @@
     // space above it.
     var L_INK_TOP_FRACTION = 0.23;
 
+    // Same padding problem at the bottom: bbox.y + bbox.height reaches
+    // well past the glyph's actual visible base (font metrics reserve
+    // descender room even though "L" has none). Pixel-measured the
+    // same way: real ink ends at ~81.75% of the bbox height. Used as
+    // the stream's "flow just started" target instead of the padded
+    // bbox bottom — without this, the very first moments of the pour
+    // (before L's own fill has caught up) drew the stream running
+    // through the glyph and past its visible bottom edge.
+    var L_INK_BOTTOM_FRACTION = 0.8175;
+
     var letterIds = ['L', 'W', 'S'];
     var glyphEls = {};
     letterIds.forEach(function (id) { glyphEls[id] = svg.querySelector('#lwsGlyph' + id); });
@@ -187,7 +197,7 @@
     // filled this is exactly where its liquid surface sits, so the
     // stream comes to rest touching it with zero gap.
     var lInkTopY = letters[0].bbox.y + letters[0].bbox.height * L_INK_TOP_FRACTION;
-    var lBottomY = letters[0].bbox.y + letters[0].bbox.height;
+    var lInkBottomY = letters[0].bbox.y + letters[0].bbox.height * L_INK_BOTTOM_FRACTION;
 
     // Ring center as authored in the markup — the pivot for the SVG
     // native rotate(angle cx cy) transform below. Using literal
@@ -229,12 +239,15 @@
       // surface the whole time (not a fixed target) — so the falling
       // water and the rising liquid always meet with no gap, and the
       // visible falling length naturally shortens as L fills, exactly
-      // like water closing the distance to a rising surface. Once L is
-      // full (and for the rest of the timeline, through W/S filling
-      // elsewhere) the surface term is pinned at lInkTopY, so the
-      // stream just rests there.
+      // like water closing the distance to a rising surface. lLevelP
+      // is already clamped to [0,1] by windowProgress/easeInOutCubic,
+      // so this interpolation never needs to be clamped again — at 0
+      // (flow just started) it targets the glyph's real ink bottom,
+      // at 1 (L full, and for the rest of the timeline through W/S
+      // filling elsewhere) it rests at the real ink top, zero gap
+      // either way.
       var lLevelP = easeInOutCubic(windowProgress(t, letters[0].window));
-      var lSurfaceY = Math.max(lBottomY - lLevelP * letters[0].bbox.height, lInkTopY);
+      var lSurfaceY = lInkBottomY - lLevelP * (lInkBottomY - lInkTopY);
       var streamP = windowProgress(t, profile.stream);
       var streamY2 = streamY1 + streamP * (lSurfaceY - streamY1);
       streamEl.setAttribute('y2', streamY2.toFixed(1));
