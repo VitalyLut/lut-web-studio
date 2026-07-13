@@ -109,11 +109,12 @@
     var valveEl = svg.querySelector('[data-valve]');
     var streamEl = svg.querySelector('[data-stream]');
     var faucetGroup = svg.querySelector('[data-faucet-group]');
-    var streamLen = Math.abs(
-      parseFloat(streamEl.getAttribute('y2')) - parseFloat(streamEl.getAttribute('y1'))
-    );
-    streamEl.style.strokeDasharray = streamLen;
-    streamEl.style.strokeDashoffset = streamLen;
+    // Fixed nozzle-mouth end; the other end (y2) is recomputed every
+    // frame below to always sit exactly on L's *current* rising liquid
+    // surface — not a static target — so there is never a gap between
+    // where the stream ends and where the liquid actually is, at any
+    // point during the fill (see the y2 update in frame()).
+    var streamY1 = parseFloat(streamEl.getAttribute('y1'));
 
     // ---- Layout: the <text> glyphs are placed at rough starting x
     // positions in the markup, but real glyph widths depend on actual
@@ -146,6 +147,16 @@
     // "L", not a stand-in guess.
     var L_STROKE_CENTER_FRACTION = 0.294;
 
+    // getBBox() on the L glyph includes the font's own metric padding
+    // above the tallest visible ink — real cap-height starts well
+    // below bbox.y. Pixel-measured off the rendered glyph (row-by-row
+    // color-difference-from-background scan): visible ink begins at
+    // ~23% into the bbox's own height. The stream's lower end targets
+    // this real ink line, not the padded bbox top, so it lands exactly
+    // on the glyph's visible edge instead of stopping short in blank
+    // space above it.
+    var L_INK_TOP_FRACTION = 0.23;
+
     var letterIds = ['L', 'W', 'S'];
     var glyphEls = {};
     letterIds.forEach(function (id) { glyphEls[id] = svg.querySelector('#lwsGlyph' + id); });
@@ -170,6 +181,13 @@
 
     var lStrokeCenterX = letters[0].bbox.x + letters[0].bbox.width * L_STROKE_CENTER_FRACTION;
     faucetGroup.style.transform = 'translateX(' + (lStrokeCenterX - FAUCET_DESIGN_CENTER_X).toFixed(1) + 'px)';
+
+    // Highest point the stream's end will ever need to reach: L's real
+    // visible ink top (see L_INK_TOP_FRACTION above). Once L is fully
+    // filled this is exactly where its liquid surface sits, so the
+    // stream comes to rest touching it with zero gap.
+    var lInkTopY = letters[0].bbox.y + letters[0].bbox.height * L_INK_TOP_FRACTION;
+    var lBottomY = letters[0].bbox.y + letters[0].bbox.height;
 
     // Ring center as authored in the markup — the pivot for the SVG
     // native rotate(angle cx cy) transform below. Using literal
@@ -206,10 +224,20 @@
       var angle = eased * profile.valveAngle;
       valveEl.setAttribute('transform', 'rotate(' + angle.toFixed(2) + ' ' + VALVE_CX + ' ' + VALVE_CY + ')');
 
-      // Stream: draws in (dash reveal) once the valve is most of the
-      // way open, then thins to nothing right at the very end.
+      // Stream: grows down from the nozzle once the valve is most of
+      // the way open, its lower end tracking L's *current* liquid
+      // surface the whole time (not a fixed target) — so the falling
+      // water and the rising liquid always meet with no gap, and the
+      // visible falling length naturally shortens as L fills, exactly
+      // like water closing the distance to a rising surface. Once L is
+      // full (and for the rest of the timeline, through W/S filling
+      // elsewhere) the surface term is pinned at lInkTopY, so the
+      // stream just rests there.
+      var lLevelP = easeInOutCubic(windowProgress(t, letters[0].window));
+      var lSurfaceY = Math.max(lBottomY - lLevelP * letters[0].bbox.height, lInkTopY);
       var streamP = windowProgress(t, profile.stream);
-      streamEl.style.strokeDashoffset = (streamLen * (1 - streamP)).toFixed(1);
+      var streamY2 = streamY1 + streamP * (lSurfaceY - streamY1);
+      streamEl.setAttribute('y2', streamY2.toFixed(1));
       if (t >= profile.streamEndThin[0]) {
         streamEl.classList.add('is-ending');
       }
